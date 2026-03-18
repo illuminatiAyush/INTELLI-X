@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
-import { Zap, Twitter, Linkedin, Instagram, Youtube, Mail, Phone } from 'lucide-react'
+import { Twitter, Linkedin, Instagram, Youtube, Mail, Phone } from 'lucide-react'
 
 const footerLinks = {
   Product: ['Features', 'Dashboard', 'AI Engine', 'Analytics', 'Pricing', 'Changelog'],
@@ -26,10 +26,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-5">
-              <div className="relative w-9 h-9">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl" />
-                <Zap className="absolute inset-0 m-auto w-5 h-5 text-white" />
-              </div>
+              <img src="/intellix-icon.svg" alt="IntelliX Logo" className="w-9 h-9" />
               <span className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 Intelli<span className="text-gradient">X</span>
               </span>

@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
-import { Eye, EyeOff, Zap, ArrowRight, Mail, Lock } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { Eye, EyeOff, ArrowRight, Mail, Lock, Sun, Moon } from 'lucide-react'
 import ParticleBackground from '../animations/ParticleBackground'
 import { supabase } from '../lib/supabase'
 
 const LoginPage = () => {
-  const { isDark } = useTheme()
+  const { isDark, toggleTheme } = useTheme()
+  const { role, user } = useAuth()
   const navigate = useNavigate()
 
   const [form, setForm] = useState({ email: '', password: '' })
@@ -15,6 +17,14 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  // Navigate only when both login is submitted and role is loaded
+  useEffect(() => {
+    if (submitted && role && user) {
+      console.log('LoginPage: Login successful and role loaded, navigating to dashboard...')
+      navigate('/dashboard')
+    }
+  }, [submitted, role, user, navigate])
 
   const validate = () => {
     const e = {}
@@ -44,28 +54,33 @@ const LoginPage = () => {
       })
 
       if (error) {
-        setErrors({ email: error.message }) // Show supabase error near email
+        setErrors({ email: error.message }) 
         setLoading(false)
         return
       }
 
       setSubmitted(true)
-      setTimeout(() => navigate('/dashboard'), 1800)
+      
+      // Safety: If navigation doesn't happen in 10s (e.g. role hang), reset loading
+      setTimeout(() => {
+        if (loading) {
+          console.warn('Login: Redirection timeout hit.')
+          setLoading(false)
+        }
+      }, 10000)
+
     } catch (err) {
+      console.error('Login error:', err)
       setErrors({ email: 'An unexpected error occurred' })
       setLoading(false)
     }
   }
 
-  const bg = isDark ? 'bg-[#0B0B0F]' : 'bg-gradient-to-br from-indigo-50 via-white to-purple-50'
-  const cardBg = isDark
-    ? 'bg-white/3 border-white/8 backdrop-blur-2xl'
-    : 'bg-white/80 border-gray-200 shadow-2xl backdrop-blur-xl'
-  const inputBg = isDark
-    ? 'bg-white/5 border-white/10 text-white placeholder-gray-600 focus:border-purple-500/50 focus:bg-white/8'
-    : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-purple-400 focus:bg-white'
-  const labelColor = isDark ? 'text-gray-400' : 'text-gray-600'
-  const headingColor = isDark ? 'text-white' : 'text-gray-900'
+  const bg = 'bg-[var(--bg-app)]'
+  const cardBg = 'bg-[var(--bg-surface)] border-[var(--border-subtle)]'
+  const inputBg = 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:border-[var(--color-purple)]'
+  const labelColor = 'text-[var(--text-secondary)]'
+  const headingColor = 'text-[var(--text-primary)]'
 
   return (
     <div className={`min-h-screen flex items-center justify-center relative overflow-hidden ${bg}`}>
@@ -78,6 +93,24 @@ const LoginPage = () => {
         </>
       )}
 
+      {/* Theme Toggle */}
+      <div className="fixed top-8 right-8 z-50">
+        <button
+          onClick={toggleTheme}
+          className="relative flex items-center justify-between gap-3 p-1.5 bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 group overflow-hidden"
+          aria-label="Toggle theme"
+        >
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all bg-[var(--color-purple)]/10 text-[var(--color-purple)]">
+            {isDark ? <Moon className="w-4 h-4 fill-current" /> : <Sun className="w-4 h-4" />}
+            <span className="text-[10px] font-bold uppercase tracking-widest">{isDark ? 'Dark' : 'Light'}</span>
+          </div>
+          <div className="pr-3 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-purple)]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+        </button>
+      </div>
+
       <div className="relative z-10 w-full max-w-md px-6 py-12">
         {/* Logo */}
         <motion.div
@@ -87,10 +120,7 @@ const LoginPage = () => {
           className="text-center mb-10"
         >
           <Link to="/" className="inline-flex items-center gap-2 group mb-6">
-            <div className="relative w-10 h-10">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl opacity-90 group-hover:opacity-100 transition-opacity" />
-              <Zap className="absolute inset-0 m-auto w-5 h-5 text-white" />
-            </div>
+            <img src="/intellix-icon.svg" alt="IntelliX Logo" className="w-10 h-10" />
             <span className={`text-2xl font-bold ${headingColor}`}>
               Intelli<span className="text-gradient">X</span>
             </span>

@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import ParticleBackground from '../animations/ParticleBackground'
-import { Play, ArrowRight, TrendingUp, Users, BookOpen, DollarSign, Zap } from 'lucide-react'
+import { Play, ArrowRight, TrendingUp, Users, BookOpen, DollarSign } from 'lucide-react'
 
 const FloatingCard = ({ children, className, delay = 0, animClass = 'animate-float-1' }) => (
   <motion.div
@@ -174,8 +174,8 @@ const Hero = () => {
                   <p className={`text-xs font-medium mb-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Live Dashboard</p>
                   <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>IntelliX OS</p>
                 </div>
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                  <img src="/intellix-icon.svg" alt="IntelliX Logo" className="w-8 h-8" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">

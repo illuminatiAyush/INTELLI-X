@@ -4,40 +4,59 @@
 
 @layer base {
   :root {
-    --bg-primary: #0B0B0F;
-    --color-purple: #BF5FFF;
-    --color-blue: #0066FF;
-    --color-cyan: #00F5FF;
+    /* Primary Colors */
+    --color-purple: #9333ea;
+    --color-blue: #3b82f6;
+    --color-cyan: #06b6d4;
+    
+    /* Semantic Tokens - Dark (Default) */
+    --bg-app: #09090b;
+    --bg-surface: #121214;
+    --bg-card: rgba(24, 24, 27, 0.4);
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.12);
+  }
+
+  .light-mode {
+    --bg-app: #ffffff;
+    --bg-surface: #fafafa;
+    --bg-card: #ffffff;
+    --text-primary: #09090b;
+    --text-secondary: #71717a;
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-strong: rgba(0, 0, 0, 0.12);
   }
 
   body {
-    background-color: #0B0B0F;
-    color: #ffffff;
+    background-color: var(--bg-app);
+    color: var(--text-primary);
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .light body {
-    background-color: #f8f9ff;
-    color: #0B0B0F;
+  * {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   }
 }
 
 @layer components {
   .glass-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--bg-card);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-subtle);
     border-radius: 20px;
   }
 
   .glass-card-light {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--bg-surface);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-subtle);
     border-radius: 20px;
-    color: #0B0B0F;
+    color: var(--text-primary);
   }
 
   .neon-text {
@@ -209,7 +228,16 @@
   animation: blink 1s ease-in-out infinite;
 }
 
-/* Chart glow */
-canvas {
-  filter: drop-shadow(0 0 8px rgba(191, 95, 255, 0.3));
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-purple), var(--color-blue));
+  border-radius: 3px;
 }

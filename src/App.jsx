@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -13,9 +13,25 @@ import CTA from './components/CTA'
 import AIChatbot from './components/AIChatbot'
 import Footer from './components/Footer'
 import LoginPage from './pages/LoginPage'
-import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+
+import DashboardLayout from './components/dashboard/DashboardLayout'
+import DashboardHome from './pages/dashboard/DashboardHome'
+import InstitutesPage from './pages/dashboard/InstitutesPage'
+import TeachersPage from './pages/dashboard/TeachersPage'
+import StudentsPage from './pages/dashboard/StudentsPage'
+import BatchesPage from './pages/dashboard/BatchesPage'
+import AttendancePage from './pages/dashboard/AttendancePage'
+import TestsPage from './pages/dashboard/TestsPage'
+import ResultsPage from './pages/dashboard/ResultsPage'
+import LeaderboardPage from './pages/dashboard/LeaderboardPage'
+import MaterialsPage from './pages/dashboard/MaterialsPage'
+import AnalyticsPage from './pages/dashboard/AnalyticsPage'
+import SubscriptionsPage from './pages/dashboard/SubscriptionsPage'
+import SettingsPage from './pages/dashboard/SettingsPage'
+import LogsPage from './pages/dashboard/LogsPage'
+import ProfilePage from './pages/dashboard/ProfilePage'
 
 const HomePage = () => (
   <>
@@ -37,20 +53,6 @@ const HomePage = () => (
 )
 
 const AppContent = () => {
-  const { isDark } = useTheme()
-
-  if (typeof document !== 'undefined') {
-    if (isDark) {
-      document.documentElement.classList.add('dark')
-      document.documentElement.classList.remove('light-mode')
-      document.documentElement.style.backgroundColor = '#0B0B0F'
-    } else {
-      document.documentElement.classList.remove('dark')
-      document.documentElement.classList.add('light-mode')
-      document.documentElement.style.backgroundColor = '#f8f9ff'
-    }
-  }
-
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
@@ -59,10 +61,28 @@ const AppContent = () => {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <DashboardLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<DashboardHome />} />
+        <Route path="institutes" element={<InstitutesPage />} />
+        <Route path="teachers" element={<TeachersPage />} />
+        <Route path="students" element={<StudentsPage />} />
+        <Route path="batches" element={<BatchesPage />} />
+        <Route path="attendance" element={<AttendancePage />} />
+        <Route path="tests" element={<TestsPage />} />
+        <Route path="results" element={<ResultsPage />} />
+        <Route path="leaderboard" element={<LeaderboardPage />} />
+        <Route path="materials" element={<MaterialsPage />} />
+        <Route path="analytics" element={<AnalyticsPage />} />
+        <Route path="subscriptions" element={<SubscriptionsPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+        <Route path="logs" element={<LogsPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+      </Route>
+      {/* Fallback route - unknown routes go to index or login */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
