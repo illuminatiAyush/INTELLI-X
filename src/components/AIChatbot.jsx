@@ -1,30 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
-import { MessageSquare, X, Send, Bot, User } from 'lucide-react'
-
-const conversations = [
-  {
-    id: 1,
-    question: 'How many students were absent today?',
-    answer: 'Today 18 students were absent. 5 of them have been absent more than 3 times this week — Rahul Sharma, Priya Kale, Ankit More, Sneha Raj, and Ravi Tiwari. I\'ve scheduled automated follow-up calls to their parents. 🎯',
-  },
-  {
-    id: 2,
-    question: 'Show me this month\'s fee collection status.',
-    answer: 'This month\'s fee collection is at 94.2% (₹12.8L collected out of ₹13.6L). 73 students have pending fees. 28 reminders were sent via WhatsApp today. 6 students have partial payments — I recommend a direct call for these cases. 💰',
-  },
-  {
-    id: 3,
-    question: 'Which students are at risk of dropping out?',
-    answer: 'AI analysis shows 4 students at high dropout risk: Amit Sharma (attendance 52%, fees pending), Divya Patel (3 consecutive fails), Karan Singh (disengaged since last month), Ritu Gupta (parent complaints). Recommend intervention today. 🚨',
-  },
-  {
-    id: 4,
-    question: 'What\'s our revenue compared to last month?',
-    answer: 'Revenue this month: ₹14.2 Lakhs — up 8% vs last month (₹13.1L). Top revenue batches: JEE Advanced (₹4.8L), NEET Batch-A (₹3.9L), Class 10 Board (₹2.6L). On track to hit ₹16L target by month end. 📈',
-  },
-]
+import { X, Send, Bot, User } from 'lucide-react'
 
 const quickQuestions = [
   'Absent students today?',
@@ -47,7 +24,7 @@ const AIChatbot = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const sendMessage = (text) => {
+  const sendMessageToAI = async (text) => {
     const q = text || input.trim()
     if (!q) return
 
@@ -55,21 +32,22 @@ const AIChatbot = () => {
     setInput('')
     setIsTyping(true)
 
-    // Find best matching response
-    let response = conversations.find(c =>
-      q.toLowerCase().includes('absent') ? c.id === 1 :
-        q.toLowerCase().includes('fee') ? c.id === 2 :
-          q.toLowerCase().includes('risk') || q.toLowerCase().includes('dropout') ? c.id === 3 :
-            q.toLowerCase().includes('revenue') ? c.id === 4 : false
-    )
-
-    setTimeout(() => {
-      setIsTyping(false)
+    try {
+      const { sendMessage } = await import('../services/aiService')
+      const response = await sendMessage(q, messages)
+      
       setMessages(prev => [...prev, {
         role: 'ai',
-        text: response?.answer || 'Great question! I\'m analyzing your institute data right now... Based on current trends, I recommend checking the detailed analytics dashboard for the most accurate insights. Want me to pull up specific metrics? 📊'
+        text: response
       }])
-    }, 1500)
+    } catch {
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        text: 'Sorry, I am having trouble connecting to my servers right now. Please verify your API key or try again later. ⚠️'
+      }])
+    } finally {
+      setIsTyping(false)
+    }
   }
 
   const panelBg = isDark
@@ -198,7 +176,7 @@ const AIChatbot = () => {
               {quickQuestions.map((q) => (
                 <button
                   key={q}
-                  onClick={() => sendMessage(q)}
+                  onClick={() => sendMessageToAI(q)}
                   className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
                     isDark
                       ? 'bg-white/5 border border-white/10 text-gray-400 hover:bg-purple-500/20 hover:text-purple-300 hover:border-purple-500/30'
@@ -216,7 +194,7 @@ const AIChatbot = () => {
                 type="text"
                 value={input}
                 onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && sendMessage()}
+                onKeyDown={e => e.key === 'Enter' && sendMessageToAI()}
                 placeholder="Ask anything about your institute..."
                 className={`flex-1 text-xs px-3 py-2.5 rounded-xl outline-none transition-all ${
                   isDark
@@ -227,7 +205,7 @@ const AIChatbot = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => sendMessage()}
+                onClick={() => sendMessageToAI()}
                 className="w-9 h-9 glow-button rounded-xl flex items-center justify-center flex-shrink-0"
               >
                 <Send className="w-4 h-4 text-white" />

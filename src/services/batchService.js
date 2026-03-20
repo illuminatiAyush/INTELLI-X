@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 export const getBatches = async () => {
   const { data, error } = await supabase
     .from('batches')
-    .select('*, teachers(name)')
+    .select('*, profiles!batches_teacher_id_fkey(first_name, last_name)')
     .order('created_at', { ascending: false })
   if (error) throw error
   return data
@@ -12,7 +12,7 @@ export const getBatches = async () => {
 export const getBatchById = async (id) => {
   const { data, error } = await supabase
     .from('batches')
-    .select('*, teachers(name)')
+    .select('*, profiles!batches_teacher_id_fkey(first_name, last_name)')
     .eq('id', id)
     .single()
   if (error) throw error

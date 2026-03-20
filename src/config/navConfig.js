@@ -46,6 +46,7 @@ const navConfig = {
   ],
   student: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck },
     { label: 'Results', path: '/dashboard/results', icon: BarChart3 },
     { label: 'Leaderboard', path: '/dashboard/leaderboard', icon: Trophy },
     { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
