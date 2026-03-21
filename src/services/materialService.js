@@ -33,6 +33,33 @@ export const uploadMaterial = async (file, batchId, title, userId) => {
     .select()
     .single()
   if (error) throw error
+
+  // Notify all students in this batch
+  if (data && batchId) {
+    try {
+      const { data: batchStudents } = await supabase
+        .from('batch_students')
+        .select('student_id, students(profile_id)')
+        .eq('batch_id', batchId)
+
+      if (batchStudents && batchStudents.length > 0) {
+        const notifications = batchStudents
+          .filter(bs => bs.students?.profile_id)
+          .map(bs => ({
+            user_id: bs.students.profile_id,
+            title: 'New Material Uploaded',
+            message: `New study material "${title}" is available for your class.`,
+          }))
+          
+        if (notifications.length > 0) {
+          await supabase.from('notifications').insert(notifications)
+        }
+      }
+    } catch (notifyError) {
+      console.error('Failed to send material notifications:', notifyError)
+    }
+  }
+
   return data
 }
 

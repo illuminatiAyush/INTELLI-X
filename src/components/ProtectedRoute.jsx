@@ -1,8 +1,9 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import PendingApproval from './PendingApproval'
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-    const { user, role, loading } = useAuth()
+    const { user, role, teacherStatus, loading } = useAuth()
 
     if (loading) {
         return (
@@ -18,6 +19,10 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
     if (allowedRoles && !allowedRoles.includes(role)) {
         return <Navigate to="/" replace />
+    }
+
+    if (role === 'teacher' && teacherStatus === 'pending') {
+        return <PendingApproval />
     }
 
     return children

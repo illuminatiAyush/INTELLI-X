@@ -1,48 +1,39 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
-import { useAuth } from '../context/AuthContext'
-import { Eye, EyeOff, ArrowRight, Mail, Lock, Sun, Moon } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, Mail, Lock, Sun, Moon, User, Building2, GraduationCap, Briefcase } from 'lucide-react'
 import ParticleBackground from '../animations/ParticleBackground'
 import { supabase } from '../lib/supabase'
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const { isDark, toggleTheme } = useTheme()
-  const { role, user } = useAuth()
   const navigate = useNavigate()
 
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [form, setForm] = useState({ fullName: '', email: '', password: '', role: 'student', instituteCode: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
-  // Navigate only when both login is submitted and role is loaded
-  useEffect(() => {
-    if (submitted && role && user) {
-      const pendingCode = sessionStorage.getItem('pendingJoinCode')
-      if (pendingCode) {
-        sessionStorage.removeItem('pendingJoinCode')
-        navigate(`/dashboard/join/${pendingCode}`)
-      } else {
-        navigate('/dashboard')
-      }
-    }
-  }, [submitted, role, user, navigate])
-
   const validate = () => {
     const e = {}
+    if (!form.fullName.trim()) e.fullName = 'Full Name is required'
     if (!form.email.trim()) e.email = 'Email is required'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Enter a valid email address'
     if (!form.password) e.password = 'Password is required'
     else if (form.password.length < 6) e.password = 'Password must be at least 6 characters'
+    if (!form.instituteCode.trim()) e.instituteCode = 'Institute Code is required'
     return e
   }
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
     if (errors[e.target.name]) setErrors(prev => ({ ...prev, [e.target.name]: '' }))
+  }
+
+  const handleRoleSelect = (role) => {
+    setForm(prev => ({ ...prev, role }))
   }
 
   const handleSubmit = async (e) => {
@@ -53,29 +44,45 @@ const LoginPage = () => {
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // 1. Verify Institute Code via RPC
+      const { data: institute, error: instError } = await supabase
+        .rpc('get_institute_by_code', { code: form.instituteCode.toUpperCase() })
+        .single()
+        
+      if (instError || !institute) {
+        setErrors({ instituteCode: 'Invalid Institute Code.' })
+        setLoading(false)
+        return
+      }
+
+      // 2. Sign up via Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
+        options: {
+          data: {
+            role: form.role,
+            first_name: form.fullName,
+            institute_id: institute.id
+          }
+        }
       })
 
-      if (error) {
-        setErrors({ email: error.message }) 
+      if (authError) {
+        setErrors({ email: authError.message }) 
         setLoading(false)
         return
       }
 
       setSubmitted(true)
       
-      // Safety: If navigation doesn't happen in 10s (e.g. role hang), reset loading
+      // Auto redirect to login after 2 seconds
       setTimeout(() => {
-        if (loading) {
-          console.warn('Login: Redirection timeout hit.')
-          setLoading(false)
-        }
-      }, 10000)
+        navigate('/login', { replace: true })
+      }, 2500)
 
     } catch (err) {
-      console.error('Login error:', err)
+      console.error('Registration error:', err)
       setErrors({ email: 'An unexpected error occurred' })
       setLoading(false)
     }
@@ -122,9 +129,9 @@ const LoginPage = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-10"
+          className="text-center mb-8"
         >
-          <Link to="/" className="inline-flex items-center gap-2 group mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 group mb-4">
             <img src="/intellix-icon.svg" alt="IntelliX Logo" className="w-10 h-10" />
             <span className={`text-2xl font-bold ${headingColor}`}>
               Intelli<span className="text-gradient">X</span>
@@ -144,18 +151,17 @@ const LoginPage = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-6"
+              className="text-center py-6 flex flex-col items-center"
             >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, delay: 0.15 }}
-                className="w-16 h-16 glow-button rounded-2xl flex items-center justify-center mx-auto mb-5"
-              >
+              <div className="w-16 h-16 glow-button rounded-2xl flex items-center justify-center mx-auto mb-5 text-[var(--text-primary)]">
                 <span className="text-2xl">✅</span>
-              </motion.div>
-              <h2 className={`text-2xl font-black mb-2 ${headingColor}`}>Welcome back!</h2>
-              <p className={`text-sm ${labelColor}`}>Logging you into IntelliX OS...</p>
+              </div>
+              <h2 className={`text-2xl font-black mb-2 ${headingColor}`}>Account Created!</h2>
+              <p className={`text-sm ${labelColor}`}>
+                {form.role === 'teacher' 
+                  ? "Your teacher account is pending administrator approval." 
+                  : "You are officially enrolled. Redirecting to login..."}
+              </p>
               <div className="mt-5 flex justify-center">
                 <div className="w-8 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full animate-pulse" />
               </div>
@@ -164,77 +170,114 @@ const LoginPage = () => {
             <>
               {/* Header */}
               <div className="mb-8">
-                <h1 className={`text-2xl font-black mb-1.5 ${headingColor}`}>Sign in to IntelliX</h1>
+                <h1 className={`text-2xl font-black mb-1.5 ${headingColor}`}>Create an Account</h1>
                 <p className={`text-sm ${labelColor}`}>
-                  Enter your credentials to access your institute dashboard.
+                  Join your institute seamlessly.
                 </p>
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} noValidate className="space-y-5">
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                
+                {/* Role Switcher (Matched styling) */}
+                <div className={`p-1 border rounded-xl flex gap-1 relative ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-200'}`}>
+                  <button
+                    type="button"
+                    onClick={() => handleRoleSelect('student')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded-lg z-10 transition-colors ${form.role === 'student' ? 'text-white' : labelColor + ' hover:' + headingColor}`}
+                  >
+                    <GraduationCap className="w-4 h-4" /> Student
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRoleSelect('teacher')}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded-lg z-10 transition-colors ${form.role === 'teacher' ? 'text-white' : labelColor + ' hover:' + headingColor}`}
+                  >
+                    <Briefcase className="w-4 h-4" /> Teacher
+                  </button>
+                  
+                  {/* Highlight background */}
+                  <motion.div
+                    className="absolute top-1 bottom-1 w-[calc(50%-6px)] bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg -z-0"
+                    initial={false}
+                    animate={{ left: form.role === 'student' ? '4px' : 'calc(50% + 2px)' }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  />
+                </div>
+
+                {/* Institute Code field */}
+                <div className="pt-2">
+                  <div className="relative">
+                    <Building2 className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-indigo-400' : 'text-indigo-500'} z-10`} />
+                    <input
+                      name="instituteCode"
+                      type="text"
+                      value={form.instituteCode}
+                      onChange={handleChange}
+                      placeholder="Institute Join Code (e.g. A9B2X)"
+                      className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 uppercase tracking-widest font-bold ${
+                        isDark 
+                          ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 placeholder-indigo-400/50 focus:border-indigo-400' 
+                          : 'bg-indigo-50 border-indigo-200 text-indigo-700 placeholder-indigo-300 focus:border-indigo-400'
+                      } ${errors.instituteCode ? 'border-red-500/60 focus:border-red-500' : ''}`}
+                    />
+                  </div>
+                  {errors.instituteCode && (
+                    <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs text-red-400">
+                      {errors.instituteCode}
+                    </motion.p>
+                  )}
+                </div>
+
+                {/* Full Name field */}
+                <div>
+                  <div className="relative">
+                    <User className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <input
+                      name="fullName"
+                      type="text"
+                      value={form.fullName}
+                      onChange={handleChange}
+                      placeholder="Full Name"
+                      className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${inputBg} ${errors.fullName ? 'border-red-500/60 focus:border-red-500' : ''}`}
+                    />
+                  </div>
+                  {errors.fullName && (
+                    <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs text-red-400">{errors.fullName}</motion.p>
+                  )}
+                </div>
+
                 {/* Email field */}
                 <div>
-                  <label
-                    htmlFor="login-email"
-                    className={`block text-xs font-semibold mb-2 ${labelColor}`}
-                  >
-                    Email address
-                  </label>
                   <div className="relative">
                     <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
                     <input
-                      id="login-email"
                       name="email"
                       type="email"
                       autoComplete="email"
                       value={form.email}
                       onChange={handleChange}
-                      placeholder="you@institute.com"
-                      className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${inputBg} ${errors.email
-                          ? 'border-red-500/60 focus:border-red-500'
-                          : ''
-                        }`}
+                      placeholder="Email address"
+                      className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${inputBg} ${errors.email ? 'border-red-500/60 focus:border-red-500' : ''}`}
                     />
                   </div>
                   {errors.email && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-1.5 text-xs text-red-400"
-                    >
-                      {errors.email}
-                    </motion.p>
+                    <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs text-red-400">{errors.email}</motion.p>
                   )}
                 </div>
 
                 {/* Password field */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label
-                      htmlFor="login-password"
-                      className={`text-xs font-semibold ${labelColor}`}
-                    >
-                      Password
-                    </label>
-                    <a
-                      href="#"
-                      className="text-xs text-purple-400 hover:text-purple-300 font-medium transition-colors"
-                    >
-                      Forgot password?
-                    </a>
-                  </div>
                   <div className="relative">
                     <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
                     <input
-                      id="login-password"
                       name="password"
                       type={showPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
+                      autoComplete="new-password"
                       value={form.password}
                       onChange={handleChange}
-                      placeholder="Enter your password"
-                      className={`w-full pl-10 pr-11 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${inputBg} ${errors.password ? 'border-red-500/60 focus:border-red-500' : ''
-                        }`}
+                      placeholder="Password (min 6 characters)"
+                      className={`w-full pl-10 pr-11 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${inputBg} ${errors.password ? 'border-red-500/60 focus:border-red-500' : ''}`}
                     />
                     <button
                       type="button"
@@ -247,37 +290,17 @@ const LoginPage = () => {
                     </button>
                   </div>
                   {errors.password && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-1.5 text-xs text-red-400"
-                    >
-                      {errors.password}
-                    </motion.p>
+                    <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-xs text-red-400">{errors.password}</motion.p>
                   )}
-                </div>
-
-                {/* Remember me */}
-                <div className="flex items-center gap-2.5">
-                  <input
-                    id="remember-me"
-                    type="checkbox"
-                    className="w-4 h-4 rounded border-gray-600 accent-purple-500 cursor-pointer"
-                  />
-                  <label htmlFor="remember-me" className={`text-sm cursor-pointer ${labelColor}`}>
-                    Keep me signed in
-                  </label>
                 </div>
 
                 {/* Submit */}
                 <motion.button
-                  id="login-submit-btn"
                   type="submit"
                   disabled={loading}
                   whileHover={!loading ? { scale: 1.02, boxShadow: '0 0 50px rgba(191,95,255,0.4)' } : {}}
                   whileTap={!loading ? { scale: 0.98 } : {}}
-                  className={`w-full glow-button text-white font-bold py-4 rounded-2xl text-sm flex items-center justify-center gap-2 transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''
-                    }`}
+                  className={`w-full glow-button text-white font-bold py-4 rounded-2xl text-sm flex items-center justify-center gap-2 transition-all mt-6 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
                   {loading ? (
                     <>
@@ -286,45 +309,19 @@ const LoginPage = () => {
                         animate={{ rotate: 360 }}
                         transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
                       />
-                      Signing in...
+                      Registering...
                     </>
                   ) : (
-                    <>Sign In <ArrowRight className="w-4 h-4" /></>
+                    <>Register Account <ArrowRight className="w-4 h-4" /></>
                   )}
                 </motion.button>
               </form>
 
-              {/* Divider */}
-              <div className="flex items-center gap-4 my-6">
-                <div className={`flex-1 h-px ${isDark ? 'bg-white/8' : 'bg-gray-200'}`} />
-                <span className={`text-xs ${labelColor}`}>OR</span>
-                <div className={`flex-1 h-px ${isDark ? 'bg-white/8' : 'bg-gray-200'}`} />
-              </div>
-
-              {/* SSO/Google hint */}
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                className={`w-full flex items-center justify-center gap-3 py-3.5 rounded-xl border text-sm font-medium transition-all ${isDark
-                    ? 'border-white/10 text-gray-300 hover:bg-white/5'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm'
-                  }`}
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                Continue with Google
-              </motion.button>
-
-              {/* Sign up link */}
+              {/* Login link */}
               <p className={`text-center text-sm mt-6 ${labelColor}`}>
-                Don't have an account?{' '}
-                <Link to="/register" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
-                  Register here
+                Already have an account?{' '}
+                <Link to="/login" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
+                  Sign In
                 </Link>
               </p>
             </>
@@ -350,4 +347,4 @@ const LoginPage = () => {
   )
 }
 
-export default LoginPage
+export default RegisterPage

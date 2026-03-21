@@ -13,7 +13,7 @@ export const getResultsByTest = async (testId) => {
 export const getResultsByStudent = async (studentId) => {
   const { data, error } = await supabase
     .from('results')
-    .select('*, tests(title, total_marks, date, batches(name))')
+    .select('*, tests(title, total_marks, date)')
     .eq('student_id', studentId)
     .order('created_at', { ascending: false })
   if (error) throw error
@@ -30,18 +30,20 @@ export const upsertResults = async (results) => {
 }
 
 export const getLeaderboard = async (batchId) => {
-  const { data, error } = await supabase
+  let query = supabase
     .from('results')
-    .select('student_id, marks, students(name, batch_id), tests(total_marks, batch_id)')
+    .select('student_id, marks, students(name), tests(total_marks, batch_id)')
     .order('marks', { ascending: false })
+  
+  const { data, error } = await query
   if (error) throw error
 
   // Aggregate by student
   const map = {}
   data.forEach((r) => {
     const sid = r.student_id
-    const studentBatch = r.students?.batch_id
-    if (batchId && studentBatch !== batchId) return
+    const testBatch = r.tests?.batch_id
+    if (batchId && testBatch !== batchId) return
     if (!map[sid]) {
       map[sid] = { student_id: sid, name: r.students?.name || 'Unknown', totalMarks: 0, totalPossible: 0, testCount: 0 }
     }

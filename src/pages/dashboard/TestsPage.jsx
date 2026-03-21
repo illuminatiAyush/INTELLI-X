@@ -216,7 +216,7 @@ const TestsPage = () => {
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Create Test">
         <div className="space-y-4">
           <Input label="Test Title" placeholder="e.g. Physics Unit Test 1" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-          <Select label="Batch" placeholder="Select batch" options={batchOptions} value={form.batch_id} onChange={(e) => setForm({ ...form, batch_id: e.target.value })} />
+          <Select label="Batch" placeholder={batchOptions.length > 0 ? "Select batch" : "No batches available (Create one first)"} options={batchOptions} value={form.batch_id} onChange={(e) => setForm({ ...form, batch_id: e.target.value })} disabled={batchOptions.length === 0} />
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1.5">Date</label>

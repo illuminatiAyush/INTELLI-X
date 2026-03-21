@@ -36,10 +36,15 @@ const AnalyticsPage = () => {
         .from('results')
         .select('student_id, marks, tests(total_marks, batch_id)')
 
-      // Fetch students
+      // Fetch all student to batch mappings
+      const { data: batch_students } = await supabase
+        .from('batch_students')
+        .select('student_id, batch_id')
+
+      // Fetch students for display and overall scale
       const { data: students } = await supabase
         .from('students')
-        .select('id, name, batch_id')
+        .select('id, name')
 
       // Fetch test count
       const { count: testCount } = await supabase
@@ -49,6 +54,7 @@ const AnalyticsPage = () => {
       const batchList = batches || []
       const attendanceList = attendance || []
       const resultsList = results || []
+      const batchStudentsList = batch_students || []
       const studentList = students || []
 
       // Per-batch analytics
@@ -58,7 +64,7 @@ const AnalyticsPage = () => {
         const total = batchAttendance.length
         const rate = total ? ((present / total) * 100).toFixed(1) : 0
 
-        const batchStudents = studentList.filter(s => s.batch_id === batch.id)
+        const batchStudents = batchStudentsList.filter(s => s.batch_id === batch.id)
         const batchResults = resultsList.filter(r => r.tests?.batch_id === batch.id)
         const avgMarks = batchResults.length
           ? (batchResults.reduce((s, r) => s + r.marks, 0) / batchResults.length).toFixed(1)

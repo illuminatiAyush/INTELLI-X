@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [role, setRole] = useState(() => localStorage.getItem('ix_user_role'))
   const [profile, setProfile] = useState(null)
+  const [teacherStatus, setTeacherStatus] = useState('active')
   const [loading, setLoading] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
 
@@ -24,6 +25,13 @@ export const AuthProvider = ({ children }) => {
         setProfile(data)
         setRole(data.role)
         localStorage.setItem('ix_user_role', data.role)
+        
+        if (data.role === 'teacher') {
+          const { data: teacherData } = await supabase.from('teachers').select('status').eq('id', userId).single()
+          if (teacherData) {
+            setTeacherStatus(teacherData.status)
+          }
+        }
       }
     } catch (err) {
       console.error('Profile fetch failed:', err.message)
@@ -54,7 +62,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('ix_user_role', meta.role)
         setLoading(false)
         setIsInitialized(true)
-        // Background sync to ensure local state is fresh
+        // Background sync to ensure local state is fresh (and fetch teacherStatus)
         fetchProfile(u.id)
       } else {
         // Slow Path: Need to fetch from DB
@@ -90,7 +98,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, role, profile, loading: !isInitialized && loading, logOut }}>
+    <AuthContext.Provider value={{ user, role, teacherStatus, profile, loading: !isInitialized && loading, logOut }}>
       {children}
     </AuthContext.Provider>
   )

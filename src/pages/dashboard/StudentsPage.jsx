@@ -5,7 +5,6 @@ import DataTable from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
 import { Input, Select } from '../../components/ui/FormField'
 import { getStudents, createStudent, updateStudent, deleteStudent } from '../../services/studentService'
-import { getBatches } from '../../services/batchService'
 import { useAuth } from '../../context/AuthContext'
 
 const StudentsPage = () => {
@@ -16,14 +15,13 @@ const StudentsPage = () => {
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ name: '', email: '', phone: '', batch_id: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '' })
   const [saving, setSaving] = useState(false)
 
   const fetchData = async () => {
     try {
-      const [s, b] = await Promise.all([getStudents(), getBatches()])
+      const s = await getStudents()
       setStudents(s)
-      setBatches(b)
     } catch (err) {
       console.error(err)
     } finally {
@@ -35,7 +33,7 @@ const StudentsPage = () => {
 
   const openAdd = () => {
     setEditing(null)
-    setForm({ name: '', email: '', phone: '', batch_id: '' })
+    setForm({ name: '', email: '', password: '', phone: '' })
     setModalOpen(true)
   }
 
@@ -44,8 +42,8 @@ const StudentsPage = () => {
     setForm({
       name: student.name,
       email: student.email || '',
+      password: '', // Edit mode generally doesn't require password, but state needs it
       phone: student.phone || '',
-      batch_id: student.batch_id || '',
     })
     setModalOpen(true)
   }
@@ -89,9 +87,9 @@ const StudentsPage = () => {
     { key: 'email', label: 'Email' },
     { key: 'phone', label: 'Phone' },
     {
-      key: 'batch_id',
+      key: 'batch',
       label: 'Batch',
-      render: (row) => row.batches?.name || '-',
+      render: (row) => row.batch_students?.[0]?.batches?.name || '-',
     },
     {
       key: 'created_at',
@@ -124,7 +122,7 @@ const StudentsPage = () => {
     })
   }
 
-  const batchOptions = batches.map((b) => ({ value: b.id, label: b.name }))
+
 
   if (loading) {
     return (
@@ -185,25 +183,36 @@ const StudentsPage = () => {
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <Input
-            label="Email"
+            label="Email *"
             type="email"
             placeholder="student@email.com"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
+          {!editing && (
+            <Input
+              label="Password *"
+              type="password"
+              placeholder="Minimum 6 characters"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          )}
           <Input
             label="Phone"
             placeholder="+91 9876543210"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
           />
-          <Select
-            label="Batch"
-            placeholder="Select a batch"
-            options={batchOptions}
-            value={form.batch_id}
-            onChange={(e) => setForm({ ...form, batch_id: e.target.value })}
-          />
+          {!editing && (
+            <div className="p-4 rounded-xl bg-[var(--color-purple)]/5 border border-[var(--color-purple)]/20 flex flex-col items-center justify-center text-center mt-2">
+              <Users className="w-6 h-6 text-[var(--color-purple)] mb-2" />
+              <p className="text-sm font-medium text-[var(--text-primary)]">Batch Enrollment</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-1">
+                Students will join batches themselves using a Join Code after their account is created.
+              </p>
+            </div>
+          )}
           <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
             <button
               onClick={() => setModalOpen(false)}

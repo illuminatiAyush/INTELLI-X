@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Plus, Pencil, Trash2, Users, Search } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Plus, Pencil, Trash2, Users, Search, Copy, Link as LinkIcon, CheckCircle, AlertCircle } from 'lucide-react'
 import DataTable from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
 import { Input, Select } from '../../components/ui/FormField'
@@ -9,7 +9,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 
 const BatchesPage = () => {
-  const { role } = useAuth()
+  const { role, profile } = useAuth()
   const [batches, setBatches] = useState([])
   const [teachers, setTeachers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,6 +20,14 @@ const BatchesPage = () => {
   const [saving, setSaving] = useState(false)
   const [expandedBatch, setExpandedBatch] = useState(null)
   const [batchStudents, setBatchStudents] = useState([])
+  const [toast, setToast] = useState(null)
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [toast])
 
   const fetchData = async () => {
     try {
@@ -63,6 +71,8 @@ const BatchesPage = () => {
       if (editing) {
         await updateBatch(editing.id, payload)
       } else {
+        // Batches are the root table — must set institute_id explicitly
+        payload.institute_id = profile?.institute_id
         await createBatch(payload)
       }
       setModalOpen(false)
@@ -115,6 +125,47 @@ const BatchesPage = () => {
       label: 'Created',
       render: (r) => new Date(r.created_at).toLocaleDateString(),
     },
+    {
+      key: 'join_code',
+      label: 'Join Code',
+      render: (r) => (
+        <div className="flex items-center gap-2">
+          <span className="font-mono bg-white/10 px-2.5 py-1 rounded text-sm text-[var(--color-purple)] font-bold tracking-widest">
+            {r.join_code || '---'}
+          </span>
+          {r.join_code && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(r.join_code);
+                setToast({ type: 'success', message: 'Join Code copied!' });
+              }}
+              className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors"
+              title="Copy Code"
+            >
+              <Copy className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'join_link',
+      label: 'Invite Link',
+      render: (r) => r.join_link && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(r.join_link);
+            setToast({ type: 'success', message: 'Invite Link copied!' });
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 rounded-xl text-xs font-semibold transition-all active:scale-95 whitespace-nowrap"
+        >
+          <LinkIcon className="w-3.5 h-3.5" />
+          Copy Link
+        </button>
+      )
+    }
   ]
 
   if (role === 'admin') {
@@ -141,7 +192,8 @@ const BatchesPage = () => {
     })
   }
 
-  const teacherOptions = teachers.map((t) => ({ value: t.profile_id || t.id, label: t.name }))
+  const activeTeachers = teachers.filter(t => t.status !== 'pending');
+  const teacherOptions = activeTeachers.map((t) => ({ value: t.profile_id || t.id, label: t.name }))
 
   if (loading) {
     return (
@@ -152,7 +204,23 @@ const BatchesPage = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`fixed top-6 right-6 z-[60] flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border text-sm font-medium ${
+              toast.type === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-red-500/10 border-red-500/30 text-red-400'
+            }`}
+          >
+            {toast.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <motion.h1 
@@ -234,10 +302,11 @@ const BatchesPage = () => {
           />
           <Select
             label="Assign Teacher"
-            placeholder="Select a teacher"
+            placeholder={teacherOptions.length > 0 ? "Select a teacher" : "No approved teachers (Add & Approve first)"}
             options={teacherOptions}
             value={form.teacher_id}
             onChange={(e) => setForm({ ...form, teacher_id: e.target.value })}
+            disabled={teacherOptions.length === 0}
           />
           <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
             <button

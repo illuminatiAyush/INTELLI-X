@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
+import { createPortal } from 'react-dom'
 
 const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   const sizes = {
@@ -9,17 +10,19 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
     xl: 'max-w-4xl',
   }
 
-  return (
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
+          {/* Backdrop, explicitly sized to avoid browser blur edge bugs */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 w-screen h-screen bg-black/60 backdrop-blur-sm"
           />
           {/* Modal */}
           <motion.div
@@ -46,7 +49,8 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
 

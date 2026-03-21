@@ -113,10 +113,11 @@ const MaterialsPage = () => {
             </div>
             <Select
               label="Select Batch"
-              placeholder="Target batch"
+              placeholder={batchOptions.length > 0 ? "Target batch" : "No batches available"}
               options={batchOptions}
               value={uploadBatch}
               onChange={(e) => setUploadBatch(e.target.value)}
+              disabled={batchOptions.length === 0}
             />
             <div>
               <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">File (PDF/DOC)</label>

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -13,6 +14,7 @@ import CTA from './components/CTA'
 import AIChatbot from './components/AIChatbot'
 import Footer from './components/Footer'
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 
@@ -32,6 +34,22 @@ import SubscriptionsPage from './pages/dashboard/SubscriptionsPage'
 import SettingsPage from './pages/dashboard/SettingsPage'
 import LogsPage from './pages/dashboard/LogsPage'
 import ProfilePage from './pages/dashboard/ProfilePage'
+import JoinBatch from './pages/dashboard/JoinBatch'
+
+const JoinRedirect = () => {
+  const { code } = useParams()
+  useEffect(() => {
+    if (code) {
+      sessionStorage.setItem('pendingJoinCode', code)
+      window.location.href = '/dashboard'
+    }
+  }, [code])
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-app)]">
+      <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+    </div>
+  )
+}
 
 const HomePage = () => (
   <>
@@ -57,6 +75,7 @@ const AppContent = () => {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route
         path="/dashboard"
         element={
@@ -80,7 +99,10 @@ const AppContent = () => {
         <Route path="settings" element={<SettingsPage />} />
         <Route path="logs" element={<LogsPage />} />
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="join" element={<JoinBatch />} />
+        <Route path="join/:code" element={<JoinBatch />} />
       </Route>
+      <Route path="/join/:code" element={<JoinRedirect />} />
       {/* Fallback route - unknown routes go to index or login */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

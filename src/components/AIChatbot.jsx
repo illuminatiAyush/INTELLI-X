@@ -1,28 +1,150 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
+import { supabase } from '../lib/supabase'
 import { X, Send, Bot, User } from 'lucide-react'
 
-const quickQuestions = [
-  'Absent students today?',
-  'Fee collection status',
-  'At-risk students',
-  'Monthly revenue',
-]
+// Role-based quick questions
+const roleQuickQuestions = {
+  student: [
+    'My attendance percentage?',
+    'Upcoming tests?',
+    'My weak subjects?',
+    'Study plan for this week',
+  ],
+  teacher: [
+    'Class performance overview',
+    'Students with low attendance',
+    'Create a test strategy',
+    'Suggest teaching improvements',
+  ],
+  admin: [
+    'Institute analytics overview',
+    'At-risk students',
+    'Fee collection status',
+    'Monthly performance report',
+  ],
+  master_admin: [
+    'Platform-wide stats',
+    'Active institutes',
+    'System health check',
+    'Growth metrics',
+  ],
+}
 
 const AIChatbot = () => {
   const { isDark } = useTheme()
+  const { role, user, profile } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([
-    { role: 'ai', text: 'Hello! I\'m IntelliX AI Assistant. Ask me anything about your institute — attendance, fees, performance, or analytics. 🤖' }
+    { role: 'ai', text: 'Hello! I\'m IntelliX AI Assistant. Ask me anything about your institute — attendance, tests, performance, or academics. 🤖' }
   ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [contextData, setContextData] = useState({})
   const messagesEndRef = useRef(null)
+
+  const quickQuestions = roleQuickQuestions[role] || roleQuickQuestions.student
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Fetch platform context data when chat opens
+  useEffect(() => {
+    if (isOpen && user) {
+      fetchContextData()
+    }
+  }, [isOpen, user])
+
+  const fetchContextData = async () => {
+    try {
+      const ctx = {}
+
+      if (role === 'student') {
+        // Get student record
+        const { data: students } = await supabase
+          .from('students')
+          .select('id, name, batch_students(batch_id)')
+          .eq('profile_id', user.id)
+        const student = students?.[0]
+
+        if (student) {
+          // Attendance stats
+          const { data: attendance } = await supabase
+            .from('attendance')
+            .select('status')
+            .eq('student_id', student.id)
+          const total = attendance?.length || 0
+          const present = attendance?.filter(a => a.status === 'present').length || 0
+          ctx.attendance = total ? `${((present / total) * 100).toFixed(1)}%` : 'No records'
+
+          // Upcoming tests
+          const { data: tests } = await supabase
+            .from('tests')
+            .select('title, date')
+            .eq('batch_id', student.batch_students?.[0]?.batch_id || null)
+            .gte('date', new Date().toISOString().split('T')[0])
+            .order('date', { ascending: true })
+            .limit(5)
+          ctx.upcomingTests = tests?.map(t => `${t.title} - ${t.date}`) || []
+
+          // Recent results for weak area detection
+          const { data: results } = await supabase
+            .from('results')
+            .select('marks, tests(title, total_marks)')
+            .eq('student_id', student.id)
+          const weakTests = (results || []).filter(r => r.tests?.total_marks && (r.marks / r.tests.total_marks) < 0.4)
+          ctx.weakSubjects = weakTests.map(r => r.tests?.title) || []
+
+          ctx.studentName = student.name
+        }
+      } else if (role === 'teacher') {
+        // Get teacher's batches and performance
+        const { data: batches } = await supabase
+          .from('batches')
+          .select('id, name, subject')
+          .eq('teacher_id', user.id)
+        ctx.myBatches = batches?.map(b => b.name) || []
+        ctx.batchCount = batches?.length || 0
+
+        if (batches?.length) {
+          const batchIds = batches.map(b => b.id)
+          const { count: studentCount } = await supabase
+            .from('batch_students')
+            .select('student_id', { count: 'exact', head: true })
+            .in('batch_id', batchIds)
+          ctx.totalStudents = studentCount || 0
+        }
+      } else if (role === 'admin' || role === 'master_admin') {
+        // Admin/Master context
+        const { count: studentCount } = await supabase
+          .from('students')
+          .select('id', { count: 'exact', head: true })
+        const { count: batchCount } = await supabase
+          .from('batches')
+          .select('id', { count: 'exact', head: true })
+        const { count: testCount } = await supabase
+          .from('tests')
+          .select('id', { count: 'exact', head: true })
+        ctx.totalStudents = studentCount || 0
+        ctx.totalBatches = batchCount || 0
+        ctx.totalTests = testCount || 0
+
+        if (role === 'master_admin') {
+          const { count: instCount } = await supabase
+            .from('institutes')
+            .select('id', { count: 'exact', head: true })
+          ctx.totalInstitutes = instCount || 0
+        }
+      }
+
+      setContextData(ctx)
+    } catch (err) {
+      console.error('Context fetch error:', err)
+    }
+  }
 
   const sendMessageToAI = async (text) => {
     const q = text || input.trim()
@@ -34,7 +156,7 @@ const AIChatbot = () => {
 
     try {
       const { sendMessage } = await import('../services/aiService')
-      const response = await sendMessage(q, messages)
+      const response = await sendMessage(q, messages, role || 'student', contextData)
       
       setMessages(prev => [...prev, {
         role: 'ai',
@@ -112,7 +234,9 @@ const AIChatbot = () => {
                 <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>IntelliX AI Assistant</p>
                 <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                  <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Online — analyzing your institute</p>
+                  <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Online — {role === 'student' ? 'your study buddy' : role === 'teacher' ? 'teaching assistant' : 'analytics engine'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -132,7 +256,7 @@ const AIChatbot = () => {
                     </div>
                   )}
                   <div
-                    className={`max-w-[80%] px-3 py-2.5 rounded-2xl text-xs leading-relaxed ${
+                    className={`max-w-[80%] px-3 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-line ${
                       msg.role === 'user'
                         ? 'bg-gradient-to-br from-purple-500 to-blue-600 text-white rounded-br-sm'
                         : isDark
@@ -171,7 +295,7 @@ const AIChatbot = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick questions */}
+            {/* Quick questions - role-based */}
             <div className={`px-4 pb-2 flex flex-wrap gap-1.5`}>
               {quickQuestions.map((q) => (
                 <button
@@ -219,3 +343,4 @@ const AIChatbot = () => {
 }
 
 export default AIChatbot
+

@@ -26,6 +26,33 @@ export const createTest = async (test) => {
     .select()
     .single()
   if (error) throw error
+
+  // Notify all students in this batch
+  if (data && data.batch_id) {
+    try {
+      const { data: batchStudents } = await supabase
+        .from('batch_students')
+        .select('student_id, students(profile_id)')
+        .eq('batch_id', data.batch_id)
+
+      if (batchStudents && batchStudents.length > 0) {
+        const notifications = batchStudents
+          .filter(bs => bs.students?.profile_id)
+          .map(bs => ({
+            user_id: bs.students.profile_id,
+            title: 'New Test Assigned',
+            message: `A new test "${data.title}" has been created for your class.`,
+          }))
+          
+        if (notifications.length > 0) {
+          await supabase.from('notifications').insert(notifications)
+        }
+      }
+    } catch (notifyError) {
+      console.error('Failed to send test notifications:', notifyError)
+    }
+  }
+
   return data
 }
 

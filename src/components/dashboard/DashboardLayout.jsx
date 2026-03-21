@@ -12,12 +12,13 @@ import {
   Moon,
   ChevronRight,
 } from 'lucide-react'
+import NotificationsMenu from '../NotificationsMenu'
 
 const DashboardLayout = () => {
   const { user, role, profile, logOut, loading } = useAuth()
   const { isDark, toggleTheme } = useTheme()
   const navigate = useNavigate()
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
 
@@ -117,18 +118,13 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-[var(--bg-app)] flex">
       {/* Desktop Sidebar */}
       <motion.aside
+        onMouseEnter={() => setSidebarOpen(true)}
+        onMouseLeave={() => setSidebarOpen(false)}
         animate={{ width: sidebarOpen ? 260 : 72 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-30 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)]"
+        className={`hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)] overflow-hidden ${sidebarOpen ? 'shadow-2xl' : ''}`}
       >
         <SidebarContent />
-        {/* Collapse Toggle */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute -right-3 top-8 w-6 h-6 rounded-full bg-[var(--bg-surface)] border border-[var(--border-strong)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--color-purple)] transition-all shadow-sm"
-        >
-          <ChevronRight className={`w-3.5 h-3.5 transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
-        </button>
       </motion.aside>
 
       {/* Mobile Overlay */}
@@ -158,7 +154,7 @@ const DashboardLayout = () => {
       {/* Main Content */}
       <div
         className="flex-1 flex flex-col min-h-screen transition-all duration-300"
-        style={{ marginLeft: typeof window !== 'undefined' && window.innerWidth >= 1024 ? (sidebarOpen ? 260 : 72) : 0 }}
+        style={{ marginLeft: typeof window !== 'undefined' && window.innerWidth >= 1024 ? 72 : 0 }}
       >
         {/* Top Bar (mobile) */}
         <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 backdrop-blur-xl sticky top-0 z-20">
@@ -168,13 +164,12 @@ const DashboardLayout = () => {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <img src="/intellix-icon.svg" alt="IntelliX Logo" className="w-7 h-7" />
-            <span className="text-base font-bold text-[var(--text-primary)]">IntelliX</span>
+          <div className="flex items-center gap-1">
+            <NotificationsMenu />
+            <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-[var(--border-subtle)] text-[var(--text-secondary)]">
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
           </div>
-          <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-[var(--border-subtle)] text-[var(--text-secondary)]">
-            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
         </div>
 
         {/* Top Bar (desktop) */}
@@ -194,12 +189,15 @@ const DashboardLayout = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <button 
-              onClick={toggleTheme} 
-              className="p-2.5 rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-sm"
-            >
-              {isDark ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
-            </button>
+            <div className="flex items-center gap-3">
+              <NotificationsMenu />
+              <button 
+                onClick={toggleTheme} 
+                className="p-2.5 rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-sm"
+              >
+                {isDark ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+              </button>
+            </div>
             <div className="h-6 w-px bg-[var(--border-subtle)]"></div>
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-sm font-bold border border-white/10">

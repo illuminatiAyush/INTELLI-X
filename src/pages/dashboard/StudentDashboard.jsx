@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { BookOpen, Trophy, ClipboardCheck, TrendingUp } from 'lucide-react'
 import StatsCard from '../../components/ui/StatsCard'
@@ -9,9 +10,11 @@ import { useTheme } from '../../context/ThemeContext'
 const StudentDashboard = () => {
   const { isDark } = useTheme()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [studentRecord, setStudentRecord] = useState(null)
   const [stats, setStats] = useState({ tests: 0, avgScore: 0, attendanceRate: 0, rank: '-' })
   const [recentResults, setRecentResults] = useState([])
+  const [hasBatches, setHasBatches] = useState(true)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -26,6 +29,14 @@ const StudentDashboard = () => {
         setStudentRecord(student)
 
         if (!student) { setLoading(false); return }
+
+        // Check batches
+        const { data: batches } = await supabase.from('batch_students').select('batch_id').eq('student_id', student.id)
+        if (!batches || batches.length === 0) {
+          setHasBatches(false)
+          setLoading(false)
+          return
+        }
 
         // Get results
         const { data: results } = await supabase
@@ -81,17 +92,52 @@ const StudentDashboard = () => {
     )
   }
 
+  if (!hasBatches) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 border border-dashed border-[var(--border-strong)] rounded-3xl bg-[var(--bg-surface)] mt-8"
+      >
+        <div className="w-20 h-20 bg-[var(--color-purple)]/10 text-[var(--color-purple)] rounded-3xl flex items-center justify-center mb-6 border border-[var(--color-purple)]/20 shadow-2xl shadow-purple-500/20">
+          <BookOpen className="w-10 h-10" />
+        </div>
+        <h2 className="text-3xl font-black text-[var(--text-primary)] mb-3">Welcome to IntelliX!</h2>
+        <p className="text-[var(--text-secondary)] text-lg max-w-md mx-auto mb-8 leading-relaxed">
+          You are successfully registered but haven't joined any classes yet. Get your class Invite Link or Join Code from your teacher to begin exploring materials and tests.
+        </p>
+        <button 
+          onClick={() => navigate('/dashboard/join')}
+          className="glow-button px-8 py-4 rounded-xl text-white font-bold tracking-wide transition-all active:scale-95 flex items-center gap-2"
+        >
+          <BookOpen className="w-5 h-5"/>
+          Join Your First Batch
+        </button>
+      </motion.div>
+    )
+  }
+
   return (
     <div className="space-y-8">
-      <div>
-        <motion.h1
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <motion.h1
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+          >
+            Welcome, {studentRecord.name}
+          </motion.h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">Your academic performance and progress</p>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate('/dashboard/join')}
+          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-purple)] text-white text-sm font-semibold shadow-lg shadow-purple-500/20 active:scale-95 transition-all"
         >
-          Welcome, {studentRecord.name}
-        </motion.h1>
-        <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">Your academic performance and progress</p>
+          <BookOpen className="w-5 h-5" /> Join Batch
+        </motion.button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
