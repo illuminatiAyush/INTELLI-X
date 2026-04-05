@@ -1,0 +1,65 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node dependencies
+node_modules/
+
+# Production build outputs
+dist/
+dist-ssr/
+build/
+out/
+
+# Output/Generated files
+out.json
+eslint.json
+
+# IDE and Editor directories/files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.sample
+*.env
+!.env.example
+
+# Cache directories
+.eslintcache
+.vite/
+.turbo/
+.vercel/
+.npm/
+
+# Temporary and backup files
+*.tmp
+*.bak
+~*
+
+# Coverage and test outputs
+coverage/
+.nyc_output/
+
+# Backend scripts & tests
+*.sql
+test-signup.mjs
+e2e-test.js
+supabase_test_result.txt
