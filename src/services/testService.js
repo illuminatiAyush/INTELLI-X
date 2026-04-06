@@ -42,6 +42,8 @@ export const createTest = async (test) => {
             user_id: bs.students.profile_id,
             title: 'New Test Assigned',
             message: `A new test "${data.title}" has been created for your class.`,
+            type: 'test',
+            institute_id: data.institute_id,
           }))
           
         if (notifications.length > 0) {

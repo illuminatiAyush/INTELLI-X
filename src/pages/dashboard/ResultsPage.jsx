@@ -5,7 +5,7 @@ import DataTable from '../../components/ui/DataTable'
 import { Select } from '../../components/ui/FormField'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { Sparkles, Download, X } from 'lucide-react'
+import { Sparkles, Download, X, AlertTriangle } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
 import jsPDF from 'jspdf'
 import toast from 'react-hot-toast'
@@ -40,6 +40,12 @@ const ResultsPage = () => {
       doc.text(`Marks Obtained: ${r.marks} / ${total}`, 14, 60)
       doc.text(`Percentage: ${pct}%`, 14, 70)
       doc.text(`Global Rank: ${r.rank ? '#' + r.rank : 'N/A'}`, 14, 80)
+      
+      if (r.violation_count > 0) {
+        doc.setTextColor('#ef4444')
+        doc.text(`⚠️ Tab Switch Violations: ${r.violation_count}`, 14, 90)
+        doc.setTextColor('#000000')
+      }
 
       if (r.ai_feedback) {
          doc.setFontSize(16)
@@ -73,7 +79,8 @@ const ResultsPage = () => {
          }
       }
 
-      doc.save(`IntelliX_${studentName}_${r.tests?.title}.pdf`)
+      const fileName = `InteliX_${(studentName || 'Student').replace(/\s+/g, '_')}_${(r.tests?.title || 'Report').replace(/\s+/g, '_')}.pdf`
+      doc.save(fileName)
       toast.success('Report downloaded successfully!')
     } catch (err) {
       console.error(err)
@@ -116,6 +123,7 @@ const ResultsPage = () => {
           .select('*, students(name), tests(title, total_marks)')
           .eq('test_id', selectedTest)
           .order('rank', { ascending: true, nullsFirst: false })
+        // violation_count is auto-included with '*'
         setResults(data || [])
       } catch (err) {
         console.error(err)
@@ -149,7 +157,7 @@ const ResultsPage = () => {
 
   const renderActions = (r) => (
     <div className="flex items-center justify-end gap-2">
-      {r.ai_feedback && (
+      {r.ai_feedback && Object.keys(r.ai_feedback).length > 0 && (
         <button
           onClick={() => { setSelectedResult(r); setAiModalOpen(true); }}
           className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 hover:scale-105 transition-all shadow-sm"
@@ -198,6 +206,21 @@ const ResultsPage = () => {
               #{r.rank}
             </span>
           ) : '-',
+        },
+        {
+          key: 'violations',
+          label: 'Violations',
+          render: (r) => {
+            const count = r.violation_count || 0
+            if (count === 0) return (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20">Clean</span>
+            )
+            return (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-1 w-fit">
+                <AlertTriangle className="w-3 h-3" /> {count}
+              </span>
+            )
+          }
         },
         { key: 'actions', label: '', render: renderActions }
       ]

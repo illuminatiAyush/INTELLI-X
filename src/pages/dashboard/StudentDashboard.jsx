@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Trophy, ClipboardCheck, TrendingUp, Sparkles, Play, Clock, Activity } from 'lucide-react'
+import { BookOpen, Trophy, ClipboardCheck, TrendingUp, Sparkles, Play, Clock, Activity, Plus, Bell, X, Lock } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import StatsCard from '../../components/ui/StatsCard'
 import { useAuth } from '../../context/AuthContext'
@@ -19,9 +19,14 @@ const StudentDashboard = () => {
   const [hasBatches, setHasBatches] = useState(true)
   const [loading, setLoading] = useState(true)
   const [chartData, setChartData] = useState([])
+  const [enrolledBatches, setEnrolledBatches] = useState([])
+  const [notifications, setNotifications] = useState([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [showNotifications, setShowNotifications] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
+      const now = new Date()
       try {
         // Get student record
         const { data: students } = await supabase
@@ -43,6 +48,13 @@ const StudentDashboard = () => {
 
         const batchIds = batches.map(b => b.batch_id)
 
+        // Fetch full batch details for My Subjects display
+        const { data: batchDetails } = await supabase
+          .from('batches')
+          .select('id, name, subject')
+          .in('id', batchIds)
+          .order('name')
+        setEnrolledBatches(batchDetails || [])
         // Get results using profile_id (User UUID)
         const { data: results } = await supabase
           .from('results')
@@ -80,26 +92,34 @@ const StudentDashboard = () => {
         }))
         setChartData(cData)
 
-        // Get active AI tests (tests with questions that haven't been attempted)
+        // Get AI tests (active + upcoming)
         const { data: testData } = await supabase
           .from('tests')
-          .select('*, batches(name), questions(id)')
+          .select('*, batches(name), questions(count)')
           .in('batch_id', batchIds)
-          .order('created_at', { ascending: false })
+          .order('date', { ascending: false })
 
-        const now = new Date()
         const resultTestIds = new Set(resultList.map(r => r.test_id))
-        const active = (testData || [])
-          .filter(t => t.questions && t.questions.length > 0)
-          .filter(t => !resultTestIds.has(t.id))
+        const activeOrUpcoming = (testData || [])
+          .filter(t => t.id && !resultTestIds.has(t.id))
           .filter(t => {
-            if (t.end_time && new Date(t.end_time) < now) return false
-            if (t.start_time && new Date(t.start_time) > now) return false
-            return true
+            const isEnded = (t.end_time && new Date(t.end_time) < now) || false
+            return !isEnded
           })
-          .slice(0, 3)
+          .slice(0, 4)
 
-        setActiveTests(active)
+        setActiveTests(activeOrUpcoming)
+
+        // Get notifications
+        const { data: notifies } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10)
+        
+        setNotifications(notifies || [])
+        setUnreadCount(notifies?.filter(n => !n.read).length || 0)
       } catch (err) {
         console.error('Error:', err)
       } finally {
@@ -109,6 +129,22 @@ const StudentDashboard = () => {
     if (user) fetchData()
   }, [user])
 
+  const markAsRead = async (notificationId) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId)
+      
+      if (error) throw error
+      
+      // Update local state
+      setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, read: true } : n))
+      setUnreadCount(prev => Math.max(0, prev - 1))
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err)
+    }
+  }
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -164,14 +200,60 @@ const StudentDashboard = () => {
           </motion.h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">Your academic performance and progress</p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/dashboard/join')}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-purple)] text-white text-sm font-semibold shadow-lg shadow-purple-500/20 active:scale-95 transition-all"
-        >
-          <BookOpen className="w-5 h-5" /> Join Subject
-        </motion.button>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="p-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all relative"
+            >
+              <Bell className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-[var(--bg-surface)]" />
+              )}
+            </motion.button>
+
+            {/* Notification Popover */}
+            {showNotifications && (
+              <div className="absolute right-0 mt-3 w-80 bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-2xl shadow-2xl z-50 overflow-hidden">
+                <div className="px-4 py-3 border-b border-[var(--border-subtle)] flex items-center justify-between bg-gradient-to-r from-purple-500/5 to-cyan-500/5">
+                  <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Notifications</span>
+                  <button onClick={() => setShowNotifications(false)}><X className="w-4 h-4 text-[var(--text-secondary)]" /></button>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-[var(--text-secondary)] text-sm">No notifications yet</div>
+                  ) : (
+                    notifications.map(n => (
+                      <div 
+                        key={n.id} 
+                        onClick={() => !n.read && markAsRead(n.id)}
+                        className={`px-4 py-3 border-b border-[var(--border-subtle)] hover:bg-[var(--bg-app)] transition-colors cursor-pointer ${!n.read ? 'bg-purple-500/5' : ''}`}
+                      >
+                        <div className="flex justify-between items-start gap-2">
+                          <p className="text-sm font-bold text-[var(--text-primary)]">{n.title}</p>
+                          {!n.read && <span className="w-2 h-2 rounded-full bg-purple-500 mt-1.5 flex-shrink-0" />}
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">{n.message}</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] mt-2">{new Date(n.created_at).toLocaleDateString()}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate('/dashboard/join')}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-purple)] text-white text-sm font-semibold shadow-lg shadow-purple-500/20 active:scale-95 transition-all"
+          >
+            <BookOpen className="w-5 h-5" /> Join Subject
+          </motion.button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -192,29 +274,34 @@ const StudentDashboard = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {studentRecord?.batch_name ? (
-             <motion.div
-               whileHover={{ y: -5 }}
-               className="p-6 rounded-[2rem] bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-sm hover:shadow-xl hover:shadow-purple-500/5 transition-all cursor-pointer group"
-               onClick={() => navigate('/dashboard/materials')}
-             >
-               <div className="w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-4 group-hover:bg-purple-500 group-hover:text-white transition-all">
-                 <BookOpen className="w-7 h-7" />
-               </div>
-               <h3 className="font-bold text-[var(--text-primary)] mb-1">{studentRecord.batch_name}</h3>
-               <p className="text-xs text-[var(--text-secondary)]">Main Batch</p>
-             </motion.div>
-          ) : null}
-          
-          {/* If there are more batches from the join, we would map them here. 
-              For now, using the student's primary batch display plus a placeholder for 'View All' */}
+          {enrolledBatches.map((batch, i) => (
+            <motion.div
+              key={batch.id}
+              whileHover={{ y: -5 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.07 }}
+              className="p-6 rounded-[2rem] bg-[var(--bg-surface)] border border-[var(--border-subtle)] shadow-sm hover:shadow-xl hover:shadow-purple-500/5 hover:border-purple-500/30 transition-all cursor-pointer group"
+              onClick={() => navigate('/dashboard/materials')}
+            >
+              <div className="w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-4 group-hover:bg-purple-500 group-hover:text-white transition-all">
+                <BookOpen className="w-7 h-7" />
+              </div>
+              <h3 className="font-bold text-[var(--text-primary)] mb-1 truncate">{batch.name}</h3>
+              <p className="text-xs text-[var(--text-secondary)] font-medium uppercase tracking-wider">
+                {batch.subject || 'Subject'}
+              </p>
+            </motion.div>
+          ))}
+
+          {/* Join More card */}
           <motion.div
             whileHover={{ y: -5 }}
             className="p-6 rounded-[2rem] bg-[var(--bg-app)] border border-dashed border-[var(--border-subtle)] flex flex-col items-center justify-center text-center group cursor-pointer hover:border-purple-500/50 transition-all"
             onClick={() => navigate('/dashboard/join')}
           >
             <div className="w-12 h-12 rounded-full bg-[var(--border-subtle)]/20 flex items-center justify-center mb-3 group-hover:bg-purple-500/10 transition-all">
-              <Play className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-purple-400" />
+              <Plus className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-purple-400" />
             </div>
             <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">Join More</p>
           </motion.div>
@@ -245,28 +332,45 @@ const StudentDashboard = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {activeTests.map((test) => (
-              <div
-                key={test.id}
-                className="flex items-center justify-between px-5 py-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-purple-500/30 transition-all group cursor-pointer"
-                onClick={() => navigate(`/dashboard/test-attempt/${test.id}`)}
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-purple-400 transition-colors truncate">{test.title}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-[var(--text-secondary)]">{test.questions?.length || 0} Qs</span>
-                    {test.duration_minutes && (
-                      <span className="flex items-center gap-0.5 text-xs text-[var(--text-secondary)]">
-                        <Clock className="w-3 h-3" /> {test.duration_minutes}m
-                      </span>
-                    )}
+            {activeTests.map((test) => {
+              const isLocked = test.start_time && new Date(test.start_time) > new Date()
+              return (
+                <div
+                  key={test.id}
+                  className={`flex items-center justify-between px-5 py-4 rounded-xl border transition-all group cursor-pointer ${
+                    isLocked 
+                      ? 'border-[var(--border-subtle)]/50 bg-[var(--bg-app)] opacity-60' 
+                      : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-purple-500/30'
+                  }`}
+                  onClick={() => !isLocked && navigate(`/dashboard/test-attempt/${test.id}`)}
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-sm font-semibold truncate ${isLocked ? 'text-[var(--text-secondary)]' : 'text-[var(--text-primary)] group-hover:text-purple-400'} transition-colors`}>{test.title}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      {isLocked ? (
+                        <span className="flex items-center gap-1 text-[10px] text-amber-400 font-bold uppercase tracking-wider bg-amber-500/10 px-1.5 py-0.5 rounded">
+                          <Clock className="w-2.5 h-2.5" /> Scheduled
+                        </span>
+                      ) : (
+                        <span className="text-xs text-[var(--text-secondary)]">Live Now</span>
+                      )}
+                      {test.duration_minutes && (
+                        <span className="flex items-center gap-0.5 text-xs text-[var(--text-secondary)]">
+                          <Clock className="w-3 h-3" /> {test.duration_minutes}m
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className={`ml-3 p-2 rounded-lg transition-all ${
+                    isLocked 
+                      ? 'bg-[var(--border-subtle)]/10 text-[var(--text-secondary)]' 
+                      : 'bg-green-500/10 text-green-400 group-hover:bg-purple-500/10 group-hover:text-purple-400'
+                  }`}>
+                    {isLocked ? <Lock className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                   </div>
                 </div>
-                <div className="ml-3 p-2 rounded-lg bg-green-500/10 text-green-400 group-hover:bg-purple-500/10 group-hover:text-purple-400 transition-all">
-                  <Play className="w-4 h-4" />
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </motion.div>
       )}

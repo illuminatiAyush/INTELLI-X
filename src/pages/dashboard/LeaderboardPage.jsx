@@ -50,7 +50,7 @@ const LeaderboardPage = () => {
       // Note: We join with students on profile_id (handled by the updated foreign key)
       const { data, error } = await supabase
         .from('results')
-        .select('student_id, marks, students(name), tests(total_marks, batch_id)')
+        .select('student_id, marks, students(name), tests!inner(total_marks, batch_id)')
         .eq('tests.batch_id', selectedBatch)
         .order('marks', { ascending: false })
       
@@ -58,7 +58,9 @@ const LeaderboardPage = () => {
 
       // Aggregate by student (student_id is now the profile_id)
       const map = {}
-      ;(data || []).forEach((r) => {
+      ;(data || [])
+        .filter((r) => r.tests && r.tests.batch_id === selectedBatch)
+        .forEach((r) => {
         const sid = r.student_id
         if (!map[sid]) {
           map[sid] = { 

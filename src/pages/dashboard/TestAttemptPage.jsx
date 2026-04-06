@@ -22,31 +22,35 @@ const TestAttemptPage = () => {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [result, setResult] = useState(null)
-  const [studentId, setStudentId] = useState(null)
-
-  const [attempt, setAttempt] = useState(null)
+  const [violationCount, setViolationCount] = useState(0)
+  const [attemptId, setAttemptId] = useState(null)
 
   const timerRef = useRef(null)
+  const pollRef = useRef(null)
   const questionsRef = useRef([])
   const answersRef = useRef({})
   const testRef = useRef(null)
   const submittingRef = useRef(false)
   const submittedRef = useRef(false)
+  const violationRef = useRef(0)
+  const attemptIdRef = useRef(null)
 
-  // Sync refs for stable access in timer/realtime
+  // Sync refs for stable access in timer/realtime callbacks
   useEffect(() => {
     questionsRef.current = questions
     answersRef.current = answers
     testRef.current = test
     submittingRef.current = submitting
     submittedRef.current = submitted
-  }, [questions, answers, test, submitting, submitted])
+    violationRef.current = violationCount
+    attemptIdRef.current = attemptId
+  }, [questions, answers, test, submitting, submitted, violationCount, attemptId])
 
   // 2. HELPER FUNCTIONS
   const formatTime = (seconds) => {
     if (seconds === null) return '--:--'
     if (seconds <= 0) return '00:00'
-    const m = Math.floor(seconds / (60))
+    const m = Math.floor(seconds / 60)
     const s = Math.floor(seconds % 60)
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
@@ -58,10 +62,22 @@ const TestAttemptPage = () => {
     return 'text-green-400'
   }
 
-  // 3. EVENT HANDLERS (Declared before useEffect/usage)
-  async function handleSubmit(isAutoSubmit = false) {
+  // 3. SAVE ANSWERS TO DB (Persistent across refresh)
+  const persistAnswers = async (newAnswers) => {
+    if (!attemptIdRef.current) return
+    try {
+      await supabase
+        .from('student_attempts')
+        .update({ answers: newAnswers })
+        .eq('id', attemptIdRef.current)
+    } catch (err) {
+      console.warn('Answer save failed (non-critical):', err)
+    }
+  }
+
+  // 4. EVENT HANDLERS
+  async function handleSubmit(isAutoSubmit = false, reason = '') {
     if (submittingRef.current || submittedRef.current) return
-    
     const qList = questionsRef.current
     const ansList = answersRef.current
     const currentT = testRef.current
@@ -72,26 +88,76 @@ const TestAttemptPage = () => {
 
     try {
       if (timerRef.current) clearInterval(timerRef.current)
+      if (pollRef.current) clearInterval(pollRef.current)
+
+      // 1. DATA VALIDATION
+      if (!attemptIdRef.current) {
+        // Emergency fetch attempt id if missing from state
+        const { data: syncAttempt } = await supabase
+          .from('student_attempts')
+          .select('id, status')
+          .eq('student_id', user.id)
+          .eq('test_id', testId)
+          .maybeSingle()
+        
+        if (syncAttempt) {
+            if (syncAttempt.status === 'submitted' || syncAttempt.status === 'forced_end') {
+                toast('Tests already submitted.')
+                navigate('/dashboard')
+                return
+            }
+            attemptIdRef.current = syncAttempt.id
+        } else {
+            throw new Error('Attempt Session Missing. Please refresh and try again.')
+        }
+      }
+
+      const currentAttemptId = attemptIdRef.current
 
       // Calculate score
       let score = 0
-      qList.forEach(q => {
-        if (ansList[q.id] === q.answer) score++
-      })
-
-      // Save result using profile_id as student_id standard
-      const { data: resultData, error: resultErr } = await supabase
-        .from('results')
-        .insert({
-          student_id: user.id, 
-          test_id: testId,
-          marks: score,
-          answers: ansList,
-          submitted_at: new Date().toISOString(),
-          institute_id: currentT?.institute_id,
+      if (qList && qList.length > 0) {
+        qList.forEach(q => {
+          if (q && ansList[q.id] === q.answer) score++
         })
-        .select()
-        .single()
+      }
+
+      // 2. UPDATE ATTEMPT STATUS
+      const status = reason === 'teacher_stop' ? 'forced_end' : 
+                     reason === 'violation' ? 'submitted' :
+                     isAutoSubmit ? 'submitted' : 'submitted'
+      
+      await supabase
+        .from('student_attempts')
+        .update({ 
+          status,
+          answers: ansList 
+        })
+        .eq('id', currentAttemptId)
+
+      // 3. INSERT RESULT WITH RETRY
+      let resultData = null
+      let resultErr = null
+      
+      const insertResult = async () => {
+        return await supabase
+          .from('results')
+          .insert({
+            student_id: user.id,
+            test_id: testId,
+            marks: score,
+            answers: ansList,
+            submitted_at: new Date().toISOString(),
+            institute_id: currentT?.institute_id,
+            violation_count: violationRef.current,
+          })
+          .select()
+          .single()
+      }
+
+      const res = await insertResult()
+      resultData = res.data
+      resultErr = res.error
 
       if (resultErr) {
         if (resultErr.code === '23505') {
@@ -99,11 +165,17 @@ const TestAttemptPage = () => {
           const { data: existing } = await supabase.from('results').select('*').eq('student_id', user.id).eq('test_id', testId).single()
           setResult(existing)
         } else {
-          throw resultErr
+          // Retry once
+          console.warn('Submission failed once, retrying...', resultErr)
+          const retryRes = await insertResult()
+          if (retryRes.error) throw retryRes.error
+          resultData = retryRes.data
         }
-      } else {
+      }
+
+      if (resultData) {
         setResult(resultData)
-        // Background task: Generate AI Feedback for this result
+        // Background: Generate AI Feedback
         generateAIFeedback(resultData, currentT, qList)
           .then(async (feedback) => {
             if (feedback) {
@@ -116,24 +188,30 @@ const TestAttemptPage = () => {
       submittedRef.current = true
       setSubmitted(true)
 
-      if (isAutoSubmit) {
+      if (reason === 'teacher_stop') {
+        toast('The teacher has ended this test.', { icon: '🛑' })
+      } else if (reason === 'violation') {
+        toast.error('❌ Auto-submitted due to tab switching violations.', { duration: 6000 })
+      } else if (isAutoSubmit) {
         toast('⏰ Time\'s up! Test auto-submitted.', { icon: '⏱️' })
       } else {
         toast.success(`Test submitted! Score: ${score}/${qList.length}`)
       }
     } catch (err) {
       console.error('Submit error:', err)
-      toast.error('Failed to submit test. Please try again.')
-      submittingRef.current = false
+      toast.error('Submission failed. Please check your connection and try again.', { duration: 5000 })
       setSubmitting(false)
+      submittingRef.current = false
     }
   }
 
   function handleOptionSelect(questionId, option) {
-    setAnswers(prev => ({
-      ...prev,
-      [questionId]: option
-    }))
+    setAnswers(prev => {
+      const updated = { ...prev, [questionId]: option }
+      // Persist to DB (fire-and-forget)
+      persistAnswers(updated)
+      return updated
+    })
   }
 
   function goNext() {
@@ -148,15 +226,15 @@ const TestAttemptPage = () => {
     }
   }
 
-  // 4. DATA LOADING & EFFECTS
+  // 5. DATA LOADING & EFFECTS
   useEffect(() => {
     if (!user || !testId) return
 
     const loadData = async () => {
       try {
         setLoading(true)
-        
-        // 1. Check if already attempted (results)
+
+        // 1. Check if already submitted
         const { data: existingResult } = await supabase
           .from('results')
           .select('*')
@@ -181,39 +259,102 @@ const TestAttemptPage = () => {
         if (tErr || !testData) throw new Error('Test not found')
         setTest(testData)
 
-        // 3. Timer Persistence: Check or Create attempt record
-        const { data: attemptData, error: aErr } = await supabase
+        // 3. Check if test is locked (ended by teacher or past end_time)
+        if (testData.end_time && new Date(testData.end_time) <= new Date()) {
+          toast.error('This test has already ended.')
+          navigate('/dashboard')
+          return
+        }
+
+        // 4. Check if test hasn't started yet
+        if (testData.start_time && new Date(testData.start_time) > new Date()) {
+          toast.error('This test has not started yet.')
+          navigate('/dashboard')
+          return
+        }
+
+        // 5. Timer Persistence: Check or Create attempt record
+        const { data: attemptData } = await supabase
           .from('student_attempts')
           .select('*')
           .eq('student_id', user.id)
           .eq('test_id', testId)
           .maybeSingle()
 
-        let currentStartTime;
+        let currentAttempt
+        const durationSecs = (testData.duration_minutes || 30) * 60
+
         if (!attemptData) {
-          // First time starting
+          // First time starting — create attempt with server-persisted ends_at
+          const startedAt = new Date()
+          const endsAt = new Date(startedAt.getTime() + durationSecs * 1000)
+
           const { data: newAttempt, error: iErr } = await supabase
             .from('student_attempts')
             .insert({
               student_id: user.id,
               test_id: testId,
-              institute_id: testData.institute_id
+              institute_id: testData.institute_id,
+              ends_at: endsAt.toISOString(),
+              status: 'in_progress',
+              answers: {},
+              violation_count: 0,
             })
             .select()
             .single()
-          
+
           if (iErr) {
-             // Fallback to now if table doesn't exist
-             currentStartTime = new Date()
-             console.warn('student_attempts table might be missing. Using local start time.')
+            console.error('student_attempts insert failed:', iErr)
+            // Retry once immediately for robustness
+            const { data: retryAttempt, error: rErr } = await supabase
+              .from('student_attempts')
+              .insert({
+                student_id: user.id,
+                test_id: testId,
+                institute_id: testData.institute_id,
+                ends_at: endsAt.toISOString(),
+                status: 'in_progress',
+              })
+              .select().single()
+            
+            if (rErr) throw new Error('Failed to initialize test session. Please try again.')
+            currentAttempt = retryAttempt
+            setAttemptId(retryAttempt.id)
           } else {
-             currentStartTime = new Date(newAttempt.started_at)
+            currentAttempt = newAttempt
+            setAttemptId(newAttempt.id)
           }
         } else {
-          currentStartTime = new Date(attemptData.started_at)
+          // Resuming — check if already submitted
+          if (attemptData.status === 'submitted' || attemptData.status === 'forced_end') {
+            toast('This test was already submitted.')
+            navigate('/dashboard')
+            return
+          }
+
+          currentAttempt = attemptData
+          setAttemptId(attemptData.id)
+
+          // Restore saved answers
+          if (attemptData.answers && Object.keys(attemptData.answers).length > 0) {
+            setAnswers(attemptData.answers)
+          }
+
+          // If ends_at is missing (old record), compute it
+          if (!attemptData.ends_at) {
+            const endsAt = new Date(new Date(attemptData.started_at).getTime() + durationSecs * 1000)
+            currentAttempt.ends_at = endsAt.toISOString()
+            // Patch the DB
+            if (attemptData.id) {
+              await supabase.from('student_attempts').update({ ends_at: endsAt.toISOString() }).eq('id', attemptData.id)
+            }
+          }
         }
 
-        // 4. Load questions
+        // Set violation count from DB
+        setViolationCount(currentAttempt.violation_count || 0)
+
+        // 6. Load questions
         const { data: qData, error: qErr } = await supabase
           .from('questions')
           .select('*')
@@ -223,15 +364,14 @@ const TestAttemptPage = () => {
         if (qErr || !qData || qData.length === 0) throw new Error('Questions not found')
         setQuestions(qData)
 
-        // 5. Calculate remaining time
-        const durationSecs = (testData.duration_minutes || 30) * 60
+        // 7. Calculate remaining time from SERVER-BASED ends_at
+        const endsAtTime = new Date(currentAttempt.ends_at)
         const now = new Date()
-        const elapsedSecs = Math.floor((now - currentStartTime) / 1000)
-        const remaining = Math.max(0, durationSecs - elapsedSecs)
-        
+        const remaining = Math.max(0, Math.floor((endsAtTime - now) / 1000))
+
         setTimeLeft(remaining)
         if (remaining <= 0) {
-           handleSubmit(true)
+          handleSubmit(true)
         }
 
       } catch (err) {
@@ -246,7 +386,7 @@ const TestAttemptPage = () => {
     loadData()
   }, [testId, user])
 
-  // Timer Effect
+  // Timer Effect — counts down locally but is initialized from server
   useEffect(() => {
     if (timeLeft === null || submitted || loading) return
 
@@ -264,7 +404,7 @@ const TestAttemptPage = () => {
     return () => clearInterval(timerRef.current)
   }, [timeLeft === null, submitted, loading])
 
-  // Realtime Listeners
+  // Realtime Listener — teacher stop
   useEffect(() => {
     if (!testId || submitted || loading) return
 
@@ -274,38 +414,66 @@ const TestAttemptPage = () => {
         const updated = payload.new
         // If teacher forced an early end
         if (updated?.end_time && new Date(updated.end_time) <= new Date()) {
-          toast('The teacher has ended this test.', { icon: '🛑' })
-          handleSubmit(true)
+          handleSubmit(true, 'teacher_stop')
         }
       })
       .subscribe()
 
-    return () => supabase.removeChannel(channel)
+    // Fallback polling every 30 seconds in case Realtime misses an event
+    pollRef.current = setInterval(async () => {
+      if (submittedRef.current) return
+      try {
+        const { data: freshTest } = await supabase
+          .from('tests')
+          .select('end_time')
+          .eq('id', testId)
+          .single()
+        if (freshTest?.end_time && new Date(freshTest.end_time) <= new Date()) {
+          handleSubmit(true, 'teacher_stop')
+        }
+      } catch {}
+    }, 30000)
+
+    return () => {
+      supabase.removeChannel(channel)
+      if (pollRef.current) clearInterval(pollRef.current)
+    }
   }, [testId, submitted, loading])
 
-  // Anti-Cheat: Tab Switch Detection
+  // Anti-Cheat: Server-Persisted Tab Switch Detection
   useEffect(() => {
     if (submitted || loading || !testId) return
 
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        const storageKey = `cheat_count_${user.id}_${testId}`
-        const count = parseInt(localStorage.getItem(storageKey) || '0')
-        
-        if (count === 0) {
+    const handleVisibilityChange = async () => {
+      if (document.hidden && !submittedRef.current) {
+        const newCount = violationRef.current + 1
+        setViolationCount(newCount)
+
+        // Persist to DB
+        if (attemptIdRef.current) {
+          try {
+            await supabase
+              .from('student_attempts')
+              .update({ violation_count: newCount })
+              .eq('id', attemptIdRef.current)
+          } catch (err) {
+            console.warn('Violation save failed:', err)
+          }
+        }
+
+        if (newCount === 1) {
           toast.error('⚠️ WARNING: Do not switch tabs! Your next tab switch will auto-submit the test.', {
             duration: 6000,
             icon: '🚨',
             style: { border: '1px solid #ef4444', backgroundColor: '#450a0a', color: '#f87171' }
           })
-          localStorage.setItem(storageKey, '1')
-        } else {
+        } else if (newCount >= 2) {
           toast.error('❌ Tab switch detected again. Auto-submitting test.', {
             duration: 6000,
             icon: '🔒',
             style: { border: '1px solid #ef4444', backgroundColor: '#450a0a', color: '#f87171' }
           })
-          handleSubmit(true) // Auto submit on second violation
+          handleSubmit(true, 'violation')
         }
       }
     }
@@ -314,7 +482,7 @@ const TestAttemptPage = () => {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [submitted, loading, testId, user])
 
-  // 5. RENDER LOGIC
+  // 6. RENDER LOGIC
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -330,7 +498,7 @@ const TestAttemptPage = () => {
     const pct = total ? Math.round((score / total) * 100) : 0
 
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-lg mx-auto py-12"
@@ -345,8 +513,8 @@ const TestAttemptPage = () => {
           </div>
           <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Submission Successful!</h2>
           <p className="text-[var(--text-secondary)] text-sm mb-8">{test?.title}</p>
-          
-          <div className="grid grid-cols-2 gap-4 mb-8">
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="p-4 rounded-2xl bg-[var(--bg-app)] border border-[var(--border-subtle)]">
               <p className="text-2xl font-bold text-[var(--text-primary)]">{score}/{total}</p>
               <p className="text-[10px] uppercase tracking-widest text-[var(--text-secondary)] mt-1 font-bold">Marks Obtained</p>
@@ -361,6 +529,14 @@ const TestAttemptPage = () => {
             </div>
           </div>
 
+          {/* Violations Badge */}
+          {(result?.violation_count > 0 || violationCount > 0) && (
+            <div className="mb-6 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
+              <p className="text-xs font-bold text-red-400">
+                ⚠️ {result?.violation_count || violationCount} Tab Switch Violation{(result?.violation_count || violationCount) > 1 ? 's' : ''} Detected
+              </p>
+            </div>
+          )}
           <button
             onClick={() => navigate('/dashboard')}
             className="w-full py-4 rounded-xl bg-purple-500 text-white font-bold shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all"
@@ -402,6 +578,13 @@ const TestAttemptPage = () => {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          {/* Violations indicator */}
+          {violationCount > 0 && (
+            <div className="px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              {violationCount} Violation{violationCount > 1 ? 's' : ''}
+            </div>
+          )}
           <div className={`px-5 py-3 rounded-xl border font-mono text-xl font-black ${
             timeLeft <= 60 ? 'bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)]'
           }`}>
@@ -488,7 +671,7 @@ const TestAttemptPage = () => {
           >
             <ChevronLeft className="w-5 h-5" /> Previous
           </button>
-          
+
           <div className="text-xs font-bold text-[var(--text-secondary)] tracking-widest uppercase opacity-40">
             Question {currentQuestion + 1} of {questions.length}
           </div>

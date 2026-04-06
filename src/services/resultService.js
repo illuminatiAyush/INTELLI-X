@@ -24,8 +24,34 @@ export const upsertResults = async (results) => {
   const { data, error } = await supabase
     .from('results')
     .upsert(results, { onConflict: 'student_id,test_id' })
-    .select()
+    .select('*, tests(title)')
+  
   if (error) throw error
+
+  // Notify students whose results were updated
+  // Note: 'results' is an array. If multiple results are upserted, we notify each.
+  if (results && results.length > 0) {
+    try {
+      // Get test title if not provided (usually need to fetch it)
+      const testId = results[0].test_id
+      const { data: testData } = await supabase.from('tests').select('title, institute_id').eq('id', testId).single()
+      
+      const notifications = results.map(r => ({
+        user_id: r.student_id, // student_id is the profile_id (Auth UUID)
+        title: 'Results Published',
+        message: `Your results for "${testData?.title || 'Test'}" are now available.`,
+        type: 'result',
+        institute_id: testData?.institute_id
+      }))
+
+      if (notifications.length > 0) {
+        await supabase.from('notifications').insert(notifications)
+      }
+    } catch (notifyErr) {
+      console.error('Failed to send result notifications:', notifyErr)
+    }
+  }
+
   return data
 }
 

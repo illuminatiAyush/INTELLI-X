@@ -90,23 +90,27 @@ const BatchesPage = () => {
     if (!form.name.trim()) return
     setSaving(true)
     try {
-      const payload = { ...form }
-      if (!payload.teacher_id) delete payload.teacher_id
-      
-      // Handle Invite Expiry
-      if (payload.invite_expiry_days) {
-        const d = new Date()
-        d.setDate(d.getDate() + parseInt(payload.invite_expiry_days))
-        payload.invite_expiry = d.toISOString()
-      } else if (!editing) {
-         payload.invite_expiry = null // Default unlimited
+      // Only include core fields guaranteed to exist in the DB schema
+      const payload = {
+        name: form.name.trim(),
+        subject: form.subject.trim() || null,
       }
-      delete payload.invite_expiry_days
+      if (form.teacher_id) payload.teacher_id = form.teacher_id
 
-      // Handle Max Uses
-      payload.max_uses = payload.max_uses ? parseInt(payload.max_uses) : -1
-
-      
+      // invite_expiry — only add if column exists (requires DB migration)
+      try {
+        if (form.invite_expiry_days) {
+          const d = new Date()
+          d.setDate(d.getDate() + parseInt(form.invite_expiry_days))
+          payload.invite_expiry = d.toISOString()
+        }
+        // max_uses — only add when user provides a value
+        if (form.max_uses && !isNaN(parseInt(form.max_uses))) {
+          payload.max_uses = parseInt(form.max_uses)
+        }
+      } catch {
+        // columns may not exist yet — skip silently
+      }
       if (editing) {
         await updateBatch(editing.id, payload)
         setToast({ type: 'success', message: 'Batch updated successfully' })
@@ -144,11 +148,16 @@ const BatchesPage = () => {
     setExpandedBatch(batch)
     setStudentsModalOpen(true)
     const { data } = await supabase
-      .from('students')
-      .select('id, name, email')
+      .from('batch_students')
+      .select('students(id, name, email)')
       .eq('batch_id', batch.id)
-      .order('name')
-    setBatchStudents(data || [])
+    // Flatten: each row is { students: {id, name, email} } → extract inner object
+    const studentList = (data || [])
+      .map(row => row.students)
+      .filter(Boolean)
+      .filter((s, index, self) => self.findIndex(t => t.id === s.id) === index) // Unique students only
+    
+    setBatchStudents(studentList)
   }
 
   const filtered = batches.filter(
@@ -287,7 +296,7 @@ const BatchesPage = () => {
                     onClick={(e) => { e.stopPropagation(); handleRowClick(batch); }}
                     className="glow-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-white text-xs sm:text-sm font-bold tracking-wide active:scale-95 flex items-center gap-1 sm:gap-1.5"
                   >
-                    Enter <Play className="w-3 h-3 fill-current" />
+                    View Detail <Users className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>

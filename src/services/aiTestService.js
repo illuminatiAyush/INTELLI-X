@@ -129,34 +129,64 @@ export const filterByChapter = (text, prompt) => {
   return result.join('\n')
 }
 
+// ── STEP 3.5: Extract question count from prompt text ─────────────────────
+export const extractQuestionCount = (promptText) => {
+  if (!promptText) return 10
+
+  // Match patterns like: "generate 15 MCQs", "create 20 questions", "make 10 mcq", "15 questions"
+  const patterns = [
+    /(?:generate|create|make|give|prepare|build|design|write)\s+(\d+)\s*(?:mcq|question|q|ques)/i,
+    /(\d+)\s*(?:mcq|question|ques)/i,
+    /(?:mcq|question|ques)\w*\s*[:–-]?\s*(\d+)/i,
+  ]
+
+  for (const regex of patterns) {
+    const match = promptText.match(regex)
+    if (match) {
+      const num = parseInt(match[1], 10)
+      if (num >= 1 && num <= 50) return num
+    }
+  }
+
+  return 10 // Default if no number found in prompt
+}
 // ── STEP 4 + 5: Generate MCQs using AI (Gemini or Groq) ─────────────────────────
 export const generateMCQs = async (content, numQuestions, onProgress) => {
   onProgress?.('Preparing content for AI...')
 
   const groqKey = import.meta.env.VITE_GROQ_API_KEY
   const geminiKey = import.meta.env.VITE_GEMINI_API_KEY
-  
+
   if (!groqKey && !geminiKey) {
     throw new Error('AI credits not found. Please configure Groq or Gemini API key in .env')
   }
 
-  // Optimized truncation to stay within TPM limits (approx 2000-2500 tokens)
-  const maxChars = 8000 
-  const truncatedContent = content.length > maxChars ? content.substring(0, maxChars) : content
+  // Guard: reject scanned/empty PDFs before hitting any AI
+  const trimmed = (content || '').trim()
+  if (trimmed.length < 100) {
+    throw new Error(
+      'Not enough text could be extracted from this PDF. ' +
+      'The file may be a scanned image. Please use a text-based PDF or type the content manually in the AI Prompt field.'
+    )
+  }
+
+  // Optimized truncation to stay within TPM limits (~2000-2500 tokens)
+  const maxChars = 8000
+  const truncatedContent = trimmed.length > maxChars ? trimmed.substring(0, maxChars) : trimmed
 
   onProgress?.('Generating interactive questions...')
 
-  // Strategy: Try Gemini first if available (higher limits), else use Groq
-  if (geminiKey) {
+  // Strategy: Try Groq first (reliable free tier), then Gemini as fallback
+  if (groqKey) {
     try {
-      return await generateWithGemini(truncatedContent, numQuestions, geminiKey, onProgress)
+      return await generateWithGroq(truncatedContent, numQuestions, groqKey, onProgress)
     } catch (err) {
-      console.warn('Gemini failed, trying Groq fallback:', err)
-      if (!groqKey) throw err
+      console.warn('Groq failed, trying Gemini fallback:', err)
+      if (!geminiKey) throw err
     }
   }
 
-  return await generateWithGroq(truncatedContent, numQuestions, groqKey, onProgress)
+  return await generateWithGemini(truncatedContent, numQuestions, geminiKey, onProgress)
 }
 
 // ── GROQ GENERATOR ───────────────────────────────────────────────────
@@ -200,8 +230,10 @@ ${content}`
 }
 
 // ── GEMINI GENERATOR ─────────────────────────────────────────────────
+const GEMINI_MODEL = 'gemini-2.0-flash'
+
 const generateWithGemini = async (content, numQuestions, apiKey, onProgress) => {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`
   
   const prompt = `You are an expert educator focusing on high-quality learning assessments.
 Generate exactly ${numQuestions} high-quality, conceptually rigorous MCQs based on the provided content.
@@ -227,8 +259,7 @@ ${content}`
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 3000,
-        responseMimeType: "application/json"
+        maxOutputTokens: 3000
       }
     }),
   })
@@ -252,13 +283,13 @@ const parseAndValidateMCQs = async (rawResponse, numQuestions, content, apiKey, 
     
     let retryResponse
     if (provider === 'gemini') {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`
       retryResponse = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: `System: Output ONLY valid JSON array. No markdown.\nUser: Generate ${numQuestions} MCQs from: ${content.substring(0, 5000)}` }] }],
-          generationConfig: { responseMimeType: "application/json" }
+          generationConfig: {}
         }),
       })
     } else {
@@ -305,6 +336,64 @@ const parseAndValidateMCQs = async (rawResponse, numQuestions, content, apiKey, 
     throw new Error('Could not generate valid questions. Content might be too technical or too large for the current model.')
   }
 
+  // Count mismatch check: if AI returned significantly fewer/more questions than requested, try once more
+  if (validated.length < numQuestions * 0.7 && provider && apiKey) {
+    onProgress?.(`AI returned ${validated.length}/${numQuestions} questions. Requesting more...`)
+    try {
+      const deficit = numQuestions - validated.length
+      let supplementRaw
+
+      if (provider === 'gemini') {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `Generate exactly ${deficit} more unique MCQs from this content. Return ONLY a JSON array.\n\n${content.substring(0, 5000)}` }] }],
+            generationConfig: { temperature: 0.8 }
+          })
+        })
+        if (resp.ok) {
+          const d = await resp.json()
+          supplementRaw = d.candidates?.[0]?.content?.parts?.[0]?.text
+        }
+      } else {
+        const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { role: 'system', content: 'Output ONLY a valid JSON array.' },
+              { role: 'user', content: `Generate exactly ${deficit} more unique MCQs from this content: ${content.substring(0, 4000)}` },
+            ],
+            model: 'llama-3.1-8b-instant',
+            temperature: 0.8,
+          })
+        })
+        if (resp.ok) {
+          const d = await resp.json()
+          supplementRaw = d.choices?.[0]?.message?.content
+        }
+      }
+
+      if (supplementRaw) {
+        const extra = tryParseJSON(supplementRaw)
+        if (extra && Array.isArray(extra)) {
+          const validExtra = extra.filter(
+            q => q.question && Array.isArray(q.options) && q.options.length === 4 && ['A','B','C','D'].includes(String(q.answer).toUpperCase().trim())
+          ).map((q, i) => ({
+            question: String(q.question).trim(),
+            options: q.options.map(o => String(o).trim()),
+            answer: String(q.answer).toUpperCase().trim(),
+            sort_order: validated.length + i,
+          }))
+          validated.push(...validExtra)
+        }
+      }
+    } catch (supplementErr) {
+      console.warn('Supplement generation failed (non-critical):', supplementErr)
+    }
+  }
   return validated
 }
 
@@ -372,13 +461,13 @@ Return ONLY a valid JSON object with the exact following schema:
 }
 No markdown, no json code blocks.`
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey}`
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0.2 }
+        generationConfig: { temperature: 0.2 }
       })
     })
 

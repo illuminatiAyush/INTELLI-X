@@ -109,8 +109,16 @@ const PerformanceChart = ({ testScores, loading }) => {
         </div>
         <h3 className="text-lg font-bold text-[var(--text-primary)]">Performance Trend</h3>
       </div>
-      <div className="h-56">
-        {chartData && <Line data={chartData} options={options} />}
+      <div className="h-56 relative">
+        {chartData ? (
+          <Line data={chartData} options={options} />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 border border-dashed border-[var(--border-subtle)] rounded-xl">
+             <TrendingUp className="w-8 h-8 text-[var(--text-secondary)] mb-3 opacity-30" />
+             <p className="text-sm font-bold text-[var(--text-primary)]">Score Trend Pending</p>
+             <p className="text-[var(--text-secondary)] text-[10px] uppercase tracking-widest font-bold mt-1">First test results will appear here</p>
+          </div>
+        )}
       </div>
     </motion.div>
   )

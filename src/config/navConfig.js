@@ -12,13 +12,17 @@ import {
   PieChart,
   User,
   Activity,
-  Sparkles
+  Sparkles,
+  PlusCircle
 } from 'lucide-react'
 
 const navConfig = {
   master_admin: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Institutes', path: '/dashboard/institutes', icon: Layers },
+    { label: 'Teachers', path: '/dashboard/teachers', icon: Users },
+    { label: 'Students', path: '/dashboard/students', icon: Users },
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers },
     { label: 'System Analytics', path: '/dashboard/analytics', icon: Activity },
     { label: 'Subscriptions', path: '/dashboard/subscriptions', icon: CreditCard },
     { label: 'Settings', path: '/dashboard/settings', icon: Settings },
@@ -39,6 +43,8 @@ const navConfig = {
   ],
   teacher: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Students', path: '/dashboard/students', icon: Users },
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers },
     { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck },
     { label: 'Tests', path: '/dashboard/tests', icon: FileText },
     { label: 'Results', path: '/dashboard/results', icon: BarChart3 },
@@ -48,6 +54,7 @@ const navConfig = {
   ],
   student: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Join Batch', path: '/dashboard/join', icon: PlusCircle },
     { label: 'AI Tests', path: '/dashboard/active-tests', icon: Sparkles },
     { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck },
     { label: 'Results', path: '/dashboard/results', icon: BarChart3 },

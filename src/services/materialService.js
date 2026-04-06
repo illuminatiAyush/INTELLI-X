@@ -1,11 +1,19 @@
 import { supabase } from '../lib/supabase'
 
-export const getMaterials = async (batchId) => {
+export const getMaterials = async (batchIdOrIds) => {
   let query = supabase
     .from('materials')
-    .select('*, batches(name)')
+    .select('*, batches(name), profiles:uploaded_by(first_name, last_name)')
     .order('created_at', { ascending: false })
-  if (batchId) query = query.eq('batch_id', batchId)
+  
+  if (batchIdOrIds) {
+    if (Array.isArray(batchIdOrIds)) {
+      if (batchIdOrIds.length === 0) return []
+      query = query.in('batch_id', batchIdOrIds)
+    } else {
+      query = query.eq('batch_id', batchIdOrIds)
+    }
+  }
   const { data, error } = await query
   if (error) throw error
   return data

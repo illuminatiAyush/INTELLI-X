@@ -25,7 +25,7 @@ const DashboardLayout = () => {
 
   const navItems = role ? (navConfig[role] || []) : []
   const currentPath = location.pathname
-  const currentNavItem = navItems.find((item) => item.path === currentPath) || { label: 'Overview' }
+  const currentNavItem = (navItems || []).find((item) => item.path === currentPath) || { label: 'Overview' }
 
   const handleLogout = async () => {
     await logOut()
@@ -41,12 +41,13 @@ const DashboardLayout = () => {
 
   const roleLabel = roleLabels[role] || 'User'
 
-  let displayName = profile?.first_name
-    ? `${profile.first_name} ${profile.last_name || ''}`
-    : user?.email?.split('@')[0] || 'User'
-
-  // Special branding: if name is 'admin' and they are the super admin, show 'Master'
-  if (role === 'master_admin' && (displayName.toLowerCase() === 'admin' || !profile?.first_name)) {
+  let displayName = profile?.name || 
+                   profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : 
+                   user?.user_metadata?.full_name || 
+                   user?.email?.split('@')[0] || 
+                   'User'
+  
+  if (role === 'master_admin' && (displayName.toLowerCase() === 'admin' || displayName === 'User')) {
     displayName = 'Master'
   }
 

@@ -30,7 +30,7 @@ const StatsCard = ({ title, value, icon: Icon, trend, color = 'purple' }) => {
                 {trend > 0 ? '↑' : '↓'}
               </span>
               <span className={`text-xs font-medium ${trend > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-                {Math.abs(trend)}%
+                {isNaN(trend) ? '0' : Math.abs(trend)}%
               </span>
               <span className="text-[10px] text-[var(--text-secondary)]">vs last month</span>
             </div>

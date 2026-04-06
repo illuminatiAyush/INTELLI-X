@@ -22,12 +22,35 @@ const MaterialsPage = () => {
 
   const fetchData = async () => {
     try {
-      let query = supabase.from('batches').select('*').order('name')
-      if (role === 'teacher') query = query.eq('teacher_id', user.id)
-      const { data: batchData } = await query
-      setBatches(batchData || [])
+      let batchData = []
+      if (role === 'student') {
+        const { data: enrolledBatches } = await supabase.from('batch_students').select('batch_id').eq('student_id', user.id)
+        if (enrolledBatches && enrolledBatches.length > 0) {
+          const batchIds = enrolledBatches.map(eb => eb.batch_id)
+          const { data } = await supabase.from('batches').select('*').in('id', batchIds).order('name')
+          batchData = data || []
+        }
+      } else {
+        let query = supabase.from('batches').select('*').order('name')
+        if (role === 'teacher') query = query.eq('teacher_id', user.id)
+        const { data } = await query
+        batchData = data || []
+      }
+      setBatches(batchData)
 
-      const mats = await getMaterials(selectedBatch || undefined)
+      let mats = []
+      if (role === 'student') {
+        if (batchData.length > 0) {
+          if (selectedBatch) {
+            mats = await getMaterials(selectedBatch)
+          } else {
+            const batchIds = batchData.map(b => b.id)
+            mats = await getMaterials(batchIds)
+          }
+        }
+      } else {
+        mats = await getMaterials(selectedBatch || undefined)
+      }
       setMaterials(mats)
     } catch (err) {
       console.error(err)
@@ -153,7 +176,7 @@ const MaterialsPage = () => {
         <div className="flex-1">
           <Select
             label="Filter by Batch"
-            placeholder="View All"
+            placeholder="All Batches"
             options={[{ value: '', label: 'All Batches' }, ...batchOptions]}
             value={selectedBatch}
             onChange={(e) => setSelectedBatch(e.target.value)}
@@ -204,9 +227,9 @@ const MaterialsPage = () => {
                 </div>
               </div>
               <div className="mb-6 flex-1">
-                <p className="text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1.5">
+                 <p className="text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1.5 flex-wrap leading-relaxed">
                    <span className="w-1 h-1 rounded-full bg-[var(--border-subtle)]" />
-                   Published {new Date(mat.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                   Published {mat.profiles?.first_name ? `by ${mat.profiles.first_name} ${mat.profiles.last_name || ''} ` : ''}on {new Date(mat.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
               <div className="flex items-center gap-2">

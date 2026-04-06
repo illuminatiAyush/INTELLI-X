@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Upload, Sparkles, Trash2, Plus, ChevronDown, ChevronUp, FileText, Loader2, CheckCircle2, AlertCircle, Brain, Send } from 'lucide-react'
+import { X, Upload, Sparkles, Trash2, Plus, ChevronDown, ChevronUp, FileText, Loader2, CheckCircle2, AlertCircle, Brain, Send, Clock } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast'
-import { extractPdfText, cleanText, filterByChapter, generateMCQs } from '../../services/aiTestService'
+import { extractPdfText, cleanText, filterByChapter, generateMCQs, extractQuestionCount } from '../../services/aiTestService'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 
@@ -20,12 +20,11 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
   
   // Config state
   const [prompt, setPrompt] = useState('')
-  const [numQuestions, setNumQuestions] = useState(15)
   const [selectedBatch, setSelectedBatch] = useState('')
   const [testTitle, setTestTitle] = useState('')
   const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
   const [durationMinutes, setDurationMinutes] = useState(30)
+  const [totalMarks, setTotalMarks] = useState(15)
   
   // Generated questions
   const [questions, setQuestions] = useState([])
@@ -40,12 +39,11 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
     setPdfFile(null)
     setPdfText('')
     setPrompt('')
-    setNumQuestions(15)
     setSelectedBatch('')
     setTestTitle('')
     setStartTime('')
-    setEndTime('')
     setDurationMinutes(30)
+    setTotalMarks(15)
     setQuestions([])
     setEditingIndex(null)
     setProgress('')
@@ -79,12 +77,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
       const rawText = await extractPdfText(file, setProgress)
       const cleaned = cleanText(rawText)
       
-      if (cleaned.length < 100) {
-        toast.error('PDF contains too little readable text. Try a different file.')
-        setStep(1)
-        setPdfFile(null)
-        return
-      }
+      // Removed text length validation to allow image-heavy PDFs
       
       setPdfText(cleaned)
       setTestTitle(file.name.replace('.pdf', '').replace(/[_-]/g, ' '))
@@ -115,13 +108,21 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
     setStep(3)
     
     try {
+      // Smart extraction: parse number of questions from prompt
+      const extractedCount = extractQuestionCount(prompt)
+      setProgress(`Extracting ${extractedCount} questions from prompt...`)
       // Filter content by chapter/section if specified
       setProgress('Filtering content by chapter...')
       const filtered = filterByChapter(pdfText, prompt)
       
-      // Generate MCQs
-      const mcqs = await generateMCQs(filtered, numQuestions, setProgress)
+      // Generate MCQs with AI-extracted count
+      // Append local ids for stable React keys
+      const mcqs = (await generateMCQs(filtered, extractedCount, setProgress)).map(q => ({
+        ...q,
+        local_id: Math.random().toString(36).substr(2, 9)
+      }))
       
+      setTotalMarks(mcqs.length)
       setQuestions(mcqs)
       setStep(4)
       toast.success(`${mcqs.length} questions generated successfully!`)
@@ -192,12 +193,14 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
         .insert({
           title: testTitle,
           batch_id: selectedBatch,
-          date: new Date().toISOString().split('T')[0],
-          total_marks: questions.length,
+          date: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD in local time
+          total_marks: totalMarks || questions.length,
           created_by: user.id,
           institute_id: instituteId,
           start_time: startTime || null,
-          end_time: endTime || null,
+          end_time: startTime && durationMinutes 
+            ? new Date(new Date(startTime).getTime() + (durationMinutes || 30) * 60 * 1000).toISOString() 
+            : null,
           duration_minutes: durationMinutes || 30,
           is_ai_generated: true,
           status: startTime ? 'published' : 'draft',
@@ -225,26 +228,22 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
 
       if (qError) throw qError
 
-      // Send notifications to students in this batch
       try {
         const { data: batchStudents } = await supabase
           .from('batch_students')
-          .select('student_id, students(profile_id)')
+          .select('student_id')
           .eq('batch_id', selectedBatch)
 
-        if (batchStudents?.length > 0) {
-          const notifications = batchStudents
-            .filter(bs => bs.students?.profile_id)
-            .map(bs => ({
-              user_id: bs.students.profile_id,
-              title: 'New AI Test Available',
-              message: `A new test "${testTitle}" has been created for your class.`,
-              institute_id: instituteId,
-            }))
+        if (batchStudents && batchStudents.length > 0) {
+          const notifications = batchStudents.map(bs => ({
+            user_id: bs.student_id,
+            title: 'New AI Test Available',
+            message: `A new test "${testTitle}" has been created for your class.`,
+            type: 'test',
+            institute_id: instituteId,
+          }))
 
-          if (notifications.length > 0) {
-            await supabase.from('notifications').insert(notifications)
-          }
+          await supabase.from('notifications').insert(notifications)
         }
       } catch (notifyErr) {
         console.error('Notification error:', notifyErr)
@@ -429,17 +428,12 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                   </p>
                 </div>
 
-                {/* Number of Questions */}
-                <div>
-                  <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">Number of Questions</label>
-                  <input
-                    type="number"
-                    min={5}
-                    max={30}
-                    value={numQuestions}
-                    onChange={(e) => setNumQuestions(parseInt(e.target.value) || 15)}
-                    className="w-32 px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-purple-500/50 transition-all"
-                  />
+                {/* AI auto-detects question count from prompt. Show info. */}
+                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-purple-500/5 border border-purple-500/20">
+                  <Sparkles className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                  <p className="text-xs text-purple-400/80 font-medium">
+                    💡 AI will auto-detect question count from your prompt. E.g., "Generate <strong>15</strong> MCQs from Chapter 3". Default: 10 if not specified.
+                  </p>
                 </div>
 
                 {/* Timing Settings */}
@@ -447,7 +441,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                   <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
                     <span className="text-lg">⏱️</span> Test Timing (Optional)
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Start Time</label>
                       <input
@@ -458,26 +452,28 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">End Time</label>
-                      <input
-                        type="datetime-local"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs outline-none focus:border-purple-500/50 transition-all"
-                      />
-                    </div>
-                    <div>
                       <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Duration (min)</label>
                       <input
                         type="number"
                         min={5}
                         max={180}
                         value={durationMinutes}
-                        onChange={(e) => setDurationMinutes(parseInt(e.target.value) || 30)}
+                        onChange={(e) => setDurationMinutes(e.target.value === '' ? '' : Number(e.target.value))}
                         className="w-full px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs outline-none focus:border-purple-500/50 transition-all"
                       />
                     </div>
                   </div>
+                  {/* Auto-computed end time preview */}
+                  {startTime && durationMinutes && (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)]">
+                      <Clock className="w-3.5 h-3.5 text-[var(--text-secondary)]" />
+                      <span className="text-xs text-[var(--text-secondary)] font-medium">
+                        Auto End Time: <span className="text-[var(--text-primary)] font-bold">
+                          {new Date(new Date(startTime).getTime() + durationMinutes * 60 * 1000).toLocaleString()}
+                        </span>
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Generate Button */}
@@ -538,7 +534,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                 <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                   {questions.map((q, qIdx) => (
                     <div
-                      key={qIdx}
+                      key={q.local_id || qIdx}
                       className={`rounded-2xl border transition-all ${
                         editingIndex === qIdx
                           ? 'border-purple-500/30 bg-purple-500/5'

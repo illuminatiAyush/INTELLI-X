@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, FileText, Trash2, Search, ListOrdered, Sparkles, Brain, Clock, CheckCircle2 } from 'lucide-react'
+import { Plus, FileText, Trash2, Search, ListOrdered, Sparkles, Brain, Clock, CheckCircle2, FileDown, AlertTriangle } from 'lucide-react'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import DataTable from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
 import { Input, Select } from '../../components/ui/FormField'
@@ -24,10 +26,20 @@ const TestsPage = () => {
   const [selectedTest, setSelectedTest] = useState(null)
   const [testStudents, setTestStudents] = useState([])
   const [marks, setMarks] = useState({})
-  const [form, setForm] = useState({ title: '', batch_id: '', date: new Date().toISOString().split('T')[0], total_marks: '100' })
+  const [form, setForm] = useState({ 
+    title: '', 
+    batch_id: '', 
+    date: new Date().toLocaleDateString('en-CA'), 
+    total_marks: '100' 
+  })
   const [saving, setSaving] = useState(false)
   const [aiModalOpen, setAiModalOpen] = useState(false)
 
+  // Admin-specific: batch→test→results flow
+  const [adminSelBatch, setAdminSelBatch] = useState('')
+  const [adminSelTest, setAdminSelTest] = useState('')
+  const [adminResults, setAdminResults] = useState([])
+  const [adminLoading, setAdminLoading] = useState(false)
   const fetchData = async () => {
     try {
       let query = supabase.from('tests').select('*, batches(name), questions(id)').order('date', { ascending: false })
@@ -96,7 +108,12 @@ const TestsPage = () => {
         created_by: user.id,
       })
       setModalOpen(false)
-      setForm({ title: '', batch_id: '', date: new Date().toISOString().split('T')[0], total_marks: '100' })
+      setForm({ 
+        title: '', 
+        batch_id: '', 
+        date: new Date().toLocaleDateString('en-CA'), 
+        total_marks: '100' 
+      })
       fetchData()
       toast.success('Test created successfully!')
     } catch (err) {
@@ -186,7 +203,8 @@ const TestsPage = () => {
   }
 
   const filtered = tests.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()))
-  const canManage = role === 'admin' || role === 'teacher'
+  const canManage = role === 'teacher'          // create / delete / end / save marks
+  const canView   = role === 'admin' || role === 'teacher'  // view status + results
 
   const columns = [
     { key: 'title', label: 'Test Title', render: (r) => (
@@ -205,7 +223,7 @@ const TestsPage = () => {
     { key: 'questions_count', label: 'Questions', render: (r) => r.questions?.length || 0 },
   ]
 
-  if (canManage) {
+  if (canView) {
     columns.push({
       key: 'status_col',
       label: 'Status',
@@ -258,12 +276,14 @@ const TestsPage = () => {
           >
             <ListOrdered className="w-3.5 h-3.5" /> Results
           </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); handleDeleteTest(row.id) }}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-red-400 transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {canManage && (
+            <button
+              onClick={(e) => { e.stopPropagation(); handleDeleteTest(row.id) }}
+              className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-red-400 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </div>
       ),
     })
@@ -271,6 +291,139 @@ const TestsPage = () => {
 
   const batchOptions = batches.map((b) => ({ value: b.id, label: b.name }))
 
+  const downloadResultsPDF = () => {
+    if (!selectedTest) return
+    const batchName = selectedTest.batches?.name || 'Batch'
+    const testTitle = selectedTest.title || 'Test'
+    const doc = new jsPDF()
+
+    // Styled header
+    doc.setFillColor(139, 92, 246)
+    doc.rect(0, 0, 220, 28, 'F')
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Results Report', 14, 18)
+
+    // Meta
+    doc.setTextColor(40, 40, 40)
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Test: ${testTitle}`, 14, 38)
+    doc.text(`Batch: ${batchName}`, 14, 46)
+    doc.text(`Date: ${selectedTest.date}  |  Total Marks: ${selectedTest.total_marks}`, 14, 54)
+
+    // Ranked table
+    const ranked = [...testStudents]
+      .map(s => ({ ...s, m: parseInt(marks[s.id] ?? NaN) }))
+      .sort((a, b) => (isNaN(a.m) ? 1 : isNaN(b.m) ? -1 : b.m - a.m))
+
+    autoTable(doc, {
+      startY: 62,
+      head: [['Rank', 'Student Name', 'Email', 'Marks', 'Score %']],
+      body: ranked.map((s, i) => [
+        isNaN(s.m) ? '-' : i + 1,
+        s.name || 'Unknown student',
+        s.email || '-',
+        isNaN(s.m) ? 'N/A' : `${s.m} / ${selectedTest.total_marks || 100}`,
+        isNaN(s.m) ? '-' : Math.round((s.m / (selectedTest.total_marks || 100)) * 100) + '%',
+      ]),
+      styles: { fontSize: 10, cellPadding: 5 },
+      headStyles: { fillColor: [139, 92, 246], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 245, 255] },
+      didParseCell: (data) => {
+        if (data.column.index === 4 && data.section === 'body') {
+          const pct = parseInt(data.cell.raw)
+          data.cell.styles.fontStyle = 'bold'
+          data.cell.styles.textColor = pct >= 75 ? [16, 185, 129] : pct >= 50 ? [245, 158, 11] : [239, 68, 68]
+        }
+      },
+    })
+
+    // Page footer
+    const pages = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.setTextColor(150)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`Generated by IntelliX  •  Page ${i} of ${pages}`, 14, doc.internal.pageSize.height - 8)
+    }
+
+    doc.save(`results_${testTitle}_${selectedTest.date}.pdf`)
+  }
+
+  // ── Admin: fetch results for a selected test ──────────────────────────────
+  const fetchAdminResults = async (testId) => {
+    setAdminLoading(true)
+    try {
+      const { data } = await supabase
+        .from('results')
+        .select('marks, rank, violation_count, students(name, email)')
+        .eq('test_id', testId)
+        .order('rank', { ascending: true })
+      setAdminResults(data || [])
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setAdminLoading(false)
+    }
+  }
+
+  const downloadAdminResultsPDF = () => {
+    const testObj = tests.find(t => t.id === adminSelTest)
+    const batchObj = batches.find(b => b.id === adminSelBatch)
+    if (!testObj) return
+    const doc = new jsPDF()
+
+    doc.setFillColor(139, 92, 246)
+    doc.rect(0, 0, 220, 28, 'F')
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Results Report', 14, 18)
+
+    doc.setTextColor(40, 40, 40)
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`Test: ${testObj.title}`, 14, 38)
+    doc.text(`Batch: ${batchObj?.name || '-'}`, 14, 46)
+    doc.text(`Date: ${testObj.date}  |  Total Marks: ${testObj.total_marks}`, 14, 54)
+
+    autoTable(doc, {
+      startY: 62,
+      head: [['Rank', 'Student Name', 'Email', 'Marks', 'Score %']],
+      body: adminResults.map((r) => {
+        const pct = testObj.total_marks ? Math.round((r.marks / testObj.total_marks) * 100) : '-'
+        return [
+          r.rank ?? '-',
+          r.students?.name || '-',
+          r.students?.email || '-',
+          `${r.marks} / ${testObj.total_marks}`,
+          typeof pct === 'number' ? pct + '%' : '-',
+        ]
+      }),
+      styles: { fontSize: 10, cellPadding: 5 },
+      headStyles: { fillColor: [139, 92, 246], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [248, 245, 255] },
+      didParseCell: (data) => {
+        if (data.column.index === 4 && data.section === 'body') {
+          const pct = parseInt(data.cell.raw)
+          data.cell.styles.fontStyle = 'bold'
+          data.cell.styles.textColor = pct >= 75 ? [16, 185, 129] : pct >= 50 ? [245, 158, 11] : [239, 68, 68]
+        }
+      },
+    })
+
+    const pages = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.setTextColor(150)
+      doc.text(`Generated by IntelliX  •  Page ${i} of ${pages}`, 14, doc.internal.pageSize.height - 8)
+    }
+    doc.save(`results_${testObj.title}_${testObj.date}.pdf`)
+  }
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -279,6 +432,136 @@ const TestsPage = () => {
     )
   }
 
+  // ── Admin view: batch → test → results ───────────────────────────────────
+  if (role === 'admin') {
+    const adminBatchTests = tests.filter(t => t.batch_id === adminSelBatch)
+    const adminTestObj = tests.find(t => t.id === adminSelTest)
+    const selectCls = 'w-full px-4 py-2.5 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-[var(--color-purple)] transition-all appearance-none cursor-pointer'
+    const labelCls = 'block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2'
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <motion.h1 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">Tests &amp; Results</motion.h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">View and download test result reports</p>
+        </div>
+
+        {/* Selectors card */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[var(--bg-card)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+          <div>
+            <label className={labelCls}>Batch</label>
+            <select
+              value={adminSelBatch}
+              onChange={(e) => { setAdminSelBatch(e.target.value); setAdminSelTest(''); setAdminResults([]) }}
+              className={selectCls}
+            >
+              <option value="">Choose a batch</option>
+              {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Test</label>
+            <select
+              value={adminSelTest}
+              disabled={!adminSelBatch}
+              onChange={async (e) => {
+                const tid = e.target.value
+                setAdminSelTest(tid)
+                setAdminResults([])
+                if (tid) await fetchAdminResults(tid)
+              }}
+              className={`${selectCls} disabled:opacity-40 disabled:cursor-not-allowed`}
+            >
+              <option value="">Choose a test</option>
+              {adminBatchTests.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* Results table */}
+        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+          {adminSelTest && adminResults.length > 0 && (
+            <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-[var(--bg-app)]/50">
+              <div>
+                <p className="font-semibold text-[var(--text-primary)]">{adminTestObj?.title}</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">{adminResults.length} students &bull; Total: {adminTestObj?.total_marks} marks</p>
+              </div>
+              <button
+                onClick={downloadAdminResultsPDF}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--color-purple)]/10 text-[var(--color-purple)] hover:bg-[var(--color-purple)]/20 transition-all text-sm font-semibold active:scale-95"
+              >
+                <FileDown className="w-4 h-4" /> Download PDF
+              </button>
+            </div>
+          )}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-[var(--bg-app)]/50 text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+                <tr>
+                  <th className="px-6 py-5 font-bold">Student</th>
+                  <th className="px-6 py-5 font-bold">Marks</th>
+                  <th className="px-6 py-5 font-bold">%</th>
+                  <th className="px-6 py-5 font-bold">Rank</th>
+                  <th className="px-6 py-5 font-bold">Violations</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--border-subtle)]">
+                {!adminSelBatch || !adminSelTest ? (
+                  <tr><td colSpan="5" className="px-6 py-12 text-center text-[var(--text-secondary)] text-sm">Select a batch and test to view results</td></tr>
+                ) : adminLoading ? (
+                  <tr><td colSpan="5" className="px-6 py-12 text-center">
+                    <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto" />
+                  </td></tr>
+                ) : adminResults.length === 0 ? (
+                  <tr><td colSpan="5" className="px-6 py-12 text-center text-[var(--text-secondary)] text-sm">No results recorded for this test yet</td></tr>
+                ) : (
+                  adminResults.map((r, i) => {
+                    const pct = adminTestObj?.total_marks ? Math.round((r.marks / adminTestObj.total_marks) * 100) : null
+                    const pctColor = pct === null ? '' : pct >= 75 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'
+                    const violations = r.violation_count || 0
+                    return (
+                      <tr key={i} className="hover:bg-[var(--bg-app)] transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[var(--color-purple)]/10 text-[var(--color-purple)] flex items-center justify-center text-xs font-bold">
+                              {r.students?.name?.charAt(0).toUpperCase() || '?'}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-[var(--text-primary)] text-sm">{r.students?.name || '-'}</p>
+                              <p className="text-xs text-[var(--text-secondary)]">{r.students?.email || ''}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 font-bold text-[var(--text-primary)]">
+                          {r.marks} <span className="text-[var(--text-secondary)] font-normal text-xs">/ {adminTestObj?.total_marks}</span>
+                        </td>
+                        <td className={`px-6 py-4 font-bold ${pctColor}`}>
+                          {pct !== null ? `${pct}%` : '-'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="px-2.5 py-1 rounded-lg bg-[var(--color-purple)]/10 text-[var(--color-purple)] text-xs font-bold">#{r.rank ?? i + 1}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {violations === 0 ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20">Clean</span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-1 w-fit">
+                              <AlertTriangle className="w-3 h-3" /> {violations}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -380,33 +663,49 @@ const TestsPage = () => {
                     </div>
                     <span className="text-sm font-bold text-[var(--text-primary)]">{student.name}</span>
                   </div>
-                  <input
-                    type="number"
-                    min="0"
-                    max={selectedTest?.total_marks || 100}
-                    placeholder="Marks"
-                    value={marks[student.id] ?? ''}
-                    onChange={(e) => setMarks({ ...marks, [student.id]: e.target.value })}
-                    className="w-24 px-4 py-2 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm text-center font-bold outline-none focus:border-[var(--color-purple)] focus:ring-1 focus:ring-[var(--color-purple)]"
-                  />
+                  {role === 'admin' ? (
+                    <span className="w-24 px-4 py-2 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm text-center font-bold inline-block">
+                      {marks[student.id] !== undefined && marks[student.id] !== '' ? `${marks[student.id]} / ${selectedTest?.total_marks}` : '-'}
+                    </span>
+                  ) : (
+                    <input
+                      type="number"
+                      min="0"
+                      max={selectedTest?.total_marks || 100}
+                      placeholder="Marks"
+                      value={marks[student.id] ?? ''}
+                      onChange={(e) => setMarks({ ...marks, [student.id]: e.target.value })}
+                      className="w-24 px-4 py-2 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm text-center font-bold outline-none focus:border-[var(--color-purple)] focus:ring-1 focus:ring-[var(--color-purple)]"
+                    />
+                  )}
                 </div>
               ))
             )}
           </div>
-          <div className="flex justify-end gap-3 pt-6 border-t border-[var(--border-subtle)]">
-            <button 
-              onClick={() => setResultsModal(false)} 
-              className="px-6 py-2.5 rounded-xl text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-all"
+          <div className="flex justify-between items-center pt-6 border-t border-[var(--border-subtle)]">
+            <button
+              onClick={downloadResultsPDF}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-purple)]/10 text-[var(--color-purple)] hover:bg-[var(--color-purple)]/20 transition-all text-sm font-semibold active:scale-95"
             >
-              Cancel
+              <FileDown className="w-4 h-4" /> Download PDF
             </button>
-            <button 
-              onClick={handleSaveResults} 
-              disabled={saving} 
-              className="px-8 py-2.5 rounded-xl bg-[var(--color-purple)] text-white text-sm font-bold shadow-lg shadow-purple-500/20 active:scale-95 disabled:opacity-50 transition-all"
-            >
-              {saving ? 'Saving Results...' : 'Save All Results'}
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setResultsModal(false)}
+                className="px-6 py-2.5 rounded-xl text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-app)] transition-all"
+              >
+                {role === 'admin' ? 'Close' : 'Cancel'}
+              </button>
+              {role !== 'admin' && (
+                <button
+                  onClick={handleSaveResults}
+                  disabled={saving}
+                  className="px-8 py-2.5 rounded-xl bg-[var(--color-purple)] text-white text-sm font-bold shadow-lg shadow-purple-500/20 active:scale-95 disabled:opacity-50 transition-all"
+                >
+                  {saving ? 'Saving Results...' : 'Save All Results'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </Modal>

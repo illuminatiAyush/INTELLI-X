@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import { Plus, Search, Edit2, Trash2, Mail, BookOpen } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Mail, BookOpen, Phone } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
 import { createPortal } from 'react-dom'
@@ -14,7 +14,8 @@ const TeachersPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', subject: '' })
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', subject: '', phone: '' })
+  const [editingTeacher, setEditingTeacher] = useState(null)
 
   useEffect(() => {
     fetchTeachers()
@@ -37,41 +38,64 @@ const TeachersPage = () => {
     }
   }
 
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
     try {
-      if (!formData.email || !formData.password) {
-        throw new Error("Email and password are required for login access.")
-      }
-
-      // Call Edge Function to create auth user and profile
-      const { data, error: invokeError } = await supabase.functions.invoke('create-user', {
-        body: {
-          email: formData.email,
-          password: formData.password,
-          role: 'teacher',
-          name: formData.name,
-          subject: formData.subject,
-          institute_id: profile?.institute_id
+      if (editingTeacher) {
+        // Edit mode: update only name and subject directly on teachers table
+        const { error } = await supabase
+          .from('teachers')
+          .update({ name: formData.name, subject: formData.subject, phone: formData.phone || null, email: formData.email || null })
+          .eq('id', editingTeacher.id)
+        if (error) throw error
+        setShowModal(false)
+        setEditingTeacher(null)
+        fetchTeachers()
+        alert(`Teacher "${formData.name}" updated successfully!`)
+      } else {
+        // Add mode: create via Edge Function (handles auth + profile)
+        if (!formData.email || !formData.password) {
+          throw new Error('Email and password are required for login access.')
         }
-      })
-
-      if (invokeError) throw new Error(invokeError.message)
-      if (data?.error) throw new Error(data.error)
-      
-      setShowModal(false)
-      setFormData({ name: '', email: '', password: '', subject: '' })
-      fetchTeachers()
-      alert(`Teacher "${formData.name}" created successfully!`)
+        const { data, error: invokeError } = await supabase.functions.invoke('create-user', {
+          body: {
+            email: formData.email,
+            password: formData.password,
+            role: 'teacher',
+            name: formData.name,
+            subject: formData.subject,
+            phone: formData.phone || null,
+            institute_id: profile?.institute_id
+          }
+        })
+        if (invokeError) throw new Error(invokeError.message)
+        if (data?.error) throw new Error(data.error)
+        setShowModal(false)
+        setFormData({ name: '', email: '', password: '', subject: '', phone: '' })
+        fetchTeachers()
+        alert(`Teacher "${formData.name}" created successfully!`)
+      }
     } catch (error) {
-      console.error('Error adding teacher:', error)
-      alert('Error adding teacher: ' + error.message)
+      console.error('Error saving teacher:', error)
+      alert('Error: ' + error.message)
     } finally {
       setSubmitting(false)
     }
   }
 
+  const handleOpenEdit = (teacher) => {
+    setEditingTeacher(teacher)
+    setFormData({ name: teacher.name || '', email: teacher.email || '', password: '', subject: teacher.subject || '', phone: teacher.phone || '' })
+    setShowModal(true)
+  }
+
+  const handleOpenAdd = () => {
+    setEditingTeacher(null)
+    setFormData({ name: '', email: '', password: '', subject: '', phone: '' })
+    setShowModal(true)
+  }
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to remove this teacher?')) return
     
@@ -108,7 +132,7 @@ const TeachersPage = () => {
           <p className="text-[var(--text-secondary)] mt-1 font-medium">Manage teaching staff for your institute</p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+        onClick={() => handleOpenAdd()}
           className="flex items-center px-5 py-2.5 bg-[var(--color-purple)] text-white rounded-xl hover:opacity-90 transition-all font-semibold shadow-lg shadow-purple-500/20 active:scale-95"
         >
           <Plus className="w-5 h-5 mr-2" />
@@ -136,7 +160,8 @@ const TeachersPage = () => {
               <tr>
                 <th className="px-6 py-5 font-bold">Name</th>
                 <th className="px-6 py-5 font-bold">Subject</th>
-                <th className="px-6 py-5 font-bold">Contact</th>
+                <th className="px-6 py-5 font-bold">Phone</th>
+                <th className="px-6 py-5 font-bold">Email</th>
                 <th className="px-6 py-5 font-bold text-right">Actions</th>
               </tr>
             </thead>
@@ -156,9 +181,25 @@ const TeachersPage = () => {
                       {teacher.subject || '-'}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">{teacher.email || '-'}</td>
+                  <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-3.5 h-3.5 text-[var(--color-purple)]" />
+                      {teacher.phone || '-'}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-3.5 h-3.5 text-blue-400" />
+                      {teacher.email || '-'}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 text-right space-x-3 whitespace-nowrap">
-                    <button className="text-gray-400 hover:text-white transition"><Edit2 className="w-4 h-4 inline" /></button>
+                    <button
+                      onClick={() => handleOpenEdit(teacher)}
+                      className="text-gray-400 hover:text-white transition"
+                    >
+                      <Edit2 className="w-4 h-4 inline" />
+                    </button>
                     <button 
                       onClick={() => handleDelete(teacher.id)}
                       className="text-red-400 hover:text-red-300 transition"
@@ -170,7 +211,7 @@ const TeachersPage = () => {
               ))}
               {filteredTeachers.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
                     No teachers found. Click 'Add Teacher' to create one.
                   </td>
                 </tr>
@@ -183,7 +224,7 @@ const TeachersPage = () => {
       {showModal && typeof document !== 'undefined' && createPortal(
         <div className="fixed inset-0 w-screen h-screen bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className={`${isDark ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'} border p-6 rounded-xl w-full max-w-md shadow-2xl relative z-50`}>
-            <h2 className="text-xl font-bold mb-4">Add New Teacher</h2>
+          <h2 className="text-xl font-bold mb-4">{editingTeacher ? 'Edit Teacher' : 'Add New Teacher'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4 max-h-[85vh] overflow-y-auto pr-2">
               <div>
                 <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Full Name</label>
@@ -195,27 +236,45 @@ const TeachersPage = () => {
                   className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
                 />
               </div>
-              <div>
-                <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Email Address *</label>
-                <input
-                  required
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
-                />
-              </div>
-              <div>
-                <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Password *</label>
-                <input
-                  required
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Minimum 6 characters"
-                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
-                />
-              </div>
+              {/* Email — shown in edit mode for updating the teachers table record */}
+              {editingTeacher && (
+                <div>
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Email / Gmail</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="teacher@gmail.com"
+                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                  />
+                </div>
+              )}
+              {/* Email & Password — only for new teacher creation */}
+              {!editingTeacher && (
+                <>
+                  <div>
+                    <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Email Address *</label>
+                    <input
+                      required
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Password *</label>
+                    <input
+                      required
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="Minimum 6 characters"
+                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                    />
+                  </div>
+                </>
+              )}
               <div>
                 <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Subject Expertise</label>
                 <input
@@ -224,6 +283,17 @@ const TeachersPage = () => {
                   placeholder="e.g. Advanced Mathematics"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                />
+              </div>
+              {/* Phone — editable in both add and edit mode */}
+              <div>
+                <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="e.g. +91 98765 43210"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
                 />
               </div>
@@ -243,7 +313,7 @@ const TeachersPage = () => {
                   className="px-4 py-2 bg-[var(--color-purple)] text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
                 >
                   {submitting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                  {submitting ? 'Saving...' : 'Save Teacher'}
+                  {submitting ? 'Saving...' : editingTeacher ? 'Update Teacher' : 'Save Teacher'}
                 </button>
               </div>
             </form>

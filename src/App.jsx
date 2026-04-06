@@ -17,6 +17,7 @@ import RegisterPage from './pages/RegisterPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 import Toast from './components/ui/Toast'
+import ErrorBoundary from './components/ErrorBoundary'
 
 import DashboardLayout from './components/dashboard/DashboardLayout'
 import DashboardHome from './pages/dashboard/DashboardHome'
@@ -86,24 +87,30 @@ const AppContent = () => {
         }
       >
         <Route index element={<DashboardHome />} />
-        <Route path="institutes" element={<InstitutesPage />} />
-        <Route path="teachers" element={<TeachersPage />} />
-        <Route path="students" element={<StudentsPage />} />
-        <Route path="batches" element={<BatchesPage />} />
-        <Route path="attendance" element={<AttendancePage />} />
-        <Route path="tests" element={<TestsPage />} />
-        <Route path="results" element={<ResultsPage />} />
-        <Route path="leaderboard" element={<LeaderboardPage />} />
-        <Route path="materials" element={<MaterialsPage />} />
-        <Route path="analytics" element={<AnalyticsPage />} />
-        <Route path="subscriptions" element={<SubscriptionsPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-        <Route path="logs" element={<LogsPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="join" element={<JoinBatch />} />
-        <Route path="join/:code" element={<JoinBatch />} />
-        <Route path="active-tests" element={<ActiveTestsPage />} />
-        <Route path="test-attempt/:testId" element={<TestAttemptPage />} />
+
+        {/* Protected Admin Routes */}
+        <Route path="institutes" element={<ProtectedRoute allowedRoles={['master_admin']}><InstitutesPage /></ProtectedRoute>} />
+        <Route path="teachers" element={<ProtectedRoute allowedRoles={['admin', 'master_admin']}><TeachersPage /></ProtectedRoute>} />
+        <Route path="subscriptions" element={<ProtectedRoute allowedRoles={['admin', 'master_admin']}><SubscriptionsPage /></ProtectedRoute>} />
+        <Route path="logs" element={<ProtectedRoute allowedRoles={['master_admin']}><LogsPage /></ProtectedRoute>} />
+        
+        {/* Common Dashboard Routes */}
+        <Route path="students" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><StudentsPage /></ProtectedRoute>} />
+        <Route path="batches" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><BatchesPage /></ProtectedRoute>} />
+        <Route path="attendance" element={<ProtectedRoute allowedRoles={['admin', 'teacher']}><AttendancePage /></ProtectedRoute>} />
+        <Route path="tests" element={<ProtectedRoute allowedRoles={['admin', 'teacher']}><TestsPage /></ProtectedRoute>} />
+        <Route path="results" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><ResultsPage /></ProtectedRoute>} />
+        <Route path="leaderboard" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><LeaderboardPage /></ProtectedRoute>} />
+        <Route path="materials" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><MaterialsPage /></ProtectedRoute>} />
+        <Route path="analytics" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><AnalyticsPage /></ProtectedRoute>} />
+        <Route path="settings" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><SettingsPage /></ProtectedRoute>} />
+        <Route path="profile" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><ProfilePage /></ProtectedRoute>} />
+        
+        {/* Student Specific Routes */}
+        <Route path="join" element={<ProtectedRoute allowedRoles={['student']}><JoinBatch /></ProtectedRoute>} />
+        <Route path="join/:code" element={<ProtectedRoute allowedRoles={['student']}><JoinBatch /></ProtectedRoute>} />
+        <Route path="active-tests" element={<ProtectedRoute allowedRoles={['student']}><ActiveTestsPage /></ProtectedRoute>} />
+        <Route path="test-attempt/:testId" element={<ProtectedRoute allowedRoles={['student']}><TestAttemptPage /></ProtectedRoute>} />
       </Route>
       <Route path="/join/:code" element={<JoinRedirect />} />
       {/* Fallback route - unknown routes go to index or login */}
@@ -114,14 +121,16 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <ThemeProvider>
-          <Toast />
-          <AppContent />
-        </ThemeProvider>
-      </BrowserRouter>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter>
+          <ThemeProvider>
+            <Toast />
+            <AppContent />
+          </ThemeProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
 

@@ -26,7 +26,7 @@ const TeacherDashboard = () => {
           .eq('teacher_id', user.id)
 
         const batchList = myBatches || []
-        const batchIds = batchList.map((b) => b.id)
+        const batchIds = (batchList || []).map((b) => b.id).filter(Boolean)
 
         let testCount = 0
         let aiTestCount = 0
@@ -45,7 +45,7 @@ const TeacherDashboard = () => {
           aiTestCount = aiCount || 0
         }
 
-        const totalStudents = batchList.reduce((sum, b) => sum + (b.students?.length || 0), 0)
+        const totalStudents = (batchList || []).reduce((sum, b) => sum + (b.students?.length || 0), 0)
 
         setStats({
           batches: batchList.length,
@@ -201,9 +201,9 @@ const TeacherDashboard = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {activeTests.map((t) => {
-              const testResults = liveResults.filter(r => r.test_id === t.id)
+              const testResults = (liveResults || []).filter(r => r.test_id === t.id)
               const attemptCount = testResults.length
-              const isEnded = t.end_time && new Date(t.end_time) < new Date()
+              const isEnded = (t.end_time && new Date(t.end_time) < new Date()) || false
               const avgScore = attemptCount > 0 
                 ? (testResults.reduce((sum, r) => sum + (r.marks || 0), 0) / attemptCount).toFixed(1) 
                 : 0

@@ -105,14 +105,14 @@ export const fetchTestScores = async (userId) => {
 export const fetchSubjectPerformance = async (userId) => {
   try {
     const student = await getStudentRecord(userId)
-    if (!student) return null
+    if (!student) return { strong: null, weak: null }
 
     const { data: results } = await supabase
       .from('results')
       .select('marks, tests(total_marks, batch_id, batches(name, subject))')
       .eq('student_id', student.id)
 
-    if (!results || results.length === 0) return null
+    if (!results || results.length === 0) return { strong: null, weak: null }
 
     // Group by subject
     const subjectMap = {}
@@ -128,7 +128,7 @@ export const fetchSubjectPerformance = async (userId) => {
       avg: v.possible ? Number(((v.total / v.possible) * 100).toFixed(1)) : 0,
     }))
 
-    if (subjects.length === 0) return null
+    if (subjects.length === 0) return { strong: null, weak: null }
 
     subjects.sort((a, b) => b.avg - a.avg)
     return {
@@ -137,7 +137,7 @@ export const fetchSubjectPerformance = async (userId) => {
     }
   } catch (err) {
     console.error('fetchSubjectPerformance error:', err.message)
-    return null
+    return { strong: null, weak: null }
   }
 }
 

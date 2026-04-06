@@ -51,6 +51,20 @@ const StrengthWeak = ({ subjects, loading }) => {
     )
   }
 
+  if (!subjects || (!subjects.strong && !subjects.weak)) {
+    return (
+      <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 text-center shadow-sm">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500/10 to-teal-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-4">
+          <ArrowUp className="w-6 h-6" />
+        </div>
+        <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">No Subject Insights Yet</h3>
+        <p className="text-[var(--text-secondary)] text-xs font-medium max-w-[220px] mx-auto leading-relaxed">
+          Complete your first few tests to see which subjects are your strengths and which need more focus.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -58,8 +72,23 @@ const StrengthWeak = ({ subjects, loading }) => {
       transition={{ delay: 0.15 }}
       className="grid grid-cols-1 sm:grid-cols-2 gap-4"
     >
-      <SubjectCard label="Strongest Subject" subject={subjects.strong} isStrength />
-      <SubjectCard label="Weakest Subject" subject={subjects.weak} isStrength={false} />
+      {subjects.strong ? (
+        <SubjectCard label="Strongest Subject" subject={subjects.strong} isStrength />
+      ) : (
+        <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 opacity-60">
+          <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase">Strongest Subject</p>
+          <p className="text-sm font-medium text-[var(--text-primary)] mt-2">Insufficient data</p>
+        </div>
+      )}
+      
+      {subjects.weak ? (
+        <SubjectCard label="Weakest Subject" subject={subjects.weak} isStrength={false} />
+      ) : (
+        <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 opacity-60">
+          <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase">Weakest Subject</p>
+          <p className="text-sm font-medium text-[var(--text-primary)] mt-2">Insufficient data</p>
+        </div>
+      )}
     </motion.div>
   )
 }
