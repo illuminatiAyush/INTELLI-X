@@ -3,9 +3,9 @@ import { supabase } from '../lib/supabase'
 export const getResultsByTest = async (testId) => {
   const { data, error } = await supabase
     .from('results')
-    .select('*, students(name)')
+    .select('*, students(name, email), tests(total_marks)')
     .eq('test_id', testId)
-    .order('rank', { ascending: true, nullsFirst: false })
+    .order('marks', { ascending: false })
   if (error) throw error
   return data
 }
@@ -29,15 +29,13 @@ export const upsertResults = async (results) => {
   if (error) throw error
 
   // Notify students whose results were updated
-  // Note: 'results' is an array. If multiple results are upserted, we notify each.
   if (results && results.length > 0) {
     try {
-      // Get test title if not provided (usually need to fetch it)
       const testId = results[0].test_id
       const { data: testData } = await supabase.from('tests').select('title, institute_id').eq('id', testId).single()
       
       const notifications = results.map(r => ({
-        user_id: r.student_id, // student_id is the profile_id (Auth UUID)
+        user_id: r.student_id,
         title: 'Results Published',
         message: `Your results for "${testData?.title || 'Test'}" are now available.`,
         type: 'result',
@@ -55,31 +53,31 @@ export const upsertResults = async (results) => {
   return data
 }
 
-export const getLeaderboard = async (batchId) => {
-  let query = supabase
+// PART 1, 2, 3: Fetch Data for Leaderboard Across All Roles
+export const getTestLeaderboard = async (testId) => {
+  if (!testId) return []
+  
+  const { data, error } = await supabase
     .from('results')
-    .select('student_id, marks, students(name), tests(total_marks, batch_id)')
+    .select(`
+      student_id, 
+      marks, 
+      students!inner(name, email), 
+      tests!inner(total_marks)
+    `)
+    .eq('test_id', testId)
     .order('marks', { ascending: false })
   
-  const { data, error } = await query
   if (error) throw error
 
-  // Aggregate by student
-  const map = {}
-  data.forEach((r) => {
-    const sid = r.student_id
-    const testBatch = r.tests?.batch_id
-    if (batchId && testBatch !== batchId) return
-    if (!map[sid]) {
-      map[sid] = { student_id: sid, name: r.students?.name || 'Unknown', totalMarks: 0, totalPossible: 0, testCount: 0 }
-    }
-    map[sid].totalMarks += r.marks
-    map[sid].totalPossible += r.tests?.total_marks || 100
-    map[sid].testCount += 1
-  })
-
-  return Object.values(map)
-    .map((s) => ({ ...s, percentage: s.totalPossible ? ((s.totalMarks / s.totalPossible) * 100).toFixed(1) : 0 }))
-    .sort((a, b) => b.percentage - a.percentage)
-    .map((s, i) => ({ ...s, rank: i + 1 }))
+  // PART 4: RANK CALCULATION
+  return (data || []).map((r, i) => ({
+    student_id: r.student_id,
+    name: r.students?.name || 'Unknown',
+    email: r.students?.email,
+    marks: r.marks,
+    total_marks: r.tests?.total_marks || 100,
+    percentage: r.tests?.total_marks ? ((r.marks / r.tests.total_marks) * 100).toFixed(1) : 0,
+    rank: i + 1
+  }))
 }

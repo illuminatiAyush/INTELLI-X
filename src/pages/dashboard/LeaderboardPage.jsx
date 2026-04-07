@@ -10,6 +10,8 @@ const LeaderboardPage = () => {
   const { user, role } = useAuth()
   const [batches, setBatches] = useState([])
   const [selectedBatch, setSelectedBatch] = useState('')
+  const [tests, setTests] = useState([])
+  const [selectedTest, setSelectedTest] = useState('')
   const [leaderboard, setLeaderboard] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -23,11 +25,14 @@ const LeaderboardPage = () => {
           const { data: batchStudents } = await supabase
             .from('batch_students')
             .select('batch_id')
-            .eq('student_id', user.id) // Corrected to use profile_id
+            .eq('student_id', user.id)
           
           const batchIds = (batchStudents || []).map(bs => bs.batch_id)
           if (batchIds.length > 0) {
             query = query.in('id', batchIds)
+          } else {
+            setLoading(false)
+            return
           }
         }
         const { data } = await query
@@ -42,46 +47,59 @@ const LeaderboardPage = () => {
     fetchBatches()
   }, [])
 
+  useEffect(() => {
+    const fetchTests = async () => {
+      if (!selectedBatch) return
+      try {
+        const { data } = await supabase
+          .from('tests')
+          .select('id, title')
+          .eq('batch_id', selectedBatch)
+          .eq('status', 'published')
+          .order('date', { ascending: false })
+        
+        setTests(data || [])
+        if (data?.length > 0) setSelectedTest(data[0].id)
+        else setSelectedTest('')
+      } catch (err) {
+        console.error('Error fetching tests:', err)
+      }
+    }
+    fetchTests()
+  }, [selectedBatch])
+
   const fetchLeaderboard = async () => {
-    if (!selectedBatch) return
+    if (!selectedTest) {
+      setLeaderboard([])
+      return
+    }
     setRefreshing(true)
     try {
-      // Fetch results for the selected batch
-      // Note: We join with students on profile_id (handled by the updated foreign key)
+      // PART 1 & 2: CORRECT QUERY LOGIC - Fetch all results for selected_test_id
       const { data, error } = await supabase
         .from('results')
-        .select('student_id, marks, students(name), tests!inner(total_marks, batch_id)')
-        .eq('tests.batch_id', selectedBatch)
-        .order('marks', { ascending: false })
+        .select(`
+          student_id, 
+          marks, 
+          students!inner(name, email), 
+          tests!inner(total_marks)
+        `)
+        .eq('test_id', selectedTest)
       
       if (error) throw error
 
-      // Aggregate by student (student_id is now the profile_id)
-      const map = {}
-      ;(data || [])
-        .filter((r) => r.tests && r.tests.batch_id === selectedBatch)
-        .forEach((r) => {
-        const sid = r.student_id
-        if (!map[sid]) {
-          map[sid] = { 
-            student_id: sid, 
-            name: r.students?.name || 'Unknown', 
-            totalMarks: 0, 
-            totalPossible: 0, 
-            testCount: 0 
-          }
-        }
-        map[sid].totalMarks += r.marks
-        map[sid].totalPossible += r.tests?.total_marks || 100
-        map[sid].testCount += 1
-      })
-
-      const sorted = Object.values(map)
-        .map((s) => ({ 
-          ...s, 
-          percentage: s.totalPossible ? ((s.totalMarks / s.totalPossible) * 100).toFixed(1) : 0 
+      // PART 3: SORT LEADERBOARD by marks DESC
+      const sorted = (data || [])
+        .map((r) => ({
+          student_id: r.student_id,
+          name: r.students?.name || 'Unknown',
+          email: r.students?.email,
+          totalMarks: r.marks,
+          totalPossible: r.tests?.total_marks || 100,
+          percentage: r.tests?.total_marks ? ((r.marks / r.tests.total_marks) * 100).toFixed(1) : 0
         }))
-        .sort((a, b) => b.percentage - a.percentage)
+        .sort((a, b) => b.totalMarks - a.totalMarks)
+        // PART 4: RANK CALCULATION
         .map((s, i) => ({ ...s, rank: i + 1 }))
 
       setLeaderboard(sorted)
@@ -95,10 +113,14 @@ const LeaderboardPage = () => {
   }
 
   useEffect(() => {
-    if (!selectedBatch) return
+    if (!selectedTest) {
+      setLeaderboard([])
+      setLoading(false)
+      return
+    }
     setLoading(true)
     fetchLeaderboard()
-  }, [selectedBatch])
+  }, [selectedTest])
 
   // Realtime subscription for live updates
   useEffect(() => {
@@ -120,7 +142,8 @@ const LeaderboardPage = () => {
     }
   }, [selectedBatch])
 
-  const getRankStyle = (rank) => {
+  const getRankStyle = (rank, isCurrentUser) => {
+    if (isCurrentUser) return 'from-purple-500/30 to-purple-500/10 border-purple-500 shadow-lg shadow-purple-500/20'
     if (rank === 1) return 'from-amber-500/20 to-amber-500/5 border-amber-500/30 shadow-lg shadow-amber-500/10'
     if (rank === 2) return 'from-slate-400/20 to-slate-400/5 border-slate-400/30 shadow-lg shadow-slate-400/10'
     if (rank === 3) return 'from-orange-600/20 to-orange-600/5 border-orange-600/30 shadow-lg shadow-orange-600/10'
@@ -135,6 +158,7 @@ const LeaderboardPage = () => {
   }
 
   const batchOptions = batches.map((b) => ({ value: b.id, label: b.name }))
+  const testOptions = tests.map((t) => ({ value: t.id, label: t.title }))
 
   return (
     <div className="space-y-8">
@@ -151,7 +175,7 @@ const LeaderboardPage = () => {
         </div>
         <button
           onClick={fetchLeaderboard}
-          disabled={refreshing}
+          disabled={refreshing || !selectedTest}
           className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition-all"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
@@ -159,46 +183,73 @@ const LeaderboardPage = () => {
         </button>
       </div>
 
-      <div className="max-w-sm bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
-        <Select label="Batch Filter" options={batchOptions} value={selectedBatch} onChange={(e) => setSelectedBatch(e.target.value)} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+          <Select label="Select Batch" options={batchOptions} value={selectedBatch} onChange={(e) => setSelectedBatch(e.target.value)} />
+        </div>
+        <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+          <Select 
+            label="Select Test" 
+            options={testOptions} 
+            value={selectedTest} 
+            onChange={(e) => setSelectedTest(e.target.value)} 
+            disabled={!selectedBatch || tests.length === 0}
+          />
+        </div>
       </div>
 
-      {loading ? (
+      {!selectedBatch ? (
+        <div className="text-center py-20 bg-[var(--bg-surface)]/50 rounded-3xl border border-dashed border-[var(--border-subtle)]">
+          <p className="text-[var(--text-secondary)] font-medium">Please select a batch to view leaderboard</p>
+        </div>
+      ) : tests.length === 0 ? (
+        <div className="text-center py-20 bg-[var(--bg-surface)]/50 rounded-3xl border border-dashed border-[var(--border-subtle)]">
+          <p className="text-[var(--text-secondary)] font-medium">No published tests found for this batch</p>
+        </div>
+      ) : loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="w-10 h-10 border-4 border-[var(--color-purple)]/20 border-t-[var(--color-purple)] rounded-full animate-spin" />
         </div>
       ) : leaderboard.length === 0 ? (
         <div className="text-center py-20 bg-[var(--bg-surface)]/50 rounded-3xl border border-dashed border-[var(--border-subtle)]">
           <Trophy className="w-16 h-16 mx-auto mb-4 text-[var(--text-secondary)] opacity-20" />
-          <p className="text-[var(--text-secondary)] font-medium text-lg">No results yet for this batch</p>
+          <p className="text-[var(--text-secondary)] font-medium text-lg">No attempts yet for this test</p>
         </div>
       ) : (
         <div className="space-y-4 max-w-4xl">
-          {leaderboard.map((entry, i) => (
-            <motion.div
-              key={entry.student_id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className={`flex items-center justify-between px-6 py-5 rounded-2xl border transition-all hover:scale-[1.01] bg-gradient-to-r ${getRankStyle(entry.rank)}`}
-            >
-              <div className="flex items-center gap-6">
-                <div className="w-12 h-12 flex items-center justify-center shrink-0">
-                  {getRankIcon(entry.rank)}
+          {leaderboard.map((entry, i) => {
+            const isCurrentUser = entry.student_id === user.id
+            return (
+              <motion.div
+                key={entry.student_id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className={`flex items-center justify-between px-6 py-5 rounded-2xl border transition-all hover:scale-[1.01] bg-gradient-to-r ${getRankStyle(entry.rank, isCurrentUser)}`}
+              >
+                <div className="flex items-center gap-6">
+                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    {getRankIcon(entry.rank)}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-base font-bold text-[var(--text-primary)]">{entry.name}</p>
+                      {isCurrentUser && (
+                        <span className="px-2 py-0.5 rounded-full bg-purple-500 text-[10px] font-bold text-white uppercase tracking-wider">You</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">
+                      Scored {entry.totalMarks} out of {entry.totalPossible}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-base font-bold text-[var(--text-primary)]">{entry.name}</p>
-                  <p className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">
-                    {entry.testCount} test{entry.testCount !== 1 ? 's' : ''} • {entry.totalMarks}/{entry.totalPossible} marks earned
-                  </p>
+                <div className="text-right">
+                  <p className="text-2xl font-black text-[var(--text-primary)]">{entry.percentage}%</p>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-[var(--text-secondary)]">score</p>
                 </div>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-black text-[var(--text-primary)]">{entry.percentage}%</p>
-                <p className="text-[10px] uppercase tracking-widest font-bold text-[var(--text-secondary)]">avg score</p>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            )
+          })}
         </div>
       )}
     </div>

@@ -69,6 +69,14 @@ const StudentsPage = () => {
       fetchData()
     } catch (err) {
       console.error(err)
+      // Provide user-friendly feedback for JWT errors
+      const errorMessage = err.message || 'Failed to save student. Please try again.'
+      alert(errorMessage)
+      
+      // If it's an auth error, we should probably redirect or suggest re-login
+      if (errorMessage.toLowerCase().includes('jwt') || errorMessage.toLowerCase().includes('session')) {
+        console.warn('Authentication error detected. User might need to re-login.')
+      }
     } finally {
       setSaving(false)
     }

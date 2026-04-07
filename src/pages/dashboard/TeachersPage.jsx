@@ -59,6 +59,12 @@ const TeachersPage = () => {
         if (!formData.email || !formData.password) {
           throw new Error('Email and password are required for login access.')
         }
+        // 1. Explicitly check for valid session before invocation
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          throw new Error("Your session has expired. Please log out and back in to add teachers.")
+        }
+
         const { data, error: invokeError } = await supabase.functions.invoke('create-user', {
           body: {
             email: formData.email,
@@ -70,7 +76,13 @@ const TeachersPage = () => {
             institute_id: profile?.institute_id
           }
         })
-        if (invokeError) throw new Error(invokeError.message)
+        
+        if (invokeError) {
+          if (invokeError.message?.includes('Invalid JWT') || invokeError.message?.includes('Unauthorized')) {
+            throw new Error("Authentication failed: Your session is invalid. Please refresh the page or re-login.")
+          }
+          throw new Error(invokeError.message)
+        }
         if (data?.error) throw new Error(data.error)
         setShowModal(false)
         setFormData({ name: '', email: '', password: '', subject: '', phone: '' })
