@@ -23,6 +23,7 @@ const navConfig = {
     { label: 'Teachers', path: '/dashboard/teachers', icon: Users },
     { label: 'Students', path: '/dashboard/students', icon: Users },
     { label: 'Batches', path: '/dashboard/batches', icon: Layers },
+    { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck },
     { label: 'System Analytics', path: '/dashboard/analytics', icon: Activity },
     { label: 'Subscriptions', path: '/dashboard/subscriptions', icon: CreditCard },
     { label: 'Settings', path: '/dashboard/settings', icon: Settings },

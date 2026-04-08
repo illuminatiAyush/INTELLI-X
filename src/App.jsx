@@ -97,7 +97,7 @@ const AppContent = () => {
         {/* Common Dashboard Routes */}
         <Route path="students" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><StudentsPage /></ProtectedRoute>} />
         <Route path="batches" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><BatchesPage /></ProtectedRoute>} />
-        <Route path="attendance" element={<ProtectedRoute allowedRoles={['admin', 'teacher']}><AttendancePage /></ProtectedRoute>} />
+        <Route path="attendance" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><AttendancePage /></ProtectedRoute>} />
         <Route path="tests" element={<ProtectedRoute allowedRoles={['admin', 'teacher']}><TestsPage /></ProtectedRoute>} />
         <Route path="results" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><ResultsPage /></ProtectedRoute>} />
         <Route path="leaderboard" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><LeaderboardPage /></ProtectedRoute>} />

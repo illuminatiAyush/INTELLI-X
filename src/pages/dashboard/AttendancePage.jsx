@@ -443,7 +443,7 @@ const AdminAttendanceView = ({ user, role }) => {
               <span className="text-red-500">Absent: <span className="font-bold">{absentCount}</span></span>
             </div>
             <div className="flex items-center gap-3">
-              {role === 'teacher' && (
+              {(role === 'teacher' || role === 'admin' || role === 'master_admin') && (
                 <>
                   <button onClick={() => markAll('present')} className="text-xs px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-all font-semibold active:scale-95">
                     Mark All Present
@@ -492,7 +492,7 @@ const AdminAttendanceView = ({ user, role }) => {
                     <p className="text-xs text-[var(--text-secondary)] font-medium">{student.email || 'No email provided'}</p>
                   </div>
                 </div>
-                {role === 'teacher' ? (
+                {(role === 'teacher' || role === 'admin' || role === 'master_admin') ? (
                   <button
                     onClick={() => toggleStatus(sid)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
@@ -518,8 +518,8 @@ const AdminAttendanceView = ({ user, role }) => {
             )})}
           </div>
 
-          {/* Save Button — teachers only */}
-          {role === 'teacher' && (
+          {/* Save Button — teachers/admins */}
+          {(role === 'teacher' || role === 'admin' || role === 'master_admin') && (
             <div className="flex justify-end pt-2">
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -566,8 +566,8 @@ const AttendancePage = () => {
         <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
           {role === 'student'
             ? 'Your attendance across all enrolled subjects'
-            : role === 'admin'
-              ? 'View attendance records across all subjects'
+            : role === 'admin' || role === 'master_admin'
+              ? 'View and manage attendance records across all subjects'
               : 'Mark and view attendance records across subjects'}
         </p>
       </div>
