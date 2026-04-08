@@ -107,7 +107,7 @@ const AIChatbot = () => {
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-8 right-8 z-50 w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300 ${
           isDark 
-            ? 'bg-[#111118] border border-white/10 text-white hover:bg-[#1a1a2e]' 
+            ? 'bg-black border border-white/10 text-white hover:bg-neutral-900' 
             : 'bg-black border border-black/10 text-white'
         }`}
       >
@@ -134,7 +134,7 @@ const AIChatbot = () => {
             exit={{ opacity: 0, y: 20, scale: 0.98 }}
             transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
             className={`fixed bottom-28 right-8 z-[90] w-[380px] rounded-[2rem] border overflow-hidden backdrop-blur-xl transition-all duration-300 flex flex-col ${
-              isDark ? 'bg-[#08080c]/90 border-white/[0.05]' : 'bg-white/90 border-gray-200'
+              isDark ? 'bg-black/90 border-white/[0.05]' : 'bg-white/90 border-gray-200'
             }`}
             style={{ height: '480px', maxHeight: 'calc(100vh - 150px)' }}
           >

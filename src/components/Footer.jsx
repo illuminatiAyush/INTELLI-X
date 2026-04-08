@@ -14,13 +14,12 @@ const Footer = () => {
   const { isDark } = useTheme()
   const [hoveredLetter, setHoveredLetter] = useState(null)
 
-  const bgClass = isDark ? 'bg-[#08080c]' : 'bg-white'
   const textColor = isDark ? 'text-gray-500' : 'text-gray-400'
   const headingColor = isDark ? 'text-gray-200' : 'text-gray-900'
   const borderColor = isDark ? 'border-white/5' : 'border-gray-100'
 
   return (
-    <footer className={`relative overflow-hidden border-t ${borderColor} ${bgClass}`}>
+    <footer className={`py-20 relative overflow-hidden ${isDark ? 'bg-black border-t border-white/5' : 'bg-[#fafafa] border-t border-black/5'}`}>
       <div className="max-w-6xl mx-auto px-6 py-24">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-16 md:gap-8 relative z-10">
           

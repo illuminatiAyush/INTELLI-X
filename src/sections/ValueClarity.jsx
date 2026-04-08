@@ -136,7 +136,7 @@ const ValueClarity = () => {
     <section
       ref={ref}
       id="value-clarity"
-      className={`relative py-[160px] overflow-hidden ${isDark ? 'bg-[#08080c]' : 'bg-white'}`}
+      className={`relative py-[160px] overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}
     >
       {/* Background Architectural Grid */}
       <div 

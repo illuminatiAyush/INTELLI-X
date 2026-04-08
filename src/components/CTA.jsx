@@ -6,7 +6,7 @@ const CTA = () => {
   const { isDark } = useTheme()
   const shouldReduceMotion = useReducedMotion()
 
-  const bgClass = isDark ? 'bg-[#08080c]' : 'bg-white'
+  const bgClass = isDark ? 'bg-black' : 'bg-white'
   const textColor = isDark ? 'text-gray-400' : 'text-gray-500'
 
   return (

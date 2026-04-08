@@ -155,7 +155,7 @@ const Features = () => {
   const tabs = ['Institute', 'Teachers', 'Students']
 
   return (
-    <section id="features" className={`relative py-32 overflow-hidden ${isDark ? 'bg-[#08080c]' : 'bg-white'}`}>
+    <section id="features" className={`py-32 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}>
       {/* Background Architectural Grid Texture */}
       <div 
         className="absolute inset-0 pointer-events-none"

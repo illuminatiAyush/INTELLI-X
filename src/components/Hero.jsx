@@ -38,7 +38,7 @@ const Hero = () => {
   }, [isDark])
 
   const bgClass = isDark
-    ? 'bg-[#08080c]'
+    ? 'bg-[#000000]'
     : 'bg-gradient-to-b from-slate-50 to-white'
 
   const eyebrowColor = isDark ? 'text-gray-500' : 'text-gray-400'

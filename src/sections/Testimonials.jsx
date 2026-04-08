@@ -47,10 +47,7 @@ const Testimonials = () => {
   }
 
   return (
-    <section
-      id="testimonials"
-      className={`relative py-[120px] flex flex-col items-center justify-center min-h-[70vh] w-full overflow-hidden ${isDark ? 'bg-[#08080c]' : 'bg-white'}`}
-    >
+    <section id="testimonials" className={`py-40 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
       {/* Background Architectural Grid Texture */}
       <div 
         className="absolute inset-0 pointer-events-none z-0"

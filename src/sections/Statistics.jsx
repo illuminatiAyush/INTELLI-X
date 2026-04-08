@@ -126,7 +126,7 @@ const Statistics = () => {
     <section 
       ref={sectionRef}
       id="statistics-strip" 
-      className={`relative py-32 overflow-hidden ${isDark ? 'bg-[#08080c]' : 'bg-white'}`}
+      className={`py-40 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-slate-50'}`}
     >
       {/* Grid Parallax Depth */}
       <motion.div 

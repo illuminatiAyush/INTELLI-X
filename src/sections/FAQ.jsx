@@ -94,7 +94,7 @@ const FAQ = () => {
   const { isDark } = useTheme()
 
   return (
-    <section id="faq" className={`relative py-32 overflow-hidden ${isDark ? 'bg-[#08080c]' : 'bg-white'}`}>
+    <section id="faq" className={`py-40 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
       {/* Background Architectural Texture */}
       <div 
         className="absolute inset-0 pointer-events-none"

@@ -10,7 +10,7 @@
     --color-cyan: #06b6d4;
     
     /* Semantic Tokens - Dark (Default) */
-    --bg-app: #09090b;
+    --bg-app: #000000;
     --bg-surface: #121214;
     --bg-card: rgba(24, 24, 27, 0.4);
     --text-primary: #fafafa;

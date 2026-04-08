@@ -78,7 +78,7 @@ const Navbar = () => {
         scrolled
           ? `rounded-[14px] py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border ${
               isDark 
-                ? 'bg-[rgba(8,8,8,0.72)] border-white/[0.08] backdrop-blur-[12px]' 
+                ? 'bg-black/80 border-white/[0.08] backdrop-blur-[12px]' 
                 : 'bg-white/80 border-black/[0.08] backdrop-blur-[12px]'
             }`
           : 'bg-transparent py-5 border-transparent'
