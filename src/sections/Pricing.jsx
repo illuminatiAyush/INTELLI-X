@@ -147,7 +147,7 @@ const Pricing = () => {
   const { isDark } = useTheme()
 
   return (
-    <section id="pricing" className={`py-40 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
+    <section id="pricing" className={`py-24 md:py-32 lg:py-40 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
       {/* Background Architectural Texture */}
       <div 
         className="absolute inset-0 pointer-events-none"

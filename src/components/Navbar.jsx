@@ -70,8 +70,8 @@ const Navbar = () => {
         y: shouldReduceMotion ? 0 : navbarY,
         left: '50%',
         translateX: '-50%',
-        top: '16px',
-        width: 'calc(100% - 32px)',
+        top: '12px',
+        width: 'calc(100% - 24px)',
         zIndex: 100
       }}
       className={`fixed max-w-[1240px] px-6 transition-all duration-240 ease-out flex items-center justify-between ${
@@ -146,8 +146,8 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className={`absolute top-[full] left-0 right-0 mt-2 p-6 rounded-[14px] border ${
-              isDark ? 'bg-[rgba(8,8,8,0.92)] border-white/[0.08] backdrop-blur-xl' : 'bg-white/95 border-black/[0.08] backdrop-blur-xl'
+            className={`absolute top-full left-0 right-0 mt-3 p-6 rounded-[20px] border shadow-2xl ${
+              isDark ? 'bg-black/95 border-white/[0.08] backdrop-blur-2xl' : 'bg-white/98 border-black/[0.08] backdrop-blur-2xl'
             }`}
           >
             <div className="flex flex-col gap-6">

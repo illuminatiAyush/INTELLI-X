@@ -154,17 +154,14 @@ const DashboardLayout = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <div
-        className="flex-1 flex flex-col min-h-screen transition-all duration-300"
-        style={{ marginLeft: typeof window !== 'undefined' && window.innerWidth >= 1024 ? 72 : 0 }}
-      >
+      <div className="flex-1 flex flex-col min-h-screen transition-all duration-300 lg:ml-[72px]">
         {/* Top Bar (mobile) */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 backdrop-blur-xl sticky top-0 z-20">
+        <div className="lg:hidden flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 backdrop-blur-xl sticky top-0 z-20">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-lg hover:bg-[var(--border-subtle)] text-[var(--text-secondary)]"
+            className="p-2 -ml-2 rounded-lg hover:bg-[var(--border-subtle)] text-[var(--text-secondary)]"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-5 h-5 md:w-6 md:h-6" />
           </button>
           <div className="flex items-center gap-1">
             <NotificationsMenu />

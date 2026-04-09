@@ -178,11 +178,11 @@ const LoginPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="lg:hidden text-center mb-10"
           >
-            <Link to="/" className="inline-flex flex-col items-center gap-4 group">
-              <div className="w-16 h-16 rounded-2xl bg-[var(--text-primary)] text-[var(--bg-app)] flex items-center justify-center shadow-2xl">
-                <Zap className="w-8 h-8 fill-current" />
+            <Link to="/" className="inline-flex flex-col items-center gap-3 group">
+              <div className="w-14 h-14 rounded-2xl bg-[var(--text-primary)] text-[var(--bg-app)] flex items-center justify-center shadow-2xl">
+                <Zap className="w-7 h-7 fill-current" />
               </div>
-              <span className={`text-2xl font-black tracking-tighter ${headingColor}`}>
+              <span className={`text-xl font-black tracking-tighter ${headingColor}`}>
                 INTELLI<span className="opacity-50">X</span>
               </span>
             </Link>
@@ -197,7 +197,7 @@ const LoginPage = () => {
             {/* Header */}
             <div className="mb-10 text-center sm:text-left relative">
               <div className="absolute -left-10 top-0 w-1 h-full bg-[var(--text-primary)] rounded-full opacity-0 sm:opacity-100" />
-              <h1 className={`text-3xl font-black mb-2 tracking-tight ${headingColor}`}>Access Terminal</h1>
+              <h1 className={`text-2xl sm:text-3xl font-black mb-2 tracking-tight ${headingColor}`}>Access Terminal</h1>
               <p className={`text-sm font-semibold ${labelColor} opacity-80 uppercase tracking-tighter`}>
                 Security Level: <span className="text-[var(--text-primary)]">Authorized Only</span>
               </p>

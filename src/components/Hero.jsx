@@ -48,7 +48,7 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className={`relative min-h-screen flex flex-col items-center justify-center overflow-hidden ${bgClass}`}
+      className={`relative min-h-[90vh] sm:min-h-screen py-20 sm:py-0 flex flex-col items-center justify-center overflow-hidden ${bgClass}`}
     >
       {/* Canvas radial glow */}
       {isDark && (

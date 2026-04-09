@@ -133,10 +133,10 @@ const AIChatbot = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.98 }}
             transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
-            className={`fixed bottom-28 right-8 z-[90] w-[380px] rounded-[2rem] border overflow-hidden backdrop-blur-xl transition-all duration-300 flex flex-col ${
-              isDark ? 'bg-black/90 border-white/[0.05]' : 'bg-white/90 border-gray-200'
+            className={`fixed bottom-24 sm:bottom-28 right-4 sm:right-8 z-[90] w-[calc(100vw-32px)] sm:w-[380px] rounded-[2rem] border overflow-hidden backdrop-blur-xl transition-all duration-300 flex flex-col shadow-2xl ${
+              isDark ? 'bg-black/95 border-white/[0.08]' : 'bg-white/95 border-gray-200'
             }`}
-            style={{ height: '480px', maxHeight: 'calc(100vh - 150px)' }}
+            style={{ height: '500px', maxHeight: 'calc(100vh - 120px)' }}
           >
             {/* Background Grid Texture */}
             <div 

@@ -136,7 +136,7 @@ const ValueClarity = () => {
     <section
       ref={ref}
       id="value-clarity"
-      className={`relative py-[160px] overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}
+      className={`relative py-24 md:py-32 lg:py-[160px] overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}
     >
       {/* Background Architectural Grid */}
       <div 
@@ -150,7 +150,7 @@ const ValueClarity = () => {
       />
 
       <div className="relative max-w-6xl mx-auto px-6 z-10">
-        <div className="grid lg:grid-cols-2 gap-20 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left Side: Literal Headline */}
           <motion.div
             initial="hidden"

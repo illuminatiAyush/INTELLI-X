@@ -19,9 +19,9 @@ const Footer = () => {
   const borderColor = isDark ? 'border-white/5' : 'border-gray-100'
 
   return (
-    <footer className={`py-20 relative overflow-hidden ${isDark ? 'bg-black border-t border-white/5' : 'bg-[#fafafa] border-t border-black/5'}`}>
-      <div className="max-w-6xl mx-auto px-6 py-24">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-16 md:gap-8 relative z-10">
+    <footer className={`py-12 md:py-20 relative overflow-hidden ${isDark ? 'bg-black border-t border-white/5' : 'bg-[#fafafa] border-t border-black/5'}`}>
+      <div className="max-w-6xl mx-auto px-6 py-12 md:py-24">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12 md:gap-8 relative z-10">
           
           {/* Brand Section */}
           <div className="md:col-span-2 space-y-8">

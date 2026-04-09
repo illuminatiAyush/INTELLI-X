@@ -133,11 +133,11 @@ const FeatureCard = ({ feature, index }) => {
         </p>
 
         {/* Dynamic points grid */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-auto pt-4 border-t border-white/[0.05]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 mt-auto pt-4 border-t border-white/[0.05]">
           {feature.points.map((point, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className={`w-1 h-1 rounded-full ${isDark ? 'bg-purple-500/50' : 'bg-purple-500/30'}`} />
-              <span className={`text-[10px] md:text-xs tracking-tight ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
+              <span className={`text-[11px] md:text-xs tracking-tight ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
                 {point}
               </span>
             </div>
@@ -155,7 +155,7 @@ const Features = () => {
   const tabs = ['Institute', 'Teachers', 'Students']
 
   return (
-    <section id="features" className={`py-32 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}>
+    <section id="features" className={`py-20 md:py-32 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}>
       {/* Background Architectural Grid Texture */}
       <div 
         className="absolute inset-0 pointer-events-none"
