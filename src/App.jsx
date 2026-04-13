@@ -12,8 +12,7 @@ import CTA from './components/CTA'
 import FAQ from './sections/FAQ'
 import AIChatbot from './components/AIChatbot'
 import Footer from './components/Footer'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
+import AuthPage from './pages/AuthPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 import Toast from './components/ui/Toast'
@@ -48,8 +47,11 @@ const JoinRedirect = () => {
     }
   }, [code])
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-app)]">
-      <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--bg-app)] gap-4 px-6 text-center">
+      <div className="w-10 h-10 border-4 border-white/10 border-t-white rounded-full animate-spin" />
+      <p className="text-sm font-medium text-[var(--text-secondary)] animate-pulse tracking-wide">
+        Verifying your invitation code...
+      </p>
     </div>
   )
 }
@@ -76,8 +78,8 @@ const AppContent = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login" element={<AuthPage />} />
+      <Route path="/register" element={<AuthPage />} />
       <Route
         path="/dashboard"
         element={

@@ -84,7 +84,7 @@ const LoginPage = () => {
   const brandingBg = isDark ? 'bg-[#0a0a0b]' : 'bg-[#f1f5f9]'
   const cardBg = isDark ? 'glass-card' : 'bg-white border-2 border-slate-200 shadow-[0_32px_64px_-16px_rgba(15,23,42,0.1)] rounded-3xl'
   const inputBg = isDark 
-    ? 'bg-transparent border-[var(--border-strong)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:border-[var(--color-purple)]'
+    ? 'bg-transparent border-[var(--border-strong)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:border-white/50'
     : 'bg-slate-100/50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-slate-900'
   const labelColor = 'text-[var(--text-secondary)]'
   const headingColor = 'text-[var(--text-primary)]'
@@ -95,13 +95,11 @@ const LoginPage = () => {
       <div className="fixed top-8 right-8 z-50">
         <button
           onClick={toggleTheme}
-          className={`relative flex items-center justify-between gap-3 p-1.5 border rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 group overflow-hidden ${
-            isDark ? 'glass-card border-[var(--border-strong)]' : 'bg-white border-slate-200'
+          className={`relative flex items-center justify-between gap-3 p-1.5 border rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 group overflow-hidden ${ isDark ? 'glass-card border-[var(--border-strong)]' : 'bg-white border-slate-200'
           }`}
           aria-label="Toggle theme"
         >
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all ${
-            isDark ? 'bg-[var(--text-primary)]/10 text-[var(--text-primary)]' : 'bg-slate-100 text-slate-900'
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all ${ isDark ? 'bg-[var(--text-primary)]/10 text-[var(--text-primary)]' : 'bg-slate-100 text-slate-900'
           }`}>
             {isDark ? <Moon className="w-4 h-4 fill-current" /> : <Sun className="w-4 h-4" />}
             <span className="text-[10px] font-bold uppercase tracking-widest">{isDark ? 'Dark' : 'Light'}</span>
@@ -115,38 +113,32 @@ const LoginPage = () => {
       {/* Left Panel: Branding (Visible only on Desktop) */}
       <div 
         className={`hidden lg:flex lg:w-[48%] xl:w-[42%] ${brandingBg} border-r border-[var(--border-subtle)] flex-col items-center justify-center relative p-16 overflow-hidden`}
-        style={{ clipPath: 'polygon(0 0, 100% 0, 88% 100%, 0 100%)', zIndex: 10 }}
+        style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0 100%)', zIndex: 10 }}
       >
-        {/* Electric Glow along the edge */}
-        <div className="absolute top-0 right-0 h-full w-[2px] bg-gradient-to-b from-transparent via-[var(--text-primary)]/20 to-transparent blur-[1px] rotate-[1.5deg]" />
-
-        {/* Subtle background abstract */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--text-primary)] blur-[150px] rounded-full -mr-64 -mt-64" />
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[var(--text-primary)] blur-[150px] rounded-full -ml-64 -mb-64 opacity-50" />
+        {/* Slant Border / Decorative Line */}
+        <div 
+          className={`absolute inset-0 z-0 ${isDark ? 'bg-white/5' : 'bg-black/5'}`}
+          style={{ clipPath: 'polygon(0 0, 100.5% 0, 85.5% 100%, 0 100%)' }}
+        />
+        {/* Subtle background abstract - REMOVED BLOBS */}
+        <div className="absolute inset-0 opacity-5">
+           <div className="absolute inset-0 bg-grid-white/[0.02]" />
         </div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
-          className="relative z-10 w-full flex flex-col items-center text-center pr-[12%]"
+          className="relative z-10 w-full flex flex-col items-center text-center pr-[15%]"
         >
           <Link to="/" className="flex flex-col items-center gap-10 group">
             <motion.div 
-              animate={{ 
-                boxShadow: isDark 
-                  ? ['0 0 20px rgba(255,255,255,0.1)', '0 0 40px rgba(255,255,255,0.2)', '0 0 20px rgba(255,255,255,0.1)']
-                  : ['0 0 20px rgba(15,23,42,0.1)', '0 0 40px rgba(15,23,42,0.2)', '0 0 20px rgba(15,23,42,0.1)']
-              }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="w-36 h-36 rounded-[2.8rem] bg-[var(--text-primary)] text-[var(--bg-app)] flex items-center justify-center shadow-3xl group-hover:scale-105 transition-all duration-700 relative overflow-hidden"
+              className={`w-36 h-36 rounded-[2.8rem] flex items-center justify-center shadow-3xl group-hover:scale-105 transition-all duration-700 relative overflow-hidden ${isDark ? 'bg-white' : 'bg-black shadow-black/20'}`}
             >
-              <Zap className="w-20 h-20 fill-current" />
-              <motion.div 
-                animate={{ x: ['-100%', '200%'] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+              <img 
+                src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"} 
+                alt="IntelliX Logo" 
+                className="w-full h-full object-cover"
               />
             </motion.div>
             
@@ -156,14 +148,14 @@ const LoginPage = () => {
               </h1>
               <div className="w-32 h-1.5 bg-[var(--text-primary)]/30 mx-auto rounded-full" />
               <p className="text-xl font-bold text-[var(--text-secondary)] max-w-xs tracking-tight leading-relaxed">
-                The <span className="text-[var(--text-primary)]">Intelligent</span> Operating System for Modern Institutes.
+                The Intelligent Operating System for Modern Institutes.
               </p>
             </div>
           </Link>
         </motion.div>
 
         {/* Footer info in left panel */}
-        <div className="absolute bottom-12 left-0 w-full px-16 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] opacity-40 pr-[18%]">
+        <div className="absolute bottom-12 left-0 w-full px-16 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)] opacity-40 pr-[20%]">
           <span>v2.8.5-pro</span>
           <span>© 2026 IntelliX Systems</span>
         </div>
@@ -179,8 +171,8 @@ const LoginPage = () => {
             className="lg:hidden text-center mb-10"
           >
             <Link to="/" className="inline-flex flex-col items-center gap-3 group">
-              <div className="w-14 h-14 rounded-2xl bg-[var(--text-primary)] text-[var(--bg-app)] flex items-center justify-center shadow-2xl">
-                <Zap className="w-7 h-7 fill-current" />
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden ${isDark ? 'bg-white' : 'bg-black'}`}>
+                <img src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"} alt="Logo" className="w-full h-full object-cover" />
               </div>
               <span className={`text-xl font-black tracking-tighter ${headingColor}`}>
                 INTELLI<span className="opacity-50">X</span>
@@ -236,7 +228,7 @@ const LoginPage = () => {
                   <label htmlFor="login-password" className={`text-[10px] font-black uppercase tracking-widest ${labelColor}`}>
                     Access Key (Password)
                   </label>
-                  <a href="#" className="text-[10px] uppercase font-black tracking-tighter text-[var(--color-purple)] hover:opacity-70 transition-opacity">
+                  <a href="#" className="text-[10px] uppercase font-black tracking-tighter text-white/50 hover:text-white transition-opacity">
                     Recover Key?
                   </a>
                 </div>
@@ -275,17 +267,18 @@ const LoginPage = () => {
                 disabled={loading}
                 whileHover={!loading ? { scale: 1.01, letterSpacing: '0.3em' } : {}}
                 whileTap={!loading ? { scale: 0.99 } : {}}
-                className={`w-full py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 ${
-                  loading 
-                    ? 'bg-[var(--text-secondary)]/20 text-[var(--text-secondary)] cursor-not-allowed' 
-                    : 'bg-[var(--text-primary)] text-[var(--bg-app)] shadow-[0_20px_40px_-15px_rgba(var(--text-primary-rgb),0.3)] hover:shadow-[var(--text-primary)]/40'
+                className={`w-full py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 relative overflow-hidden ${ loading ? 'bg-[var(--text-secondary)]/10 text-[var(--text-secondary)] cursor-not-allowed' 
+                    : 'bg-[var(--text-primary)] text-[var(--bg-app)] shadow-2xl transition-all'
                 }`}
               >
                 {loading ? (
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 border-2 border-[var(--text-secondary)]/30 border-t-[var(--text-secondary)] rounded-full animate-spin" />
-                    Connecting...
-                  </div>
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                    <div className="flex items-center gap-3 relative z-10">
+                      <div className="w-4 h-4 border-2 border-[var(--text-secondary)]/30 border-t-[var(--text-primary)] rounded-full animate-spin" />
+                      <span className="animate-pulse">Establishing Link...</span>
+                    </div>
+                  </>
                 ) : (
                   <>Establish Link <ArrowRight className="w-4 h-4" /></>
                 )}
@@ -304,8 +297,7 @@ const LoginPage = () => {
               type="button"
               whileHover={{ scale: 1.01, backgroundColor: 'var(--text-primary)', color: 'var(--bg-app)' }}
               whileTap={{ scale: 0.99 }}
-              className={`w-full flex items-center justify-center gap-4 py-4 rounded-2xl border text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${
-                isDark ? 'border-[var(--text-primary)]/20 text-white hover:border-transparent' : 'border-slate-200 text-slate-900 hover:border-transparent hover:bg-slate-900 hover:text-white'
+              className={`w-full flex items-center justify-center gap-4 py-4 rounded-2xl border text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${ isDark ? 'border-[var(--text-primary)]/20 text-white hover:border-transparent' : 'border-slate-200 text-slate-900 hover:border-transparent hover:bg-slate-900 hover:text-white'
               }`}
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">

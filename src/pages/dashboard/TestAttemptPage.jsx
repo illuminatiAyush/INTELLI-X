@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { generateAIFeedback } from '../../services/aiTestService'
+import { TestAttemptSkeleton } from '../../components/ui/Skeletons'
 
 const TestAttemptPage = () => {
   // 1. HOOKS
@@ -483,14 +484,7 @@ const TestAttemptPage = () => {
   }, [submitted, loading, testId, user])
 
   // 6. RENDER LOGIC
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-        <p className="text-sm text-[var(--text-secondary)] animate-pulse">Initializing Exam Environment...</p>
-      </div>
-    )
-  }
+  if (loading) return <TestAttemptSkeleton />
 
   if (submitted) {
     const score = result?.marks || 0
@@ -504,11 +498,9 @@ const TestAttemptPage = () => {
         className="max-w-lg mx-auto py-12"
       >
         <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-3xl p-8 text-center shadow-xl">
-          <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center ${
-            pct >= 70 ? 'bg-green-500/10' : pct >= 40 ? 'bg-amber-500/10' : 'bg-red-500/10'
+          <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center ${ pct >= 70 ? 'bg-green-500/10' : pct >= 40 ? 'bg-amber-500/10' : 'bg-red-500/10'
           }`}>
-            <CheckCircle2 className={`w-10 h-10 ${
-              pct >= 70 ? 'text-green-400' : pct >= 40 ? 'text-amber-400' : 'text-red-400'
+            <CheckCircle2 className={`w-10 h-10 ${ pct >= 70 ? 'text-green-400' : pct >= 40 ? 'text-amber-400' : 'text-red-400'
             }`} />
           </div>
           <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Submission Successful!</h2>
@@ -519,11 +511,9 @@ const TestAttemptPage = () => {
               <p className="text-2xl font-bold text-[var(--text-primary)]">{score}/{total}</p>
               <p className="text-[10px] uppercase tracking-widest text-[var(--text-secondary)] mt-1 font-bold">Marks Obtained</p>
             </div>
-            <div className={`p-4 rounded-2xl border ${
-              pct >= 70 ? 'border-green-500/20' : pct >= 40 ? 'border-amber-500/20' : 'border-red-500/20'
+            <div className={`p-4 rounded-2xl border ${ pct >= 70 ? 'border-green-500/20' : pct >= 40 ? 'border-amber-500/20' : 'border-red-500/20'
             }`}>
-              <p className={`text-2xl font-bold ${
-                pct >= 70 ? 'text-green-400' : pct >= 40 ? 'text-amber-400' : 'text-red-400'
+              <p className={`text-2xl font-bold ${ pct >= 70 ? 'text-green-400' : pct >= 40 ? 'text-amber-400' : 'text-red-400'
               }`}>{pct}%</p>
               <p className="text-[10px] uppercase tracking-widest text-[var(--text-secondary)] mt-1 font-bold">Final Score</p>
             </div>
@@ -539,7 +529,7 @@ const TestAttemptPage = () => {
           )}
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full py-4 rounded-xl bg-purple-500 text-white font-bold shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all"
+            className="w-full py-4 rounded-xl bg-white text-black font-bold shadow-xl active:scale-[0.98] transition-all"
           >
             Back to Dashboard
           </button>
@@ -554,7 +544,7 @@ const TestAttemptPage = () => {
         <AlertTriangle className="w-12 h-12 text-amber-500 mb-4" />
         <h3 className="text-lg font-bold text-[var(--text-primary)]">Test Unavailable</h3>
         <p className="text-sm text-[var(--text-secondary)] mt-2">No question data found for this exam.</p>
-        <button onClick={() => navigate('/dashboard')} className="mt-6 text-purple-400 hover:underline text-sm font-medium">Return Dashboard</button>
+        <button onClick={() => navigate('/dashboard')} className="mt-6 text-white hover:underline text-sm font-medium">Return Dashboard</button>
       </div>
     )
   }
@@ -567,7 +557,7 @@ const TestAttemptPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 mb-6 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
             <Clock className={`w-6 h-6 ${getTimerColor()}`} />
           </div>
           <div>
@@ -585,15 +575,14 @@ const TestAttemptPage = () => {
               {violationCount} Violation{violationCount > 1 ? 's' : ''}
             </div>
           )}
-          <div className={`px-5 py-3 rounded-xl border font-mono text-xl font-black ${
-            timeLeft <= 60 ? 'bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)]'
+          <div className={`px-5 py-3 rounded-xl border font-mono text-xl font-black ${ timeLeft <= 60 ? 'bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)]'
           }`}>
             {formatTime(timeLeft)}
           </div>
           <button
             onClick={() => handleSubmit(false)}
             disabled={submitting}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+            className="px-6 py-3 bg-white text-black font-bold rounded-xl shadow-xl flex items-center gap-2 hover:bg-gray-200 active:scale-[0.98] transition-all disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
             Finish
@@ -607,9 +596,7 @@ const TestAttemptPage = () => {
           <button
             key={item.id}
             onClick={() => setCurrentQuestion(idx)}
-            className={`w-10 h-10 rounded-xl font-bold text-xs transition-all ${
-              idx === currentQuestion 
-                ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30' 
+            className={`w-10 h-10 rounded-xl font-bold text-xs transition-all ${ idx === currentQuestion ? 'bg-white text-black shadow-xl ring-2 ring-white/50' 
                 : answers[item.id] 
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                   : 'bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
@@ -628,7 +615,7 @@ const TestAttemptPage = () => {
         className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[2.5rem] p-8 shadow-sm"
       >
         <div className="flex items-start gap-5 mb-10">
-          <span className="flex-shrink-0 w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 font-black text-xl border border-purple-500/20">
+          <span className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/70 font-black text-xl border border-white/10">
             {currentQuestion + 1}
           </span>
           <h2 className="text-lg md:text-xl font-semibold text-[var(--text-primary)] leading-relaxed pt-1">
@@ -644,18 +631,15 @@ const TestAttemptPage = () => {
               <button
                 key={oIdx}
                 onClick={() => handleOptionSelect(q.id, letter)}
-                className={`flex items-center gap-5 p-5 rounded-2xl border text-left transition-all ${
-                  isSelected 
-                    ? 'bg-purple-500/10 border-purple-500/40 shadow-[0_4px_15px_rgba(168,85,247,0.1)]' 
+                className={`flex items-center gap-5 p-5 rounded-2xl border text-left transition-all ${ isSelected ? 'bg-white/10 border-white/30 shadow-white/[0.05]' 
                     : 'bg-[var(--bg-app)] border-[var(--border-subtle)] hover:border-[var(--border-strong)]'
                 }`}
               >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm border transition-all ${
-                  isSelected ? 'bg-purple-500 text-white border-purple-500' : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm border transition-all ${ isSelected ? 'bg-white text-black border-white' : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
                 }`}>
                   {letter}
                 </div>
-                <span className={`text-sm md:text-base font-medium ${isSelected ? 'text-purple-400' : 'text-[var(--text-primary)]'}`}>
+                <span className={`text-sm md:text-base font-medium ${isSelected ? 'text-white' : 'text-[var(--text-primary)]'}`}>
                   {opt}
                 </span>
               </button>
@@ -679,7 +663,7 @@ const TestAttemptPage = () => {
           {currentQuestion < questions.length - 1 ? (
             <button
               onClick={goNext}
-              className="flex items-center gap-2 px-8 py-3 bg-[var(--color-purple)] text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="flex items-center gap-2 px-8 py-3 bg-white text-black font-bold rounded-xl shadow-xl hover:bg-gray-200 active:scale-[0.98] transition-all"
             >
               Next <ChevronRight className="w-5 h-5" />
             </button>
@@ -687,7 +671,7 @@ const TestAttemptPage = () => {
             <button
               onClick={() => handleSubmit(false)}
               disabled={submitting}
-              className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-8 py-3 bg-white text-black font-bold rounded-xl shadow-xl hover:bg-gray-200 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               <Send className="w-5 h-5" /> Submit Exam
             </button>

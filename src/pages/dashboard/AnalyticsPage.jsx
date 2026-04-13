@@ -5,132 +5,78 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import StatsCard from '../../components/ui/StatsCard'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { DashboardSkeleton } from '../../components/ui/Skeletons'
 
 const AnalyticsPage = () => {
   const { isDark } = useTheme()
   const { role } = useAuth()
-  const [loading, setLoading] = useState(true)
-  const [batchStats, setBatchStats] = useState([])
-  const [topStudents, setTopStudents] = useState([])
-  const [weakStudents, setWeakStudents] = useState([])
-  const [overallStats, setOverallStats] = useState({ totalStudents: 0, avgAttendance: 0, totalTests: 0, avgScore: 0 })
+  const { data: analyticsData, loading: analyticsLoading } = useAppQuery('analytics-metrics', async () => {
+    // Fetch batches with student counts
+    const { data: batches } = await supabase.from('batches').select('id, name, subject')
+    // Fetch all attendance records
+    const { data: attendance } = await supabase.from('attendance').select('batch_id, status')
+    // Fetch all results with test info
+    const { data: results } = await supabase.from('results').select('student_id, marks, tests(total_marks, batch_id)')
+    // Fetch all student to batch mappings
+    const { data: batch_students } = await supabase.from('batch_students').select('student_id, batch_id')
+    // Fetch students
+    const { data: students } = await supabase.from('students').select('id, name')
+    // Fetch test count
+    const { count: testCount } = await supabase.from('tests').select('id', { count: 'exact', head: true })
 
-  useEffect(() => {
-    fetchAnalytics()
-  }, [])
+    const batchList = batches || []
+    const attendanceList = attendance || []
+    const resultsList = results || []
+    const batchStudentsList = batch_students || []
+    const studentList = students || []
 
-  const fetchAnalytics = async () => {
-    try {
-      // Fetch batches with student counts
-      const { data: batches } = await supabase
-        .from('batches')
-        .select('id, name, subject')
+    const batchAnalytics = batchList.map(batch => {
+      const batchAttendance = attendanceList.filter(a => a.batch_id === batch.id)
+      const present = batchAttendance.filter(a => a.status === 'present').length
+      const total = batchAttendance.length
+      const rate = total ? ((present / total) * 100).toFixed(1) : 0
+      const batchResults = resultsList.filter(r => r.tests?.batch_id === batch.id)
+      const avgMarks = batchResults.length ? (batchResults.reduce((s, r) => s + r.marks, 0) / batchResults.length).toFixed(1) : 0
+      return { ...batch, studentCount: batchStudentsList.filter(s => s.batch_id === batch.id).length, attendanceRate: rate, avgMarks, testsTaken: batchResults.length }
+    })
 
-      // Fetch all attendance records
-      const { data: attendance } = await supabase
-        .from('attendance')
-        .select('batch_id, status')
+    const studentScores = {}
+    resultsList.forEach(r => {
+      if (!studentScores[r.student_id]) studentScores[r.student_id] = { totalMarks: 0, totalPossible: 0, count: 0 }
+      studentScores[r.student_id].totalMarks += r.marks
+      studentScores[r.student_id].totalPossible += (r.tests?.total_marks || 100)
+      studentScores[r.student_id].count += 1
+    })
 
-      // Fetch all results with test info
-      const { data: results } = await supabase
-        .from('results')
-        .select('student_id, marks, tests(total_marks, batch_id)')
+    const scoredStudents = Object.entries(studentScores).map(([sid, s]) => {
+      const student = studentList.find(st => st.id === sid)
+      return { id: sid, name: student?.name || 'Unknown', percentage: s.totalPossible ? ((s.totalMarks / s.totalPossible) * 100).toFixed(1) : 0, testsAttempted: s.count }
+    }).sort((a, b) => b.percentage - a.percentage)
 
-      // Fetch all student to batch mappings
-      const { data: batch_students } = await supabase
-        .from('batch_students')
-        .select('student_id, batch_id')
+    const totalAttendance = attendanceList.length
+    const totalPresent = attendanceList.filter(a => a.status === 'present').length
+    const avgAttendance = totalAttendance ? ((totalPresent / totalAttendance) * 100).toFixed(1) : 0
+    const totalMarks = resultsList.reduce((s, r) => s + r.marks, 0)
+    const totalPossible = resultsList.reduce((s, r) => s + (r.tests?.total_marks || 100), 0)
+    const avgScore = totalPossible ? ((totalMarks / totalPossible) * 100).toFixed(1) : 0
 
-      // Fetch students for display and overall scale
-      const { data: students } = await supabase
-        .from('students')
-        .select('id, name')
-
-      // Fetch test count
-      const { count: testCount } = await supabase
-        .from('tests')
-        .select('id', { count: 'exact', head: true })
-
-      const batchList = batches || []
-      const attendanceList = attendance || []
-      const resultsList = results || []
-      const batchStudentsList = batch_students || []
-      const studentList = students || []
-
-      // Per-batch analytics
-      const batchAnalytics = batchList.map(batch => {
-        const batchAttendance = attendanceList.filter(a => a.batch_id === batch.id)
-        const present = batchAttendance.filter(a => a.status === 'present').length
-        const total = batchAttendance.length
-        const rate = total ? ((present / total) * 100).toFixed(1) : 0
-
-        const batchStudents = batchStudentsList.filter(s => s.batch_id === batch.id)
-        const batchResults = resultsList.filter(r => r.tests?.batch_id === batch.id)
-        const avgMarks = batchResults.length
-          ? (batchResults.reduce((s, r) => s + r.marks, 0) / batchResults.length).toFixed(1)
-          : 0
-
-        return {
-          ...batch,
-          studentCount: batchStudents.length,
-          attendanceRate: rate,
-          avgMarks,
-          testsTaken: batchResults.length,
-        }
-      })
-
-      // Top students (by average score)
-      const studentScores = {}
-      resultsList.forEach(r => {
-        if (!studentScores[r.student_id]) {
-          studentScores[r.student_id] = { totalMarks: 0, totalPossible: 0, count: 0 }
-        }
-        studentScores[r.student_id].totalMarks += r.marks
-        studentScores[r.student_id].totalPossible += (r.tests?.total_marks || 100)
-        studentScores[r.student_id].count += 1
-      })
-
-      const scoredStudents = Object.entries(studentScores).map(([sid, s]) => {
-        const student = studentList.find(st => st.id === sid)
-        return {
-          id: sid,
-          name: student?.name || 'Unknown',
-          percentage: s.totalPossible ? ((s.totalMarks / s.totalPossible) * 100).toFixed(1) : 0,
-          testsAttempted: s.count,
-        }
-      }).sort((a, b) => b.percentage - a.percentage)
-
-      // Overall stats
-      const totalAttendance = attendanceList.length
-      const totalPresent = attendanceList.filter(a => a.status === 'present').length
-      const avgAttendance = totalAttendance ? ((totalPresent / totalAttendance) * 100).toFixed(1) : 0
-      const totalMarks = resultsList.reduce((s, r) => s + r.marks, 0)
-      const totalPossible = resultsList.reduce((s, r) => s + (r.tests?.total_marks || 100), 0)
-      const avgScore = totalPossible ? ((totalMarks / totalPossible) * 100).toFixed(1) : 0
-
-      setOverallStats({
-        totalStudents: studentList.length,
-        avgAttendance,
-        totalTests: testCount || 0,
-        avgScore,
-      })
-      setBatchStats(batchAnalytics)
-      setTopStudents(scoredStudents.slice(0, 5))
-      setWeakStudents(scoredStudents.filter(s => parseFloat(s.percentage) < 40).slice(0, 5))
-    } catch (err) {
-      console.error('Analytics error:', err)
-    } finally {
-      setLoading(false)
+    return {
+      batchStats: batchAnalytics,
+      topStudents: scoredStudents.slice(0, 5),
+      weakStudents: scoredStudents.filter(s => parseFloat(s.percentage) < 40).slice(0, 5),
+      overallStats: { totalStudents: studentList.length, avgAttendance, totalTests: testCount || 0, avgScore }
     }
-  }
+  })
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-[var(--color-purple)]/30 border-t-[var(--color-purple)] rounded-full animate-spin" />
-      </div>
-    )
-  }
+  const loading = analyticsLoading && !analyticsData
+  const batchStats = analyticsData?.batchStats || []
+  const topStudents = analyticsData?.topStudents || []
+  const weakStudents = analyticsData?.weakStudents || []
+  const overallStats = analyticsData?.overallStats || { totalStudents: 0, avgAttendance: 0, totalTests: 0, avgScore: 0 }
+
+
+  if (loading) return <DashboardSkeleton />
 
   return (
     <div className="space-y-8">
@@ -149,10 +95,10 @@ const AnalyticsPage = () => {
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Total Students" value={overallStats.totalStudents} icon={Users} color="purple" />
+        <StatsCard title="Total Students" value={overallStats.totalStudents} icon={Users} color="neutral" />
         <StatsCard title="Avg Attendance" value={`${overallStats.avgAttendance}%`} icon={ClipboardCheck} color="green" />
-        <StatsCard title="Tests Conducted" value={overallStats.totalTests} icon={BarChart3} color="blue" />
-        <StatsCard title="Avg Score" value={`${overallStats.avgScore}%`} icon={TrendingUp} color="cyan" />
+        <StatsCard title="Tests Conducted" value={overallStats.totalTests} icon={BarChart3} color="neutral" />
+        <StatsCard title="Avg Score" value={`${overallStats.avgScore}%`} icon={TrendingUp} color="neutral" />
       </div>
 
       {/* Batch Performance */}
@@ -163,7 +109,7 @@ const AnalyticsPage = () => {
         className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
       >
         <div className="flex items-center gap-2 mb-6">
-          <div className="p-2 rounded-lg bg-[var(--color-purple)]/10 text-[var(--color-purple)]">
+          <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-slate-100 text-slate-700 border border-slate-200'} shadow-sm`}>
             <BarChart3 className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-bold text-[var(--text-primary)]">Batch Performance</h2>
@@ -189,9 +135,7 @@ const AnalyticsPage = () => {
                     <td className="py-3 px-4 text-[var(--text-secondary)]">{batch.subject || '—'}</td>
                     <td className="py-3 px-4 text-center text-[var(--text-primary)] font-semibold">{batch.studentCount}</td>
                     <td className="py-3 px-4 text-center">
-                      <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${
-                        parseFloat(batch.attendanceRate) >= 80
-                          ? 'bg-green-500/10 text-green-500'
+                      <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${ parseFloat(batch.attendanceRate) >= 80 ? 'bg-green-500/10 text-green-500'
                           : parseFloat(batch.attendanceRate) >= 60
                             ? 'bg-amber-500/10 text-amber-500'
                             : 'bg-red-500/10 text-red-500'
@@ -230,11 +174,11 @@ const AnalyticsPage = () => {
               {topStudents.map((s, i) => (
                 <div key={s.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)]">
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white ${
-                      i === 0 ? 'bg-gradient-to-br from-amber-400 to-amber-600' :
-                      i === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500' :
-                      i === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600' :
-                      'bg-[var(--border-strong)]'
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-colors ${ 
+                      i === 0 ? 'bg-white text-black' :
+                      i === 1 ? 'bg-white/40 text-white' :
+                      i === 2 ? 'bg-white/20 text-white' :
+                      'bg-[var(--border-strong)] text-white'
                     }`}>
                       #{i + 1}
                     </div>

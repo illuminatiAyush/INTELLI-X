@@ -95,7 +95,7 @@ const RegisterPage = () => {
 
   const bg = 'bg-[var(--bg-app)]'
   const cardBg = 'bg-[var(--bg-surface)] border-[var(--border-subtle)]'
-  const inputBg = 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:border-[var(--color-purple)]'
+  const inputBg = 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:border-white/50'
   const labelColor = 'text-[var(--text-secondary)]'
   const headingColor = 'text-[var(--text-primary)]'
 
@@ -117,14 +117,14 @@ const RegisterPage = () => {
           className="relative flex items-center justify-between gap-3 p-1.5 bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 group overflow-hidden"
           aria-label="Toggle theme"
         >
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all bg-[var(--color-purple)]/10 text-[var(--color-purple)]">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all bg-white/10 text-white">
             {isDark ? <Moon className="w-4 h-4 fill-current" /> : <Sun className="w-4 h-4" />}
             <span className="text-[10px] font-bold uppercase tracking-widest">{isDark ? 'Dark' : 'Light'}</span>
           </div>
           <div className="pr-3 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-purple)]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
         </button>
       </div>
 
@@ -139,7 +139,7 @@ const RegisterPage = () => {
           <Link to="/" className="inline-flex items-center gap-2 group mb-4">
             <img src="/intellix-icon.svg" alt="IntelliX Logo" className="w-10 h-10" />
             <span className={`text-2xl font-bold ${headingColor}`}>
-              Intelli<span className="text-gradient">X</span>
+              IntelliX
             </span>
           </Link>
         </motion.div>
@@ -158,7 +158,7 @@ const RegisterPage = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center py-6 flex flex-col items-center"
             >
-              <div className="w-16 h-16 glow-button rounded-2xl flex items-center justify-center mx-auto mb-5 text-[var(--text-primary)]">
+              <div className="w-16 h-16 bg-white text-black rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-xl">
                 <span className="text-2xl">✅</span>
               </div>
               <h2 className={`text-2xl font-black mb-2 ${headingColor}`}>Account Created!</h2>
@@ -166,7 +166,7 @@ const RegisterPage = () => {
                 You are officially enrolled. Redirecting to login...
               </p>
               <div className="mt-5 flex justify-center">
-                <div className="w-8 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full animate-pulse" />
+                <div className="w-8 h-1 bg-white rounded-full animate-pulse" />
               </div>
             </motion.div>
           ) : (
@@ -187,21 +187,21 @@ const RegisterPage = () => {
                   <button
                     type="button"
                     onClick={() => handleRoleSelect('student')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded-lg z-10 transition-colors ${form.role === 'student' ? 'text-white' : labelColor + ' hover:' + headingColor}`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded-lg z-10 transition-colors ${form.role === 'student' ? 'text-black' : labelColor + ' hover:' + headingColor}`}
                   >
                     <GraduationCap className="w-4 h-4" /> Student
                   </button>
                   <button
                     type="button"
                     onClick={() => handleRoleSelect('teacher')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded-lg z-10 transition-colors ${form.role === 'teacher' ? 'text-white' : labelColor + ' hover:' + headingColor}`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded-lg z-10 transition-colors ${form.role === 'teacher' ? 'text-black' : labelColor + ' hover:' + headingColor}`}
                   >
                     <Briefcase className="w-4 h-4" /> Teacher
                   </button>
                   
                   {/* Highlight background */}
                   <motion.div
-                    className="absolute top-1 bottom-1 w-[calc(50%-6px)] bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg -z-0"
+                    className="absolute top-1 bottom-1 w-[calc(50%-6px)] bg-white rounded-lg -z-0"
                     initial={false}
                     animate={{ left: form.role === 'student' ? '4px' : 'calc(50% + 2px)' }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -220,17 +220,15 @@ const RegisterPage = () => {
                       className="overflow-hidden"
                     >
                       <div className="relative">
-                        <BookOpen className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-purple-400' : 'text-purple-500'} z-10`} />
+                        <BookOpen className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-white/40' : 'text-gray-400'} z-10`} />
                         <input
                           name="subject"
                           type="text"
                           value={form.subject}
                           onChange={handleChange}
                           placeholder="Subject you teach (e.g. Mathematics) *"
-                          className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${
-                            isDark
-                              ? 'bg-purple-500/10 border-purple-500/30 text-purple-100 placeholder-purple-400/50 focus:border-purple-400'
-                              : 'bg-purple-50 border-purple-200 text-purple-800 placeholder-purple-300 focus:border-purple-500'
+                          className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${ isDark ? 'bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-white/50'
+                              : 'bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-400 focus:border-gray-400'
                           } ${errors.subject ? 'border-red-500/60 focus:border-red-500' : ''}`}
                         />
                       </div>
@@ -246,17 +244,15 @@ const RegisterPage = () => {
                 {/* Institute Code field */}
                 <div className="pt-2">
                   <div className="relative">
-                    <Building2 className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-indigo-400' : 'text-indigo-500'} z-10`} />
+                    <Building2 className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-white/40' : 'text-gray-400'} z-10`} />
                     <input
                       name="instituteCode"
                       type="text"
                       value={form.instituteCode}
                       onChange={handleChange}
                       placeholder="Institute Join Code (e.g. A9B2X)"
-                      className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 uppercase tracking-widest font-bold ${
-                        isDark 
-                          ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 placeholder-indigo-400/50 focus:border-indigo-400' 
-                          : 'bg-indigo-50 border-indigo-200 text-indigo-700 placeholder-indigo-300 focus:border-indigo-400'
+                      className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 uppercase tracking-widest font-bold ${ isDark ? 'bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-white/50' 
+                          : 'bg-gray-50 border-gray-200 text-gray-700 placeholder-gray-400 focus:border-gray-400'
                       } ${errors.instituteCode ? 'border-red-500/60 focus:border-red-500' : ''}`}
                     />
                   </div>
@@ -354,14 +350,14 @@ const RegisterPage = () => {
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  whileHover={!loading ? { scale: 1.02, boxShadow: '0 0 50px rgba(191,95,255,0.4)' } : {}}
+                  whileHover={!loading ? { scale: 1.02, backgroundColor: '#f3f4f6' } : {}}
                   whileTap={!loading ? { scale: 0.98 } : {}}
-                  className={`w-full glow-button text-white font-bold py-4 rounded-2xl text-sm flex items-center justify-center gap-2 transition-all mt-6 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`w-full bg-white text-black font-bold py-4 rounded-2xl text-sm flex items-center justify-center gap-2 transition-all mt-6 shadow-xl ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
                   {loading ? (
                     <>
                       <motion.div
-                        className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                        className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full"
                         animate={{ rotate: 360 }}
                         transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
                       />
@@ -376,7 +372,7 @@ const RegisterPage = () => {
               {/* Login link */}
               <p className={`text-center text-sm mt-6 ${labelColor}`}>
                 Already have an account?{' '}
-                <Link to="/login" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
+                <Link to="/login" className="text-white hover:underline font-semibold transition-colors">
                   Sign In
                 </Link>
               </p>

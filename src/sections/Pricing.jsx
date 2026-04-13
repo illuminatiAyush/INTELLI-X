@@ -40,8 +40,8 @@ const plans = [
       'Advanced Analytics & Reports',
       'Priority Support 24/7',
     ],
-    gradient: 'from-purple-500 to-blue-600',
-    glow: 'rgba(191,95,255,0.4)',
+    gradient: 'from-white/10 to-white/5',
+    glow: 'rgba(255,255,255,0.1)',
     popular: true,
   },
   {
@@ -61,8 +61,8 @@ const plans = [
       'SLA-backed Uptime Guarantee',
       'On-premise Deployment Option',
     ],
-    gradient: 'from-amber-500 to-orange-500',
-    glow: 'rgba(245,158,11,0.3)',
+    gradient: 'from-white/10 to-white/5',
+    glow: 'rgba(255,255,255,0.1)',
     popular: false,
   },
 ]
@@ -147,7 +147,7 @@ const Pricing = () => {
   const { isDark } = useTheme()
 
   return (
-    <section id="pricing" className={`py-24 md:py-32 lg:py-40 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
+    <section id="pricing" className={`py-24 md:py-32 lg:py-40 relative overflow-hidden ${isDark ? 'bg-[#000000]' : 'bg-[#fafafa]'}`}>
       {/* Background Architectural Texture */}
       <div 
         className="absolute inset-0 pointer-events-none"

@@ -8,9 +8,9 @@ const Hero = () => {
   const canvasRef = useRef(null)
 
   const bgClass = isDark ? 'bg-[#000000]' : 'bg-white'
-  const eyebrowColor = isDark ? 'text-gray-400' : 'text-slate-500'
-  const headlineColor = isDark ? 'text-white' : 'text-slate-900'
-  const quoteColor = isDark ? 'text-gray-400' : 'text-slate-600'
+  const eyebrowColor = isDark ? 'text-gray-400' : 'text-gray-500'
+  const headlineColor = isDark ? 'text-white' : 'text-gray-900'
+  const quoteColor = isDark ? 'text-gray-400' : 'text-neutral-500'
 
   return (
     <section
@@ -48,7 +48,7 @@ const Hero = () => {
             style={{
               fontStyle: 'italic',
               fontWeight: 400,
-              color: isDark ? 'rgba(255,255,255,0.72)' : 'rgba(15,10,30,0.6)',
+              color: isDark ? 'rgba(255,255,255,0.72)' : 'rgba(0,0,0,0.6)',
             }}
           >
             future
@@ -79,7 +79,7 @@ const Hero = () => {
             id="hero-cta-btn"
           >
             <motion.span
-              whileHover={{ scale: 1.04, backgroundColor: isDark ? '#1a1a2e' : '#111' }}
+              whileHover={{ scale: 1.04, backgroundColor: isDark ? '#222' : '#111' }}
               whileTap={{ scale: 0.97 }}
               className="inline-flex items-center gap-2 cursor-pointer"
               style={{
@@ -88,7 +88,7 @@ const Hero = () => {
                 gap: '8px',
                 padding: '14px 36px',
                 borderRadius: '9999px',
-                backgroundColor: isDark ? '#111118' : '#0f0a1e',
+                backgroundColor: isDark ? '#111' : '#000',
                 color: '#fff',
                 fontSize: '0.925rem',
                 fontWeight: 500,

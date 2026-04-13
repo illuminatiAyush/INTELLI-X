@@ -105,9 +105,7 @@ const AIChatbot = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-8 right-8 z-50 w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300 ${
-          isDark 
-            ? 'bg-black border border-white/10 text-white hover:bg-neutral-900' 
+        className={`fixed bottom-8 right-8 z-50 w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300 ${ isDark ? 'bg-black border border-white/10 text-white hover:bg-neutral-900' 
             : 'bg-black border border-black/10 text-white'
         }`}
       >
@@ -133,8 +131,7 @@ const AIChatbot = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.98 }}
             transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
-            className={`fixed bottom-24 sm:bottom-28 right-4 sm:right-8 z-[90] w-[calc(100vw-32px)] sm:w-[380px] rounded-[2rem] border overflow-hidden backdrop-blur-xl transition-all duration-300 flex flex-col shadow-2xl ${
-              isDark ? 'bg-black/95 border-white/[0.08]' : 'bg-white/95 border-gray-200'
+            className={`fixed bottom-24 sm:bottom-28 right-4 sm:right-8 z-[90] w-[calc(100vw-32px)] sm:w-[380px] rounded-[2rem] border overflow-hidden backdrop-blur-xl transition-all duration-300 flex flex-col shadow-2xl ${ isDark ? 'bg-black/95 border-white/[0.08]' : 'bg-white/95 border-gray-200'
             }`}
             style={{ height: '500px', maxHeight: 'calc(100vh - 120px)' }}
           >
@@ -153,7 +150,7 @@ const AIChatbot = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className={`text-lg font-serif italic ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    IntelliX <span className="not-italic font-sans font-bold text-xs uppercase tracking-widest text-purple-400 opacity-60 ml-1">AI</span>
+                    IntelliX <span className="not-italic font-sans font-bold text-xs uppercase tracking-widest opacity-40 ml-1">AI</span>
                   </h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
@@ -179,8 +176,7 @@ const AIChatbot = () => {
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                      msg.role === 'user'
+                    className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${ msg.role === 'user'
                         ? isDark ? 'bg-white/10 text-white' : 'bg-black text-white'
                         : isDark ? 'bg-white/[0.03] border border-white/[0.05] text-gray-300' : 'bg-gray-50 border border-gray-100 text-gray-700'
                     }`}
@@ -217,9 +213,7 @@ const AIChatbot = () => {
                   <button
                     key={q}
                     onClick={() => sendMessageToAI(q)}
-                    className={`text-[10px] font-bold tracking-tight uppercase px-3 py-1.5 rounded-lg border transition-all duration-300 ${
-                      isDark
-                        ? 'bg-white/5 border-white/5 text-gray-500 hover:border-purple-500/30 hover:text-purple-300'
+                    className={`text-[10px] font-bold tracking-tight uppercase px-3 py-1.5 rounded-lg border transition-all duration-300 ${ isDark ? 'bg-white/5 border-white/5 text-gray-500 hover:border-white/30 hover:text-white'
                         : 'bg-black/5 border-black/5 text-gray-500 hover:border-black/20 hover:text-black'
                     }`}
                   >
@@ -236,16 +230,13 @@ const AIChatbot = () => {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendMessageToAI()}
                   placeholder="Engine query..."
-                  className={`flex-1 text-xs px-4 py-3 rounded-xl outline-none transition-all duration-300 ${
-                    isDark
-                      ? 'bg-white/[0.05] border border-white/[0.05] text-white placeholder-gray-600 focus:border-white/20'
+                  className={`flex-1 text-xs px-4 py-3 rounded-xl outline-none transition-all duration-300 ${ isDark ? 'bg-white/[0.05] border border-white/[0.05] text-white placeholder-gray-600 focus:border-white/20'
                       : 'bg-gray-50 border border-gray-100 text-gray-900 placeholder-gray-400 focus:border-black/20'
                   }`}
                 />
                 <button
                   onClick={() => sendMessageToAI()}
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                    isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${ isDark ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
                   }`}
                 >
                   <Send size={16} strokeWidth={2} />

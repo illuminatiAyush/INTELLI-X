@@ -27,8 +27,8 @@ const chartDefaults = {
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: 'rgba(11,11,15,0.9)',
-      borderColor: 'rgba(191,95,255,0.3)',
+      backgroundColor: 'rgba(0,0,0,0.9)',
+      borderColor: 'rgba(255,255,255,0.1)',
       borderWidth: 1,
       padding: 10,
       titleColor: '#fff',
@@ -48,11 +48,11 @@ const DashboardPreview = () => {
     datasets: [{
       label: 'Revenue (₹L)',
       data: [8.2, 9.1, 10.4, 11.8, 10.2, 12.6, 13.1, 14.0, 14.2],
-      borderColor: '#BF5FFF',
-      backgroundColor: 'rgba(191,95,255,0.08)',
+      borderColor: '#FFFFFF',
+      backgroundColor: 'rgba(255,255,255,0.05)',
       tension: 0.4,
       fill: true,
-      pointBackgroundColor: '#BF5FFF',
+      pointBackgroundColor: '#FFFFFF',
       pointRadius: 4,
       borderWidth: 2,
     }]
@@ -63,11 +63,11 @@ const DashboardPreview = () => {
     datasets: [{
       label: 'Attendance %',
       data: [88, 91, 93, 89, 95, 92, 94, 96, 94],
-      borderColor: '#00F5FF',
-      backgroundColor: 'rgba(0,245,255,0.08)',
+      borderColor: '#A1A1AA',
+      backgroundColor: 'rgba(161,161,170,0.05)',
       tension: 0.4,
       fill: true,
-      pointBackgroundColor: '#00F5FF',
+      pointBackgroundColor: '#A1A1AA',
       pointRadius: 4,
       borderWidth: 2,
     }]
@@ -79,7 +79,7 @@ const DashboardPreview = () => {
       label: 'Fees Collected',
       data: [72, 85, 91, 88, 95, 89, 94, 97, 99],
       backgroundColor: months.map((_, i) =>
-        i === months.length - 1 ? 'rgba(191,95,255,0.8)' : 'rgba(0,102,255,0.4)'
+        i === months.length - 1 ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.2)'
       ),
       borderRadius: 6,
       borderSkipped: false,
@@ -91,11 +91,11 @@ const DashboardPreview = () => {
     datasets: [{
       data: [280, 210, 320, 190, 150],
       backgroundColor: [
-        'rgba(191,95,255,0.8)',
-        'rgba(0,102,255,0.8)',
-        'rgba(0,245,255,0.6)',
-        'rgba(16,185,129,0.8)',
-        'rgba(245,158,11,0.8)',
+        'rgba(255,255,255,0.9)',
+        'rgba(255,255,255,0.6)',
+        'rgba(255,255,255,0.4)',
+        'rgba(255,255,255,0.2)',
+        'rgba(255,255,255,0.1)',
       ],
       borderWidth: 0,
     }]
@@ -148,12 +148,12 @@ const DashboardPreview = () => {
     }
   }
 
-  const panelBg = isDark ? 'bg-[#0d0d16] border-white/5' : 'bg-white border-gray-200 shadow-sm'
+  const panelBg = isDark ? 'bg-[#000000] border-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]' : 'bg-white border-gray-200 shadow-sm'
   const labelColor = isDark ? 'text-gray-400' : 'text-gray-500'
   const headingColor = isDark ? 'text-white' : 'text-gray-900'
 
   return (
-    <section id="dashboard" className={`section-padding ${isDark ? 'bg-[#0B0B0F]' : 'bg-gray-50'}`}>
+    <section id="dashboard" className={`section-padding ${isDark ? 'bg-[#000000]' : 'bg-gray-50'}`}>
       <div className="container-fluid">
         {/* Header */}
         <motion.div
@@ -163,7 +163,7 @@ const DashboardPreview = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <p className="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-4">Live Product Preview</p>
+          <p className="text-white/40 text-xs font-bold tracking-[0.2em] uppercase mb-4">Product Overview</p>
           <h2 className={`text-4xl md:text-5xl font-black mb-6 ${headingColor}`}>
             The IntelliX{' '}
             <span className="text-gradient">Analytics Dashboard</span>
@@ -175,14 +175,10 @@ const DashboardPreview = () => {
 
         {/* Dashboard UI Frame */}
         <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.97 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className={`rounded-3xl border overflow-hidden ${isDark ? 'bg-[#0a0a12] border-white/8' : 'bg-white border-gray-200 shadow-2xl'}`}
+          className={`rounded-[2rem] border overflow-hidden ${isDark ? 'bg-[#000000] border-white/10 shadow-2xl shadow-black/50' : 'bg-white border-gray-200 shadow-2xl'}`}
         >
           {/* Window chrome */}
-          <div className={`flex items-center justify-between px-6 py-4 border-b ${isDark ? 'border-white/5 bg-[#0d0d16]' : 'border-gray-100 bg-gray-50'}`}>
+          <div className={`flex items-center justify-between px-6 py-4 border-b ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
             <div className="flex items-center gap-3">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-red-500" />

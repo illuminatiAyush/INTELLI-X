@@ -19,7 +19,7 @@ const AIVisualization = () => {
     const W = canvas.offsetWidth
     const H = canvas.offsetHeight
 
-    const nodeColors = ['#BF5FFF', '#0066FF', '#00F5FF', '#7C3AED', '#06B6D4']
+    const nodeColors = ['#FFFFFF', '#A1A1AA', '#52525B', '#27272A', '#18181B']
 
     const layers = [
       { x: 0.1, count: 4 },
@@ -120,8 +120,7 @@ const AIVisualization = () => {
         ctx.arc(x, y, 3, 0, Math.PI * 2)
         ctx.fillStyle = sig.color
         ctx.fill()
-        ctx.shadowBlur = 15
-        ctx.shadowColor = sig.color
+        ctx.fill()
       })
 
       // Draw nodes
@@ -135,24 +134,13 @@ const AIVisualization = () => {
           if (node.activeCooldown === 0) node.active = false
         }
 
-        // Glow
-        if (node.active) {
-          ctx.beginPath()
-          ctx.arc(node.x, node.y, r * 3, 0, Math.PI * 2)
-          const grad = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, r * 3)
-          grad.addColorStop(0, node.color + '60')
-          grad.addColorStop(1, 'transparent')
-          ctx.fillStyle = grad
-          ctx.fill()
-        }
+
 
         // Node circle
         ctx.beginPath()
         ctx.arc(node.x, node.y, r, 0, Math.PI * 2)
         ctx.fillStyle = node.active ? node.color : node.color + '80'
         ctx.fill()
-        ctx.shadowBlur = node.active ? 20 : 8
-        ctx.shadowColor = node.color
       })
 
       animId = requestAnimationFrame(animate)
@@ -164,7 +152,7 @@ const AIVisualization = () => {
   }, [isDark])
 
   return (
-    <section id="ai" className={`section-padding ${isDark ? 'bg-[#080810]' : 'bg-gray-50'}`}>
+    <section id="ai" className={`section-padding ${isDark ? 'bg-[#000000]' : 'bg-gray-50'}`}>
       <div className="container-fluid">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left content */}
@@ -174,8 +162,8 @@ const AIVisualization = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 px-4 py-2 rounded-full mb-6">
-              <span className="text-purple-400 text-sm font-semibold">🧠 Neural AI Engine</span>
+            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-6">
+              <span className="text-white/60 text-sm font-semibold uppercase tracking-widest text-[10px]">Neural AI Engine</span>
             </div>
             <h2 className={`text-4xl md:text-5xl font-black mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               IntelliX AI Thinks{' '}
@@ -218,7 +206,7 @@ const AIVisualization = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className={`relative rounded-3xl overflow-hidden border ${isDark ? 'border-purple-500/20 bg-[#0a0a12]' : 'border-purple-100 bg-white shadow-xl'}`}
+            className={`relative rounded-3xl overflow-hidden border ${isDark ? 'border-white/10 bg-[#000000]' : 'border-gray-100 bg-white shadow-xl'}`}
             style={{ height: 400 }}
           >
             <canvas
@@ -226,8 +214,8 @@ const AIVisualization = () => {
               style={{ width: '100%', height: '100%' }}
             />
             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-              <div className={`glass-card px-3 py-2 text-xs font-semibold ${isDark ? 'text-purple-300' : 'text-purple-600'}`}>
-                🟢 AI Engine Active
+              <div className={`glass-card px-3 py-2 text-[10px] font-bold uppercase tracking-tight ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                Operational · AI Engine
               </div>
               <div className={`glass-card px-3 py-2 text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                 Analyzing 1,248 students

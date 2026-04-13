@@ -157,7 +157,7 @@ const AuthPage = () => {
 
   // ─── Shared styling tokens ──────────────
   const bg = isDark ? 'bg-black' : 'bg-[#f8fafc]'
-  const brandingBg = isDark ? 'bg-[#000000]' : 'bg-[#f1f5f9]'
+  const brandingBg = isDark ? 'bg-[#0a0a0b]' : 'bg-[#f1f5f9]'
   const cardBg = isDark 
     ? 'bg-[#0a0a0a] border border-white/10 shadow-2xl rounded-3xl' 
     : 'bg-white border border-slate-200 shadow-[0_32px_64px_-16px_rgba(15,23,42,0.1)] rounded-3xl'
@@ -201,8 +201,22 @@ const AuthPage = () => {
       {/* Left Panel: Branding (Desktop only) */}
       <div
         className={`hidden lg:flex lg:w-[48%] xl:w-[42%] ${brandingBg} border-r border-white/5 flex-col items-center justify-center relative p-16 overflow-hidden`}
-        style={{ clipPath: 'polygon(0 0, 100% 0, 88% 100%, 0 100%)', zIndex: 10 }}
+        style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0 100%)', zIndex: 10 }}
       >
+        {/* Slant Border / Decorative Line */}
+        <div 
+          className="absolute top-0 right-0 h-full w-[2px] bg-gradient-to-b from-transparent via-white/10 to-transparent"
+          style={{ 
+            right: '-1px', 
+            clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0 100%)', // This clip path doesn't work on a line, I need to rethink.
+          }} 
+        />
+        {/* Improved decorative border strategy: a sibling element with the same slant but wider */}
+        <div 
+          className={`absolute inset-0 z-0 ${isDark ? 'bg-white/5' : 'bg-black/5'}`}
+          style={{ clipPath: 'polygon(0 0, 100.5% 0, 85.5% 100%, 0 100%)' }}
+        />
+
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0 bg-grid-white/[0.02]" />
         </div>
@@ -210,17 +224,16 @@ const AuthPage = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
-          className="relative z-10 w-full flex flex-col items-center text-center pr-[12%]"
+          className="relative z-10 w-full flex flex-col items-center text-center pr-[15%]"
         >
           <Link to="/" className="flex flex-col items-center gap-10 group">
             <motion.div
-              className={`w-36 h-36 rounded-[2.8rem] flex items-center justify-center shadow-3xl group-hover:scale-105 transition-all duration-700 relative overflow-hidden ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}
+              className={`w-36 h-36 rounded-[2.8rem] flex items-center justify-center shadow-3xl group-hover:scale-105 transition-all duration-700 relative overflow-hidden ${isDark ? 'bg-white' : 'bg-black shadow-black/20'}`}
             >
-              <Zap className="w-20 h-20 fill-current" />
-              <motion.div
-                animate={{ x: ['-100%', '200%'] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                className={`absolute inset-0 ${isDark ? 'bg-gradient-to-r from-transparent via-black/10 to-transparent' : 'bg-gradient-to-r from-transparent via-white/20 to-transparent'} -skew-x-12`}
+              <img 
+                src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"} 
+                alt="IntelliX Logo" 
+                className="w-full h-full object-cover"
               />
             </motion.div>
             <div className="space-y-6">
@@ -234,7 +247,7 @@ const AuthPage = () => {
             </div>
           </Link>
         </motion.div>
-        <div className={`absolute bottom-12 left-0 w-full px-16 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.4em] ${labelColor} opacity-40 pr-[18%]`}>
+        <div className={`absolute bottom-12 left-0 w-full px-16 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.4em] ${labelColor} opacity-40 pr-[20%]`}>
           <span>v2.8.5-pro</span>
           <span>© 2026 IntelliX Systems</span>
         </div>
@@ -246,8 +259,8 @@ const AuthPage = () => {
           {/* Mobile Logo */}
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="lg:hidden text-center mb-10">
             <Link to="/" className="inline-flex flex-col items-center gap-3 group">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>
-                <Zap className="w-7 h-7 fill-current" />
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden ${isDark ? 'bg-white' : 'bg-black'}`}>
+                <img src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"} alt="Logo" className="w-full h-full object-cover" />
               </div>
               <span className={`text-xl font-black tracking-tighter ${headingColor}`}>
                 INTELLI<span className="opacity-50">X</span>

@@ -4,49 +4,28 @@ import { CreditCard, Building2, Users, Calendar } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useTheme } from '../../context/ThemeContext'
 import StatsCard from '../../components/ui/StatsCard'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { DashboardSkeleton, CardSkeleton } from '../../components/ui/Skeletons'
 
 const SubscriptionsPage = () => {
   const { isDark } = useTheme()
-  const [institutes, setInstitutes] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchInstitutes()
-  }, [])
-
-  const fetchInstitutes = async () => {
-    try {
-      const { data: instList } = await supabase
-        .from('institutes')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      // Fetch user counts per institute
-      const enriched = await Promise.all(
-        (instList || []).map(async inst => {
-          const { count } = await supabase
-            .from('profiles')
-            .select('id', { count: 'exact', head: true })
-            .eq('institute_id', inst.id)
-          return { ...inst, userCount: count || 0 }
-        })
-      )
-
-      setInstitutes(enriched)
-    } catch (err) {
-      console.error('Subscriptions error:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-[var(--color-purple)]/30 border-t-[var(--color-purple)] rounded-full animate-spin" />
-      </div>
+  const { data: subscriptionsData, loading: subscriptionsLoading } = useAppQuery('admin-subscriptions', async () => {
+    const { data: instList } = await supabase.from('institutes').select('id, name, owner_name, email, created_at').order('created_at', { ascending: false })
+    // Fetch user counts per institute
+    const enriched = await Promise.all(
+      (instList || []).map(async inst => {
+        const { count } = await supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('institute_id', inst.id)
+        return { ...inst, userCount: count || 0 }
+      })
     )
-  }
+    return enriched
+  })
+
+  const loading = subscriptionsLoading && !subscriptionsData
+  const institutes = subscriptionsData || []
+
+
+  if (loading) return <DashboardSkeleton />
 
   return (
     <div className="space-y-8">
@@ -64,8 +43,8 @@ const SubscriptionsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatsCard title="Total Institutes" value={institutes.length} icon={Building2} color="purple" />
-        <StatsCard title="Total Users" value={institutes.reduce((s, i) => s + i.userCount, 0)} icon={Users} color="blue" />
+        <StatsCard title="Total Institutes" value={institutes.length} icon={Building2} color="white" />
+        <StatsCard title="Total Users" value={institutes.reduce((s, i) => s + i.userCount, 0)} icon={Users} color="white" />
         <StatsCard title="Plan" value="Free Tier" icon={CreditCard} color="green" />
       </div>
 
@@ -75,7 +54,7 @@ const SubscriptionsPage = () => {
         className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
       >
         <div className="flex items-center gap-2 mb-6">
-          <div className="p-2 rounded-lg bg-[var(--color-purple)]/10 text-[var(--color-purple)]">
+          <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
             <Building2 className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-bold text-[var(--text-primary)]">Registered Institutes</h2>
@@ -91,11 +70,11 @@ const SubscriptionsPage = () => {
                 className="flex items-center justify-between px-5 py-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${isDark ? 'bg-white/10 text-white' : 'bg-slate-800 text-white'}`}>
                     {inst.name?.charAt(0)?.toUpperCase() || 'I'}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-purple)] transition-colors">
+                    <p className="text-sm font-semibold text-[var(--text-primary)] transition-colors">
                       {inst.name}
                     </p>
                     <p className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">

@@ -46,7 +46,7 @@ const ProfileCard = ({ profile, user, teacher, role, loading, onEdit }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0 shadow-lg shadow-purple-500/20">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-[var(--text-primary)] text-2xl font-bold flex-shrink-0 shadow-lg shadow-purple-500/20">
             {displayName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
@@ -80,7 +80,7 @@ const ProfileCard = ({ profile, user, teacher, role, loading, onEdit }) => {
       </div>
 
       {/* Decorative */}
-      <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-purple-500 opacity-[0.03] blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-purple)]/5 to-transparent pointer-events-none" />
     </motion.div>
   )
 }

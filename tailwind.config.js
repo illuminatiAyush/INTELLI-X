@@ -8,8 +8,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        'space-black': '#0B0B0F',
-        'deep-purple': '#1a0533',
+        'space-black': '#000000',
+        'deep-purple': '#0a0a0a',
         'electric-blue': '#0066FF',
         'neon-cyan': '#00F5FF',
         'neon-purple': '#BF5FFF',
@@ -23,7 +23,7 @@ export default {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'hero-gradient': 'linear-gradient(135deg, #0B0B0F 0%, #1a0533 50%, #0B0B0F 100%)',
+        'hero-gradient': 'linear-gradient(135deg, #000000 0%, #000000 50%, #000000 100%)',
         'neon-gradient': 'linear-gradient(90deg, #BF5FFF, #0066FF, #00F5FF)',
       },
       animation: {

@@ -29,10 +29,10 @@ const GoalRow = ({ icon: Icon, label, current, target, setTarget, suffix = '', p
               type="number"
               value={target}
               onChange={(e) => setTarget(Number(e.target.value))}
-              className="w-20 bg-transparent text-2xl font-bold text-purple-500 outline-none border-b-2 border-purple-500/30 focus:border-purple-500 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-20 bg-transparent text-2xl font-bold text-white outline-none border-b-2 border-white/30 focus:border-white transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               min={0}
             />
-            <span className="text-purple-500 text-lg font-bold">{suffix}</span>
+            <span className="text-white text-lg font-bold">{suffix}</span>
           </div>
         </div>
       </div>
@@ -44,7 +44,7 @@ const GoalRow = ({ icon: Icon, label, current, target, setTarget, suffix = '', p
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(progress, 100)}%` }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className={`h-full rounded-full ${isAhead ? 'bg-emerald-500' : 'bg-purple-500'}`}
+            className={`h-full rounded-full ${isAhead ? 'bg-emerald-500' : 'bg-white'}`}
           />
         </div>
       )}

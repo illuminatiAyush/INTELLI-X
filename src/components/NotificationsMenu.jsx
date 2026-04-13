@@ -26,24 +26,24 @@ const NotificationsMenu = () => {
         setNotifications(prev => [payload.new, ...prev])
         setUnreadCount(prev => prev + 1)
         toast.custom((t) => (
-          <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-white dark:bg-[#1A1C23] shadow-xl rounded-2xl pointer-events-auto flex ring-1 ring-black/5 dark:ring-white/10`}>
+          <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-white dark:bg-[#000000] shadow-xl rounded-2xl pointer-events-auto flex ring-1 ring-black/5 dark:ring-white/10`}>
             <div className="flex-1 w-0 p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0 pt-0.5">
-                  <div className="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-500">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-black'}`}>
                     <Bell className="h-5 w-5" />
                   </div>
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{payload.new.title}</p>
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{payload.new.message}</p>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-400">{payload.new.message}</p>
                 </div>
               </div>
             </div>
             <div className="flex border-l border-gray-200 dark:border-white/10">
               <button
                 onClick={() => toast.dismiss(t.id)}
-                className="w-full border border-transparent rounded-none rounded-r-2xl p-4 flex items-center justify-center text-sm font-medium text-purple-500 hover:text-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className={`w-full border border-transparent rounded-none rounded-r-2xl p-4 flex items-center justify-center text-sm font-bold transition-colors ${isDark ? 'text-white hover:text-gray-300' : 'text-gray-900 hover:text-gray-600'}`}
               >
                 Close
               </button>
@@ -127,17 +127,17 @@ const NotificationsMenu = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className={`absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl border shadow-2xl z-50 overflow-hidden flex flex-col ${isDark ? 'bg-[#0B0B0F] border-white/10' : 'bg-white border-gray-200'}`}
+            className={`absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl border shadow-2xl z-50 overflow-hidden flex flex-col ${isDark ? 'bg-[#0a0a0a] border-white/10' : 'bg-white border-gray-200'}`}
             style={{ maxHeight: '450px' }}
           >
             <div className={`p-4 border-b flex items-center justify-between ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
               <h3 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
                 Notifications
                 {unreadCount > 0 && (
-                  <span className="bg-purple-500 text-white text-[10px] px-2 py-0.5 rounded-full">{unreadCount}</span>
+                  <span className="bg-white text-black text-[10px] px-2 py-0.5 rounded-full">{unreadCount}</span>
                 )}
               </h3>
-              <button onClick={markAllAsRead} className="text-xs text-purple-400 hover:text-purple-300 transition-colors font-medium">Mark all as read</button>
+              <button onClick={markAllAsRead} className={`text-xs transition-colors font-medium ${isDark ? 'text-white/50 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}>Mark all as read</button>
             </div>
 
             <div className="overflow-y-auto flex-1 p-2 space-y-1">
@@ -153,10 +153,10 @@ const NotificationsMenu = () => {
                   <div 
                     key={n.id} 
                     onClick={() => !n.is_read && markAsRead(n.id)}
-                    className={`p-3 rounded-xl transition-all cursor-pointer flex gap-3 group relative ${n.is_read ? (isDark ? 'hover:bg-white/5 opacity-70' : 'hover:bg-gray-50 opacity-70') : (isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-purple-50/50 hover:bg-purple-50')} border border-transparent ${!n.is_read ? (isDark ? 'hover:border-white/10' : 'hover:border-purple-100') : ''}`}
+                    className={`p-3 rounded-xl transition-all cursor-pointer flex gap-3 group relative ${n.is_read ? (isDark ? 'hover:bg-white/5 opacity-70' : 'hover:bg-gray-50 opacity-70') : (isDark ? 'bg-white/5 hover:bg-white/10' : 'bg-gray-100/50 hover:bg-gray-100')} border border-transparent ${!n.is_read ? (isDark ? 'hover:border-white/10' : 'hover:border-gray-200') : ''}`}
                   >
-                    {!n.is_read && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-3/4 bg-purple-500 rounded-r-md" />}
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600'}`}>
+                    {!n.is_read && <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-3/4 rounded-r-md ${isDark ? 'bg-white' : 'bg-black'}`} />}
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-black/60'}`}>
                       <Info className="w-4 h-4" />
                     </div>
                     <div>

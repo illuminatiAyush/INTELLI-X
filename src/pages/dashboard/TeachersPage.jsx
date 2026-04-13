@@ -1,42 +1,37 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import { Plus, Search, Edit2, Trash2, Mail, BookOpen, Phone } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Mail, BookOpen, Phone, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
 import { createPortal } from 'react-dom'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { TableSkeleton } from '../../components/ui/Skeletons'
 
 const TeachersPage = () => {
   const { isDark } = useTheme()
   const { user, profile } = useAuth()
-  const [teachers, setTeachers] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showModal, setShowModal] = useState(false)
+  const { data: teachersData, loading: teachersLoading, refetch: refetchTeachers } = useAppQuery('teachers-list', async () => {
+    // RLS will automatically restrict this to the admin's institute_id
+    const { data, error } = await supabase
+      .from('teachers')
+      .select('id, name, subject, phone, email, created_at')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data || []
+  })
+
+  const teachers = teachersData || []
+  const loading = teachersLoading && !teachersData
+
   const [submitting, setSubmitting] = useState(false)
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', subject: '', phone: '' })
   const [editingTeacher, setEditingTeacher] = useState(null)
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', subject: '', phone: '' })
+  const [showModal, setShowModal] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
-    fetchTeachers()
-  }, [])
-
-  const fetchTeachers = async () => {
-    try {
-      // RLS will automatically restrict this to the admin's institute_id
-      const { data, error } = await supabase
-        .from('teachers')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setTeachers(data || [])
-    } catch (error) {
-      console.error('Error fetching teachers:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const fetchTeachers = () => refetchTeachers()
 
 
   const handleSubmit = async (e) => {
@@ -128,28 +123,41 @@ const TeachersPage = () => {
     teacher.subject?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (loading) return <div className={`${isDark ? 'text-white' : 'text-gray-900'} text-center py-10`}>Loading teachers...</div>
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-24 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-subtle)] animate-pulse" />
+        <TableSkeleton rows={10} cols={5} />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
-        <div>
-          <motion.h1 
-            initial={{ opacity: 0, x: -10 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-          >
-            Teachers
-          </motion.h1>
-          <p className="text-[var(--text-secondary)] mt-1 font-medium">Manage teaching staff for your institute</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-500 border border-cyan-500/20 shadow-sm shadow-cyan-500/5">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+            >
+              Teachers
+            </motion.h1>
+            <p className="text-[var(--text-secondary)] mt-1 font-medium">Manage and organize teaching staff</p>
+          </div>
         </div>
-        <button
-        onClick={() => handleOpenAdd()}
-          className="flex items-center px-5 py-2.5 bg-[var(--color-purple)] text-white rounded-xl hover:opacity-90 transition-all font-semibold shadow-lg shadow-purple-500/20 active:scale-95"
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => { setEditingTeacher(null); setFormData({ name: '', email: '', password: '', subject: '', phone: '' }); setShowModal(true); }}
+          className="flex items-center px-5 py-2.5 bg-white text-black rounded-xl hover:bg-gray-200 transition-all font-bold shadow-lg"
         >
-          <Plus className="w-5 h-5 mr-2" />
-          Add Teacher
-        </button>
+          <Plus className="w-5 h-5 mr-2" /> Add Teacher
+        </motion.button>
       </div>
 
       <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
@@ -161,7 +169,7 @@ const TeachersPage = () => {
               placeholder="Search teachers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-[var(--color-purple)] transition-all text-sm font-medium"
+              className={`w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-cyan-500/40 transition-all text-sm font-medium`}
             />
           </div>
         </div>
@@ -187,7 +195,7 @@ const TeachersPage = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center text-[var(--text-primary)] font-medium">
-                      <div className="p-1.5 rounded-lg bg-[var(--color-purple)]/10 text-[var(--color-purple)] mr-2.5">
+                      <div className={`p-1.5 rounded-lg ${isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'} text-[var(--text-primary)] border mr-2.5 shadow-sm`}>
                         <BookOpen className="w-3.5 h-3.5" />
                       </div>
                       {teacher.subject || '-'}
@@ -195,26 +203,26 @@ const TeachersPage = () => {
                   </td>
                   <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">
                     <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-[var(--color-purple)]" />
+                      <Phone className="w-3.5 h-3.5 text-[var(--text-secondary)] opacity-60" />
                       {teacher.phone || '-'}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">
                     <div className="flex items-center gap-2">
-                      <Mail className="w-3.5 h-3.5 text-blue-400" />
+                      <Mail className="w-3.5 h-3.5 text-[var(--text-secondary)] opacity-60" />
                       {teacher.email || '-'}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right space-x-3 whitespace-nowrap">
                     <button
                       onClick={() => handleOpenEdit(teacher)}
-                      className="text-gray-400 hover:text-white transition"
+                      className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
                     >
                       <Edit2 className="w-4 h-4 inline" />
                     </button>
                     <button 
                       onClick={() => handleDelete(teacher.id)}
-                      className="text-red-400 hover:text-red-300 transition"
+                      className="text-red-400 hover:text-red-500 transition"
                     >
                       <Trash2 className="w-4 h-4 inline" />
                     </button>
@@ -223,7 +231,7 @@ const TeachersPage = () => {
               ))}
               {filteredTeachers.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="5" className="px-6 py-8 text-center text-[var(--text-secondary)]">
                     No teachers found. Click 'Add Teacher' to create one.
                   </td>
                 </tr>
@@ -245,7 +253,7 @@ const TeachersPage = () => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
                 />
               </div>
               {/* Email — shown in edit mode for updating the teachers table record */}
@@ -257,7 +265,7 @@ const TeachersPage = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="teacher@gmail.com"
-                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
                   />
                 </div>
               )}
@@ -271,7 +279,7 @@ const TeachersPage = () => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
                     />
                   </div>
                   <div>
@@ -282,7 +290,7 @@ const TeachersPage = () => {
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       placeholder="Minimum 6 characters"
-                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
                     />
                   </div>
                 </>
@@ -295,7 +303,7 @@ const TeachersPage = () => {
                   placeholder="e.g. Advanced Mathematics"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
                 />
               </div>
               {/* Phone — editable in both add and edit mode */}
@@ -306,7 +314,7 @@ const TeachersPage = () => {
                   placeholder="e.g. +91 98765 43210"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-[var(--color-purple)]' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[var(--color-purple)]/50'} border rounded-lg focus:outline-none transition-all`}
+                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
                 />
               </div>
               
@@ -322,9 +330,9 @@ const TeachersPage = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-[var(--color-purple)] text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all flex items-center gap-2 bg-white text-black hover:bg-gray-200"
                 >
-                  {submitting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                  {submitting && <div className={`w-4 h-4 border-2 ${isDark ? 'border-black' : 'border-white'} border-t-transparent rounded-full animate-spin`} />}
                   {submitting ? 'Saving...' : editingTeacher ? 'Update Teacher' : 'Save Teacher'}
                 </button>
               </div>

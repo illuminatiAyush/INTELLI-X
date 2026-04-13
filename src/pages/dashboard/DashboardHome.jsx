@@ -19,7 +19,7 @@ const DashboardHome = () => {
     default:
       return (
         <div className="text-center py-20">
-          <p className="text-gray-400 text-lg">Unknown role. Please contact support.</p>
+          <p className="text-[var(--text-secondary)] text-lg">Unknown role. Please contact support.</p>
         </div>
       )
   }

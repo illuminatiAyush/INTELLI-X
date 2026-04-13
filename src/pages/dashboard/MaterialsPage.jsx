@@ -4,62 +4,81 @@ import { Upload, FileText, Trash2, Download, Search } from 'lucide-react'
 import { Select } from '../../components/ui/FormField'
 import { getMaterials, uploadMaterial, deleteMaterial } from '../../services/materialService'
 import { useAuth } from '../../context/AuthContext'
+import { useTheme } from '../../context/ThemeContext'
 import { supabase } from '../../lib/supabase'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { CardSkeleton } from '../../components/ui/Skeletons'
 
 const MaterialsPage = () => {
   const { user, role } = useAuth()
-  const [materials, setMaterials] = useState([])
-  const [batches, setBatches] = useState([])
-  const [selectedBatch, setSelectedBatch] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [uploading, setUploading] = useState(false)
-  const [title, setTitle] = useState('')
-  const [uploadBatch, setUploadBatch] = useState('')
-  const [search, setSearch] = useState('')
-  const fileRef = useRef(null)
-
-  const canUpload = role === 'admin' || role === 'teacher'
-
-  const fetchData = async () => {
-    try {
-      let batchData = []
-      if (role === 'student') {
-        const { data: enrolledBatches } = await supabase.from('batch_students').select('batch_id').eq('student_id', user.id)
-        if (enrolledBatches && enrolledBatches.length > 0) {
-          const batchIds = enrolledBatches.map(eb => eb.batch_id)
-          const { data } = await supabase.from('batches').select('*').in('id', batchIds).order('name')
-          batchData = data || []
-        }
-      } else {
-        let query = supabase.from('batches').select('*').order('name')
-        if (role === 'teacher') query = query.eq('teacher_id', user.id)
-        const { data } = await query
+  const { isDark } = useTheme()
+  const { data: initialData, loading: initialLoading, refetch: refetchInitial } = useAppQuery(`materials-init-${role}-${user?.id}`, async () => {
+    if (!user) return { batches: [], materials: [] }
+    
+    let batchData = []
+    if (role === 'student') {
+      const { data: enrolledBatches } = await supabase.from('batch_students').select('batch_id').eq('student_id', user.id)
+      if (enrolledBatches && enrolledBatches.length > 0) {
+        const batchIds = enrolledBatches.map(eb => eb.batch_id)
+        const { data } = await supabase.from('batches').select('id, name').in('id', batchIds).order('name')
         batchData = data || []
       }
-      setBatches(batchData)
+    } else {
+      let query = supabase.from('batches').select('id, name').order('name')
+      if (role === 'teacher') query = query.eq('teacher_id', user.id)
+      const { data } = await query
+      batchData = data || []
+    }
 
-      let mats = []
-      if (role === 'student') {
-        if (batchData.length > 0) {
-          if (selectedBatch) {
-            mats = await getMaterials(selectedBatch)
-          } else {
-            const batchIds = batchData.map(b => b.id)
-            mats = await getMaterials(batchIds)
-          }
-        }
-      } else {
-        mats = await getMaterials(selectedBatch || undefined)
+    let mats = []
+    if (role === 'student') {
+      if (batchData.length > 0) {
+        const batchIds = batchData.map(b => b.id)
+        mats = await getMaterials(batchIds)
       }
+    } else {
+      mats = await getMaterials(undefined)
+    }
+
+    return { batches: batchData, materials: mats }
+  }, { enabled: !!user })
+
+  useEffect(() => {
+    if (initialData?.materials) {
+      setMaterials(initialData.materials)
+    }
+    if (initialData?.batches) {
+      setBatches(initialData.batches)
+    }
+  }, [initialData])
+
+  const [batches, setBatches] = useState(initialData?.batches || [])
+  const [materials, setMaterials] = useState(initialData?.materials || [])
+  const [loading, setLoading] = useState(false)
+  const [selectedBatch, setSelectedBatch] = useState('')
+  const [search, setSearch] = useState('')
+  const [title, setTitle] = useState('')
+  const [uploadBatch, setUploadBatch] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef(null)
+  const canUpload = role !== 'student'
+  
+  const isInitialLoading = initialLoading && !initialData
+
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const mats = await getMaterials(selectedBatch || undefined)
       setMaterials(mats)
-    } catch (err) {
-      console.error(err)
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => { fetchData() }, [selectedBatch])
+  useEffect(() => { 
+    if (selectedBatch) fetchData() 
+    else if (initialData?.materials) setMaterials(initialData.materials)
+  }, [selectedBatch])
 
   const handleUpload = async () => {
     const file = fileRef.current?.files?.[0]
@@ -117,9 +136,9 @@ const MaterialsPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-[var(--color-purple)]/10">
-              <Upload className="w-5 h-5 text-[var(--color-purple)]" />
+          <div className={`flex items-center gap-3 mb-6`}>
+            <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
+              <Upload className="w-5 h-5" />
             </div>
             <h2 className="text-lg font-bold text-[var(--text-primary)]">Upload Material</h2>
           </div>
@@ -131,7 +150,7 @@ const MaterialsPage = () => {
                 placeholder="Enter document title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-[var(--color-purple)] focus:bg-[var(--bg-app)] transition-all"
+                className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-white/50 focus:bg-[var(--bg-app)] transition-all"
               />
             </div>
             <Select
@@ -148,16 +167,14 @@ const MaterialsPage = () => {
                 ref={fileRef}
                 type="file"
                 accept=".pdf,.doc,.docx,.ppt,.pptx,.xlsx"
-                className="w-full text-xs text-[var(--text-secondary)] file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[var(--color-purple)]/10 file:text-[var(--color-purple)] hover:file:bg-[var(--color-purple)]/20 file:cursor-pointer transition-all"
+                className={`w-full text-xs text-[var(--text-secondary)] file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:cursor-pointer transition-all ${isDark ? 'file:bg-white/10 file:text-white hover:file:bg-white/20' : 'file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200'}`}
               />
             </div>
             <div className="flex items-end">
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
                 onClick={handleUpload}
-                disabled={uploading || !title.trim() || !uploadBatch}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--color-purple)] text-white text-sm font-bold disabled:opacity-50 shadow-lg shadow-purple-500/20 active:scale-95 transition-all"
+                disabled={uploading || !title || !uploadBatch || !fileRef.current?.files[0]}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-black text-sm font-bold disabled:opacity-50 shadow-xl active:scale-95 transition-all"
               >
                 {uploading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -191,16 +208,16 @@ const MaterialsPage = () => {
               placeholder="Find materials by title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-[var(--color-purple)] focus:bg-[var(--bg-app)] transition-all"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-white/50 focus:bg-[var(--bg-app)] transition-all"
             />
           </div>
         </div>
       </div>
 
       {/* Materials Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-10 h-10 border-4 border-[var(--color-purple)]/20 border-t-[var(--color-purple)] rounded-full animate-spin" />
+      {isInitialLoading || loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => <CardSkeleton key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-20 bg-[var(--bg-surface)]/50 rounded-3xl border border-dashed border-[var(--border-subtle)]">
@@ -215,14 +232,14 @@ const MaterialsPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="group rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 flex flex-col hover:border-[var(--color-purple)]/30 hover:shadow-xl hover:shadow-purple-500/5 transition-all"
+              className="group rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 flex flex-col hover:border-white/20 hover:shadow-2xl transition-all"
             >
               <div className="flex items-start gap-3 mb-4">
-                <div className="p-3 rounded-xl bg-[var(--color-purple)]/10 text-[var(--color-purple)] group-hover:bg-[var(--color-purple)] group-hover:text-white transition-all">
+                <div className="p-3 rounded-xl transition-all bg-white/10 text-white group-hover:bg-white group-hover:text-black">
                   <FileText className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-[var(--text-primary)] truncate transition-colors group-hover:text-[var(--color-purple)]">{mat.title}</h3>
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] truncate transition-colors">{mat.title}</h3>
                   <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mt-1">{mat.batches?.name || 'PUBLIC'}</p>
                 </div>
               </div>
@@ -237,7 +254,8 @@ const MaterialsPage = () => {
                   href={mat.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] hover:bg-[var(--color-purple)] hover:text-white hover:border-transparent transition-all text-xs font-bold"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs font-bold transition-all hover:bg-white hover:text-black hover:border-transparent"
+
                 >
                   <Download className="w-3.5 h-3.5" /> Get File
                 </a>

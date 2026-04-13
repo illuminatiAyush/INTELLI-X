@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { useTheme } from '../../context/ThemeContext'
+import { DashboardSkeleton } from '../../components/ui/Skeletons'
 
 // ── Student profile imports ──────────────────────────────────────────
 import {
@@ -32,34 +35,26 @@ import ChangePassword from '../../components/profile/ChangePassword'
 // Student Profile View
 // ═══════════════════════════════════════════════════════════════════════
 const StudentProfileView = ({ user, profile, role }) => {
-  const [loading, setLoading] = useState(true)
-  const [stats, setStats] = useState(null)
-  const [testScores, setTestScores] = useState(null)
-  const [subjects, setSubjects] = useState(null)
-  const [batches, setBatches] = useState([])
+  const { isDark } = useTheme()
+  const { data: profileData, loading: profileLoading } = useAppQuery(`student-profile-data-${user?.id}`, async () => {
+    if (!user) return null
+    const [stats, testScores, subjects, batches] = await Promise.all([
+      fetchStudentStats(user.id),
+      fetchTestScores(user.id),
+      fetchSubjectPerformance(user.id),
+      fetchStudentBatches(user.id),
+    ])
+    return { stats, testScores, subjects, batches }
+  }, { enabled: !!user })
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [statsData, scoresData, subjectsData, batchData] = await Promise.all([
-          fetchStudentStats(user?.id),
-          fetchTestScores(user?.id),
-          fetchSubjectPerformance(user?.id),
-          fetchStudentBatches(user?.id),
-        ])
-        setStats(statsData)
-        setTestScores(scoresData)
-        setSubjects(subjectsData)
-        setBatches(batchData)
-      } catch (err) {
-        console.error('Student profile fetch error:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    if (user) loadData()
-    else setLoading(false)
-  }, [user])
+  const loading = profileLoading && !profileData
+  const stats = profileData?.stats || null
+  const testScores = profileData?.testScores || null
+  const subjects = profileData?.subjects || null
+  const batches = profileData?.batches || []
+
+  const [editOpen, setEditOpen] = useState(false)
+
 
   const displayName = profile?.first_name
     ? `${profile.first_name} ${profile.last_name || ''}`.trim()
@@ -79,13 +74,13 @@ const StudentProfileView = ({ user, profile, role }) => {
         className="relative overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
       >
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0 shadow-lg shadow-purple-500/20">
+          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold flex-shrink-0 shadow-xl ${isDark ? 'bg-white/10 text-white shadow-black/20' : 'bg-slate-800 text-white shadow-slate-300'}`}>
             {displayName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
             <h2 className="text-xl font-bold text-[var(--text-primary)] truncate">{displayName}</h2>
             <div className="flex items-center gap-3 mt-1">
-              <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-[var(--color-purple)]/10 text-[var(--color-purple)] border border-[var(--color-purple)]/20 capitalize">
+              <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full capitalize ${isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
                 {role || 'Student'}
               </span>
               <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
@@ -108,7 +103,7 @@ const StudentProfileView = ({ user, profile, role }) => {
             <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{user?.email || 'Not set'}</p>
           </div>
         </div>
-        <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-purple-500 opacity-[0.03] blur-3xl pointer-events-none" />
+
       </motion.div>
 
       <AcademicStats stats={stats} loading={loading} />
@@ -139,34 +134,23 @@ const StudentProfileView = ({ user, profile, role }) => {
 // Teacher Profile View
 // ═══════════════════════════════════════════════════════════════════════
 const TeacherProfileView = ({ user, profile, role }) => {
-  const [loading, setLoading] = useState(true)
-  const [teacher, setTeacher] = useState(null)
-  const [batches, setBatches] = useState([])
-  const [editOpen, setEditOpen] = useState(false)
+  const { data: teacherData, loading: tLoading, refetch } = useAppQuery(`teacher-profile-data-${user?.id}`, async () => {
+    if (!user) return null
+    const [teacher, batches] = await Promise.all([
+      fetchTeacherRecord(user.id),
+      fetchTeacherBatches(user.id),
+    ])
+    return { teacher, batches }
+  }, { enabled: !!user })
 
-  const fetchData = async () => {
-    try {
-      const teacherData = await fetchTeacherRecord(user.id)
-      setTeacher(teacherData)
-
-      const batchData = await fetchTeacherBatches(user.id)
-      setBatches(batchData)
-    } catch (err) {
-      console.error('Teacher profile fetch error:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    if (user) fetchData()
-    else setLoading(false)
-  }, [user])
+  const loading = tLoading && !teacherData
+  const teacher = teacherData?.teacher || null
+  const batches = teacherData?.batches || []
 
   const handleSaved = () => {
-    setLoading(true)
-    fetchData()
+    refetch()
   }
+
 
   return (
     <>

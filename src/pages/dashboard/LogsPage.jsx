@@ -3,107 +3,56 @@ import { motion } from 'framer-motion'
 import { FileText, Users, ClipboardCheck, BookOpen, Layers } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useTheme } from '../../context/ThemeContext'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { CardSkeleton } from '../../components/ui/Skeletons'
 
 const LogsPage = () => {
   const { isDark } = useTheme()
-  const [logs, setLogs] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { data: logsData, loading: logsLoading } = useAppQuery('activity-logs', async () => {
+    // Fetch recent activities from multiple tables
+    const [studentsRes, testsRes, attendanceRes, materialsRes, batchesRes] = await Promise.all([
+      supabase.from('students').select('id, name, created_at').order('created_at', { ascending: false }).limit(10),
+      supabase.from('tests').select('id, title, created_at').order('created_at', { ascending: false }).limit(10),
+      supabase.from('attendance').select('id, date, status, created_at, students(name)').order('created_at', { ascending: false }).limit(10),
+      supabase.from('materials').select('id, title, created_at').order('created_at', { ascending: false }).limit(10),
+      supabase.from('batches').select('id, name, created_at').order('created_at', { ascending: false }).limit(10),
+    ])
 
-  useEffect(() => {
-    fetchLogs()
-  }, [])
+    const combined = []
+    ;(studentsRes.data || []).forEach(s => {
+      combined.push({ id: `student-${s.id}`, type: 'student', icon: Users, color: 'neutral', description: `Student "${s.name}" was added`, timestamp: s.created_at })
+    })
+    ;(testsRes.data || []).forEach(t => {
+      combined.push({ id: `test-${t.id}`, type: 'test', icon: FileText, color: 'neutral', description: `Test "${t.title}" was created`, timestamp: t.created_at })
+    })
+    ;(attendanceRes.data || []).forEach(a => {
+      combined.push({ id: `attendance-${a.id}`, type: 'attendance', icon: ClipboardCheck, color: a.status === 'present' ? 'green' : 'red', description: `${a.students?.name || 'Student'} marked ${a.status} on ${new Date(a.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`, timestamp: a.created_at })
+    })
+    ;(materialsRes.data || []).forEach(m => {
+      combined.push({ id: `material-${m.id}`, type: 'material', icon: BookOpen, color: 'neutral', description: `Material "${m.title}" was uploaded`, timestamp: m.created_at })
+    })
+    ;(batchesRes.data || []).forEach(b => {
+      combined.push({ id: `batch-${b.id}`, type: 'batch', icon: Layers, color: 'neutral', description: `Batch "${b.name}" was created`, timestamp: b.created_at })
+    })
 
-  const fetchLogs = async () => {
-    try {
-      // Fetch recent activities from multiple tables
-      const [studentsRes, testsRes, attendanceRes, materialsRes, batchesRes] = await Promise.all([
-        supabase.from('students').select('id, name, created_at').order('created_at', { ascending: false }).limit(10),
-        supabase.from('tests').select('id, title, created_at').order('created_at', { ascending: false }).limit(10),
-        supabase.from('attendance').select('id, date, status, created_at, students(name)').order('created_at', { ascending: false }).limit(10),
-        supabase.from('materials').select('id, title, created_at').order('created_at', { ascending: false }).limit(10),
-        supabase.from('batches').select('id, name, created_at').order('created_at', { ascending: false }).limit(10),
-      ])
+    combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    return combined.slice(0, 30)
+  })
 
-      const combined = []
+  const loading = logsLoading && !logsData
+  const logs = logsData || []
 
-      ;(studentsRes.data || []).forEach(s => {
-        combined.push({
-          id: `student-${s.id}`,
-          type: 'student',
-          icon: Users,
-          color: 'purple',
-          description: `Student "${s.name}" was added`,
-          timestamp: s.created_at,
-        })
-      })
-
-      ;(testsRes.data || []).forEach(t => {
-        combined.push({
-          id: `test-${t.id}`,
-          type: 'test',
-          icon: FileText,
-          color: 'blue',
-          description: `Test "${t.title}" was created`,
-          timestamp: t.created_at,
-        })
-      })
-
-      ;(attendanceRes.data || []).forEach(a => {
-        combined.push({
-          id: `attendance-${a.id}`,
-          type: 'attendance',
-          icon: ClipboardCheck,
-          color: a.status === 'present' ? 'green' : 'red',
-          description: `${a.students?.name || 'Student'} marked ${a.status} on ${new Date(a.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
-          timestamp: a.created_at,
-        })
-      })
-
-      ;(materialsRes.data || []).forEach(m => {
-        combined.push({
-          id: `material-${m.id}`,
-          type: 'material',
-          icon: BookOpen,
-          color: 'cyan',
-          description: `Material "${m.title}" was uploaded`,
-          timestamp: m.created_at,
-        })
-      })
-
-      ;(batchesRes.data || []).forEach(b => {
-        combined.push({
-          id: `batch-${b.id}`,
-          type: 'batch',
-          icon: Layers,
-          color: 'amber',
-          description: `Batch "${b.name}" was created`,
-          timestamp: b.created_at,
-        })
-      })
-
-      // Sort by timestamp descending
-      combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-      setLogs(combined.slice(0, 30))
-    } catch (err) {
-      console.error('Logs error:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const colorMap = {
-    purple: 'bg-purple-500/10 text-purple-500',
-    blue: 'bg-blue-500/10 text-blue-500',
+    neutral: 'bg-white/10 text-white',
     green: 'bg-green-500/10 text-green-500',
     red: 'bg-red-500/10 text-red-500',
-    cyan: 'bg-cyan-500/10 text-cyan-500',
-    amber: 'bg-amber-500/10 text-amber-500',
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-[var(--color-purple)]/30 border-t-[var(--color-purple)] rounded-full animate-spin" />
+      <div className="space-y-4">
+        {[...Array(8)].map((_, i) => <CardSkeleton key={i} />)}
       </div>
     )
   }
@@ -142,7 +91,7 @@ const LogsPage = () => {
                   transition={{ delay: i * 0.02 }}
                   className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-[var(--bg-app)] transition-colors group"
                 >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${colorMap[log.color] || colorMap.purple}`}>
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${colorMap[log.color] || colorMap.neutral}`}>
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">

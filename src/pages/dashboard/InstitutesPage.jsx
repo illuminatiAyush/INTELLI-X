@@ -4,52 +4,32 @@ import { Plus, Search, Edit2, Trash2, Building2, UserPlus, CheckCircle, AlertCir
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
 import { createPortal } from 'react-dom'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { TableSkeleton } from '../../components/ui/Skeletons'
 
 const InstitutesPage = () => {
   const { isDark } = useTheme()
-  const [institutes, setInstitutes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showModal, setShowModal] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [toast, setToast] = useState(null)
-  const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    owner_name: '',
-    admin_email: '',
-    admin_password: '',
+  const { data: institutesData, loading: institutesLoading, refetch: refetchInstitutes } = useAppQuery('institutes-list', async () => {
+    const { data, error } = await supabase
+      .from('institutes')
+      .select('id, name, owner_name, email, join_code, created_at')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data || []
   })
 
-  useEffect(() => {
-    fetchInstitutes()
-  }, [])
+  const institutes = institutesData || []
+  const loading = institutesLoading && !institutesData
 
-  // Auto-dismiss toast
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 4000)
-      return () => clearTimeout(timer)
-    }
-  }, [toast])
+  const [submitting, setSubmitting] = useState(false)
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', owner_name: '', admin_email: '', admin_password: '' })
+  const [toast, setToast] = useState(null)
+  const [showModal, setShowModal] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
-  const fetchInstitutes = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('institutes')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setInstitutes(data || [])
-    } catch (error) {
-      console.error('Error fetching institutes:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const fetchInstitutes = () => refetchInstitutes()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -105,7 +85,14 @@ const InstitutesPage = () => {
     inst.email?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (loading) return <div className={`${isDark ? 'text-white' : 'text-gray-900'} text-center py-10`}>Loading institutes...</div>
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-24 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-subtle)] animate-pulse" />
+        <TableSkeleton rows={10} cols={5} />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -143,7 +130,7 @@ const InstitutesPage = () => {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center px-5 py-2.5 bg-[var(--color-purple)] text-white rounded-xl hover:opacity-90 transition-all font-semibold shadow-lg shadow-purple-500/20 active:scale-95"
+          className="flex items-center px-5 py-2.5 rounded-xl transition-all font-semibold shadow-xl active:scale-95 bg-white text-black hover:bg-gray-200"
         >
           <Plus className="w-5 h-5 mr-2" />
           Add Institute
@@ -160,7 +147,7 @@ const InstitutesPage = () => {
               placeholder="Search institutes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-[var(--color-purple)] transition-all text-sm font-medium"
+              className={`w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-cyan-500/40 transition-all text-sm font-medium`}
             />
           </div>
         </div>
@@ -181,8 +168,8 @@ const InstitutesPage = () => {
                 <tr key={inst.id} className="hover:bg-[var(--bg-app)] transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="p-2.5 bg-[var(--color-purple)]/10 rounded-xl mr-3 group-hover:scale-110 transition-transform">
-                        <Building2 className="w-5 h-5 text-[var(--color-purple)]" />
+                      <div className={`p-2.5 ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 border border-slate-200 text-slate-700'} rounded-xl mr-3 group-hover:scale-110 transition-transform flex items-center justify-center`}>
+                        <Building2 className="w-5 h-5" />
                       </div>
                       <span className="font-semibold text-[var(--text-primary)]">{inst.name}</span>
                     </div>
@@ -190,19 +177,19 @@ const InstitutesPage = () => {
                   <td className="px-6 py-4 text-[var(--text-secondary)]">{inst.owner_name || '-'}</td>
                   <td className="px-6 py-4 text-[var(--text-secondary)]">{inst.email || '-'}</td>
                   <td className="px-6 py-4">
-                    <div className="bg-[var(--color-purple)]/10 text-[var(--color-purple)] border border-[var(--color-purple)]/20 px-3 py-1 rounded-lg text-sm font-bold tracking-widest inline-block uppercase">
+                    <div className={`px-3 py-1 rounded-lg text-sm font-bold tracking-widest inline-block uppercase border ${isDark ? 'bg-white/10 text-white border-white/20' : 'bg-slate-100 text-slate-700 border-slate-200'}`}>
                       {inst.join_code || 'N/A'}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right space-x-3">
-                    <button className="text-gray-400 hover:text-[var(--color-purple)] transition"><Edit2 className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(inst.id)} className="text-red-400 hover:text-red-300 transition"><Trash2 className="w-4 h-4" /></button>
+                    <button className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"><Edit2 className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(inst.id)} className="text-red-400 hover:text-red-500 transition"><Trash2 className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
               {filteredInstitutes.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="5" className="px-6 py-8 text-center text-[var(--text-secondary)]">
                     No institutes found.
                   </td>
                 </tr>
@@ -238,7 +225,7 @@ const InstitutesPage = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Sunrise Coaching Center"
-                    className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-purple-400'} border rounded-xl focus:outline-none transition-all text-sm`}
+                    className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400'} border rounded-xl focus:outline-none transition-all text-sm`}
                   />
                 </div>
                 <div>
@@ -247,7 +234,7 @@ const InstitutesPage = () => {
                     type="text"
                     value={formData.owner_name}
                     onChange={(e) => setFormData({ ...formData, owner_name: e.target.value })}
-                    className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-purple-400'} border rounded-xl focus:outline-none transition-all text-sm`}
+                    className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400'} border rounded-xl focus:outline-none transition-all text-sm`}
                   />
                 </div>
                 <div>
@@ -256,7 +243,7 @@ const InstitutesPage = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-purple-400'} border rounded-xl focus:outline-none transition-all text-sm`}
+                    className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400'} border rounded-xl focus:outline-none transition-all text-sm`}
                   />
                 </div>
               </div>
@@ -267,7 +254,7 @@ const InstitutesPage = () => {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-purple-400'} border rounded-xl focus:outline-none transition-all text-sm`}
+                  className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400'} border rounded-xl focus:outline-none transition-all text-sm`}
                 />
               </div>
 
@@ -285,7 +272,7 @@ const InstitutesPage = () => {
                     value={formData.admin_email}
                     onChange={(e) => setFormData({ ...formData, admin_email: e.target.value })}
                     placeholder="admin@institute.com"
-                    className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-purple-400'} border rounded-xl focus:outline-none transition-all text-sm`}
+                    className={`w-full px-4 py-2.5 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400'} border rounded-xl focus:outline-none transition-all text-sm`}
                   />
                 </div>
                 <div>
@@ -298,7 +285,7 @@ const InstitutesPage = () => {
                       onChange={(e) => setFormData({ ...formData, admin_password: e.target.value })}
                       placeholder="Min 6 characters"
                       minLength={6}
-                      className={`w-full px-4 py-2.5 pr-10 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-purple-500' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-purple-400'} border rounded-xl focus:outline-none transition-all text-sm`}
+                      className={`w-full px-4 py-2.5 pr-10 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400'} border rounded-xl focus:outline-none transition-all text-sm`}
                     />
                     <button
                       type="button"
@@ -328,11 +315,11 @@ const InstitutesPage = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-xl hover:opacity-90 transition-all font-semibold disabled:opacity-50"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all font-semibold disabled:opacity-50 shadow-xl bg-white text-black hover:bg-gray-200"
                 >
                   {submitting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                       Creating...
                     </>
                   ) : (

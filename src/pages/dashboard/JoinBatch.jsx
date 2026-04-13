@@ -67,10 +67,10 @@ const JoinBatch = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-3xl p-8 shadow-xl relative overflow-hidden"
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-white/20" />
         
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-500/10 text-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-purple-500/20">
+          <div className="w-16 h-16 bg-white/10 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
             <BookOpen className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Join a Subject</h1>
@@ -91,7 +91,7 @@ const JoinBatch = () => {
             <div>
               <h3 className="text-lg font-bold text-[var(--text-primary)]">Successfully Joined!</h3>
               <p className="text-[var(--text-secondary)] text-sm mt-1">
-                You are now enrolled in <span className="font-semibold text-[var(--color-purple)]">{batchName}</span>
+                You are now enrolled in <span className="font-semibold text-white">{batchName}</span>
               </p>
             </div>
             <p className="text-xs text-[var(--text-secondary)] animate-pulse">
@@ -112,7 +112,7 @@ const JoinBatch = () => {
                   if (error) setError('')
                 }}
                 placeholder="e.g. ABC123"
-                className="w-full text-center text-3xl tracking-[0.2em] font-mono px-4 py-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] focus:border-[var(--color-purple)] text-[var(--text-primary)] uppercase outline-none transition-colors"
+                className="w-full text-center text-3xl tracking-[0.2em] font-mono px-4 py-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] focus:border-white/50 text-[var(--text-primary)] uppercase outline-none transition-colors"
                 maxLength={8}
                 autoFocus
               />
@@ -133,10 +133,10 @@ const JoinBatch = () => {
               disabled={loading || !joinCode}
               whileHover={!loading && joinCode ? { scale: 1.02 } : {}}
               whileTap={!loading && joinCode ? { scale: 0.98 } : {}}
-              className="w-full h-12 flex items-center justify-center gap-2 bg-[var(--color-purple)] text-white rounded-xl font-bold border border-white/10 shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full h-12 flex items-center justify-center gap-2 bg-white text-black rounded-xl font-bold border border-white/10 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
               ) : (
                 <>
                   Join Subject

@@ -75,7 +75,7 @@ const EditProfileModal = ({ isOpen, onClose, teacher, profile, onSaved }) => {
               value={form[f.key]}
               onChange={(e) => handleChange(f.key, e.target.value)}
               placeholder={f.placeholder}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-medium placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-full px-4 py-3 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-medium placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:border-[var(--text-primary)] focus:ring-1 focus:ring-white/20 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
         ))}
@@ -83,8 +83,7 @@ const EditProfileModal = ({ isOpen, onClose, teacher, profile, onSaved }) => {
         {/* Status */}
         {status.message && (
           <div
-            className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium ${
-              status.type === 'success'
+            className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium ${ status.type === 'success'
                 ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
                 : 'bg-red-500/10 text-red-500 border border-red-500/20'
             }`}
@@ -110,7 +109,7 @@ const EditProfileModal = ({ isOpen, onClose, teacher, profile, onSaved }) => {
           <button
             type="submit"
             disabled={submitting}
-            className="px-6 py-2.5 rounded-xl bg-purple-500 hover:bg-purple-600 text-white text-sm font-bold shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+            className="px-6 py-2.5 rounded-xl bg-white hover:bg-gray-200 text-black text-sm font-bold shadow-lg shadow-black/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
           >
             {submitting ? (
               <span className="flex items-center gap-2">

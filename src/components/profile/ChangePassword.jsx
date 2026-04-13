@@ -104,8 +104,7 @@ const ChangePassword = () => {
           <motion.div
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium ${
-              status.type === 'success'
+            className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium ${ status.type === 'success'
                 ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
                 : 'bg-red-500/10 text-red-500 border border-red-500/20'
             }`}
@@ -122,7 +121,7 @@ const ChangePassword = () => {
         <button
           type="submit"
           disabled={submitting}
-          className="px-6 py-3 rounded-xl bg-purple-500 hover:bg-purple-600 text-white text-sm font-bold shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+          className="px-6 py-3 rounded-xl bg-white hover:bg-gray-200 text-black text-sm font-bold shadow-[0_8px_30px_rgba(0,0,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
         >
           {submitting ? (
             <span className="flex items-center gap-2">

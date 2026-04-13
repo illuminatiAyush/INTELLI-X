@@ -47,7 +47,7 @@ const Testimonials = () => {
   }
 
   return (
-    <section id="testimonials" className={`py-24 md:py-32 lg:py-40 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-[#fafafa]'}`}>
+    <section id="testimonials" className={`py-24 md:py-32 lg:p-48 relative overflow-hidden flex flex-col items-center justify-center min-h-[60vh] md:min-h-[80vh] ${isDark ? 'bg-[#000000]' : 'bg-[#fafafa]'}`}>
       {/* Background Architectural Grid Texture */}
       <div 
         className="absolute inset-0 pointer-events-none z-0"
@@ -68,10 +68,10 @@ const Testimonials = () => {
         }}
       />
 
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 flex flex-col items-center text-center">
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-6 flex flex-col items-center justify-center text-center">
         
         {/* Minimal Section Label */}
-        <p className={`text-[12px] font-bold tracking-[0.2em] uppercase mb-[40px] opacity-55 ${isDark ? 'text-white' : 'text-black'}`}>
+        <p className={`text-[12px] font-bold tracking-[0.3em] uppercase mb-[48px] opacity-40 ${isDark ? 'text-white' : 'text-black'}`}>
           What Educators Are Saying
         </p>
 
@@ -79,19 +79,16 @@ const Testimonials = () => {
         <motion.div 
           initial={{ scale: 1, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
           whileHover={!shouldReduceMotion ? { 
-            scale: 1.01, 
-            backdropFilter: 'blur(24px)', 
-            WebkitBackdropFilter: 'blur(24px)',
+            scale: 1.005, 
+            backdropFilter: 'blur(32px)', 
+            WebkitBackdropFilter: 'blur(32px)',
             transition: { duration: 0.4, ease: "easeOut" }
           } : {}}
-          className={`relative w-full max-w-[800px] flex flex-col items-center rounded-[28px] border p-[24px] sm:p-[32px] md:p-[48px] ${
+          className={`relative w-full flex flex-col items-center rounded-[32px] border p-8 sm:p-12 md:p-16 ${
             isDark 
-              ? 'bg-black/40 border-[rgba(255,255,255,0.08)]' 
-              : 'bg-black/[0.02] border-black/[0.04]'
+              ? 'bg-black/40 border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.4)]' 
+              : 'bg-black/[0.01] border-black/[0.05] shadow-[0_20px_60px_rgba(0,0,0,0.05)]'
           }`}
-          style={{
-            boxShadow: '0px 40px 80px rgba(0,0,0,0.25)'
-          }}
         >
           {/* Fixed Height Variable Container to trap crossfades */}
           <div className="relative w-full flex flex-col items-center justify-center min-h-[240px] md:min-h-[180px]">
@@ -106,7 +103,7 @@ const Testimonials = () => {
               >
                 {/* Main Testimonial Quote */}
                 <h3 
-                  className={`text-2xl md:text-[36px] font-serif max-w-[720px] leading-[1.25] tracking-tight ${
+                  className={`text-2xl md:text-4xl lg:text-5xl font-serif max-w-[820px] leading-[1.2] tracking-tight ${
                     isDark ? 'text-white' : 'text-gray-950'
                   }`}
                   style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
@@ -115,11 +112,11 @@ const Testimonials = () => {
                 </h3>
 
                 {/* Author Block */}
-                <div className="mt-[32px] flex flex-col items-center">
-                  <p className={`text-[16px] font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                <div className="mt-8 md:mt-10 flex flex-col items-center">
+                  <p className={`text-lg font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     — {current.name}
                   </p>
-                  <p className={`text-[14px] mt-1 opacity-65 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  <p className={`text-sm mt-2 font-medium tracking-wide ${isDark ? 'text-white/40' : 'text-black/40'}`}>
                     {current.role}
                   </p>
                 </div>
@@ -129,8 +126,8 @@ const Testimonials = () => {
         </motion.div>
 
         {/* Institutional Scale Trust Line */}
-        <p className={`text-[13px] mt-[40px] opacity-50 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          Trusted by growing coaching institutes across Mumbai
+        <p className={`text-[12px] font-medium mt-[56px] tracking-wider opacity-30 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          Trusted by premium coaching institutes across Mumbai
         </p>
 
       </div>

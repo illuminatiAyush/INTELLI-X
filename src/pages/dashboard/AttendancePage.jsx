@@ -15,70 +15,56 @@ import {
 } from '../../services/attendanceService'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { TableSkeleton, CardSkeleton } from '../../components/ui/Skeletons'
 
 // ─── Student view: enrolled subjects + date-wise attendance ─────────────────
 const StudentAttendanceView = ({ user }) => {
-  const [studentId, setStudentId] = useState(null)
-  const [subjects, setSubjects] = useState([])   // [{batch, teacher, records, rate}]
-  const [expanded, setExpanded] = useState(null)  // batch id
-  const [loading, setLoading] = useState(true)
+  const { data: attendanceData, loading: attendanceLoading } = useAppQuery(`student-attendance-${user?.id}`, async () => {
+    if (!user) return []
+    
+    // 1. Get enrolled batch IDs
+    const { data: enrollments } = await supabase
+      .from('batch_students')
+      .select('batch_id')
+      .eq('student_id', user.id)
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        // 1. Get student record
-        const { data: students } = await supabase
-          .from('students')
-          .select('id')
-          .eq('profile_id', user.id)
-        const student = students?.[0]
-        if (!student) { setLoading(false); return }
-        setStudentId(student.id)
+    if (!enrollments?.length) return []
 
-        // 2. Get enrolled batch IDs using profile_id (User UUID)
-        const { data: enrollments } = await supabase
-          .from('batch_students')
-          .select('batch_id')
-          .eq('student_id', user.id)
+    const batchIds = enrollments.map(en => en.batch_id)
 
-        if (!enrollments?.length) { setLoading(false); return }
+    // 2. Fetch batches with teacher name
+    const { data: batchRows } = await supabase
+      .from('batches')
+      .select('id, name, teachers(name)')
+      .in('id', batchIds)
 
-        const batchIds = enrollments.map(en => en.batch_id)
+    if (!batchRows?.length) return []
 
-        // 2b. Fetch batches with teacher name using the same proven join as batchService
-        const { data: batchRows } = await supabase
-          .from('batches')
-          .select('id, name, teachers(name)')
-          .in('id', batchIds)
+    // 3. For each batch fetch date-wise attendance records
+    const subjectList = await Promise.all(
+      batchRows.map(async (batch) => {
+        const records = await getStudentAttendanceForBatch(user.id, batch.id)
+        const present = records.filter(r => r.status === 'present').length
+        const rate = records.length
+          ? Math.round((present / records.length) * 100)
+          : null
+        const teacher = batch.teachers?.name || 'N/A'
+        return { batch, teacher, records, rate }
+      })
+    )
+    return subjectList
+  }, { enabled: !!user })
 
-        if (!batchRows?.length) { setLoading(false); return }
+  const subjects = attendanceData || []
+  const loading = attendanceLoading && !attendanceData
+  const [expanded, setExpanded] = useState(null)
 
-        // 3. For each batch fetch date-wise attendance records using profile_id (User UUID)
-        const subjectList = await Promise.all(
-          batchRows.map(async (batch) => {
-            const records = await getStudentAttendanceForBatch(user.id, batch.id)
-            const present = records.filter(r => r.status === 'present').length
-            const rate = records.length
-              ? Math.round((present / records.length) * 100)
-              : null
-            const teacher = batch.teachers?.name || 'N/A'
-            return { batch, teacher, records, rate }
-          })
-        )
-        setSubjects(subjectList)
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [user])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-48">
-        <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+      <div className="space-y-4">
+        {[...Array(6)].map((_, i) => <CardSkeleton key={i} />)}
       </div>
     )
   }
@@ -120,7 +106,7 @@ const StudentAttendanceView = ({ user }) => {
           >
             {/* Subject name */}
             <div className="col-span-5 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[var(--color-purple)]/10 text-[var(--color-purple)] flex items-center justify-center font-bold text-sm flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-[var(--border-subtle)] text-[var(--text-primary)] flex items-center justify-center font-bold text-sm flex-shrink-0">
                 {batch.name.charAt(0).toUpperCase()}
               </div>
               <span className="font-semibold text-[var(--text-primary)] text-sm truncate">{batch.name}</span>
@@ -196,8 +182,7 @@ const StudentAttendanceView = ({ user }) => {
                         {records.map((rec) => (
                           <div
                             key={rec.date}
-                            className={`flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm transition-all ${
-                              rec.status === 'present'
+                            className={`flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm transition-all ${ rec.status === 'present'
                                 ? 'bg-emerald-500/5 border-emerald-500/20'
                                 : 'bg-red-500/5 border-red-500/20'
                             }`}
@@ -210,8 +195,7 @@ const StudentAttendanceView = ({ user }) => {
                                 })}
                               </span>
                             </div>
-                            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                              rec.status === 'present'
+                            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${ rec.status === 'present'
                                 ? 'bg-emerald-500/15 text-emerald-500'
                                 : 'bg-red-500/15 text-red-500'
                             }`}>
@@ -237,31 +221,31 @@ const StudentAttendanceView = ({ user }) => {
 
 // ─── Admin / Teacher view: mark attendance ───────────────────────────────────
 const AdminAttendanceView = ({ user, role }) => {
-  const [batches, setBatches] = useState([])
   const [selectedBatch, setSelectedBatch] = useState('')
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [students, setStudents] = useState([])
   const [attendance, setAttendance] = useState({})
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
+  const { data: initialData, loading: initialLoading } = useAppQuery(`admin-attendance-init-${role}-${user?.id}`, async () => {
+    if (!user) return { batches: [] }
+    let query = supabase.from('batches').select('id, name').order('name')
+    if (role === 'teacher') query = query.eq('teacher_id', user.id)
+    const { data } = await query
+    return { batches: data || [] }
+  }, { enabled: !!user })
+
   useEffect(() => {
-    const fetchBatches = async () => {
-      try {
-        let query = supabase.from('batches').select('*').order('name')
-        if (role === 'teacher') query = query.eq('teacher_id', user.id)
-        const { data } = await query
-        setBatches(data || [])
-        if (data?.length > 0) setSelectedBatch(data[0].id)
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
+    if (initialData?.batches?.length > 0 && !selectedBatch) {
+      setSelectedBatch(initialData.batches[0].id)
     }
-    fetchBatches()
-  }, [role, user])
+  }, [initialData])
+
+  const batches = initialData?.batches || []
+  const isInitialLoading = initialLoading && !initialData
+
 
   useEffect(() => {
     if (!selectedBatch) return
@@ -335,7 +319,7 @@ const AdminAttendanceView = ({ user, role }) => {
     const doc = new jsPDF()
 
     // Header
-    doc.setFillColor(139, 92, 246)
+    doc.setFillColor(0, 0, 0)
     doc.rect(0, 0, 220, 28, 'F')
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(18)
@@ -376,8 +360,8 @@ const AdminAttendanceView = ({ user, role }) => {
         attendance[s.profile_id || s.id] === 'present' ? 'Present' : 'Absent',
       ]),
       styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [139, 92, 246], textColor: 255, fontStyle: 'bold' },
-      alternateRowStyles: { fillColor: [248, 245, 255] },
+      headStyles: { fillColor: [0, 0, 0], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
       didParseCell: (data) => {
         if (data.column.index === 3 && data.section === 'body') {
           data.cell.styles.fontStyle = 'bold'
@@ -417,17 +401,15 @@ const AdminAttendanceView = ({ user, role }) => {
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-[var(--color-purple)] focus:bg-[var(--bg-surface)] transition-all"
+            className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-white focus:bg-[var(--bg-surface)] transition-all"
           />
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center h-32">
-          <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-        </div>
+      {isInitialLoading || loading ? (
+        <TableSkeleton rows={10} cols={3} />
       ) : students.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-[var(--text-secondary)]">
           <ClipboardCheck className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p>No students in this subject</p>
         </div>
@@ -455,7 +437,7 @@ const AdminAttendanceView = ({ user, role }) => {
               )}
               <button
                 onClick={downloadPDF}
-                className="flex items-center gap-2 text-xs px-4 py-2 rounded-xl bg-[var(--color-purple)]/10 text-[var(--color-purple)] hover:bg-[var(--color-purple)]/20 transition-all font-semibold active:scale-95"
+                className="flex items-center gap-2 text-xs px-4 py-2 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all font-semibold active:scale-95"
               >
                 <FileDown className="w-3.5 h-3.5" />
                 Download PDF
@@ -475,15 +457,12 @@ const AdminAttendanceView = ({ user, role }) => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.02 }}
-                  className={`flex items-center justify-between px-6 py-4 rounded-2xl border transition-all ${
-                    isPresent
-                      ? 'bg-emerald-500/5 border-emerald-500/20 shadow-sm shadow-emerald-500/5'
+                  className={`flex items-center justify-between px-6 py-4 rounded-2xl border transition-all ${ isPresent ? 'bg-emerald-500/5 border-emerald-500/20 shadow-sm shadow-emerald-500/5'
                       : 'bg-red-500/5 border-red-500/20 shadow-sm shadow-red-500/5'
                   }`}
                 >
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-inner ${
-                    isPresent ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-inner ${ isPresent ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'
                   }`}>
                     {student.name.charAt(0).toUpperCase()}
                   </div>
@@ -495,9 +474,7 @@ const AdminAttendanceView = ({ user, role }) => {
                 {(role === 'teacher' || role === 'admin' || role === 'master_admin') ? (
                   <button
                     onClick={() => toggleStatus(sid)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
-                      isPresent
-                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${ isPresent ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                         : 'bg-red-500 text-white shadow-lg shadow-red-500/20'
                     }`}
                   >
@@ -505,9 +482,7 @@ const AdminAttendanceView = ({ user, role }) => {
                     {isPresent ? 'Present' : 'Absent'}
                   </button>
                 ) : (
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold ${
-                    isPresent
-                      ? 'bg-emerald-500/15 text-emerald-500'
+                  <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold ${ isPresent ? 'bg-emerald-500/15 text-emerald-500'
                       : 'bg-red-500/15 text-red-500'
                   }`}>
                     {isPresent ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
@@ -526,10 +501,8 @@ const AdminAttendanceView = ({ user, role }) => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSave}
                 disabled={saving}
-                className={`flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-bold shadow-xl transition-all ${
-                  saved
-                    ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30'
-                    : 'bg-[var(--color-purple)] text-white shadow-purple-500/30'
+                className={`flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-bold shadow-xl transition-all ${ saved ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30'
+                    : 'bg-white text-black shadow-white/10'
                 }`}
               >
                 {saving ? (
@@ -555,21 +528,26 @@ const AttendancePage = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <motion.h1
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-        >
-          Attendance
-        </motion.h1>
-        <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
-          {role === 'student'
-            ? 'Your attendance across all enrolled subjects'
-            : role === 'admin' || role === 'master_admin'
-              ? 'View and manage attendance records across all subjects'
-              : 'Mark and view attendance records across subjects'}
-        </p>
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-sm shadow-emerald-500/5">
+          <ClipboardCheck className="w-6 h-6" />
+        </div>
+        <div>
+          <motion.h1
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+          >
+            Attendance
+          </motion.h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
+            {role === 'student'
+              ? 'Your attendance across all enrolled subjects'
+              : role === 'admin' || role === 'master_admin'
+                ? 'View and manage attendance records across all subjects'
+                : 'Mark and view attendance records across subjects'}
+          </p>
+        </div>
       </div>
 
       {role === 'student'

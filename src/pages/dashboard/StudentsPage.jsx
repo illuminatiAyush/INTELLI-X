@@ -6,36 +6,46 @@ import { Input } from '../../components/ui/FormField'
 import { getStudents, createStudent, updateStudent, deleteStudent } from '../../services/studentService'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { TableSkeleton } from '../../components/ui/Skeletons'
+import { supabase } from '../../lib/supabase'
 
 const StudentsPage = () => {
   const { isDark } = useTheme()
   const { role } = useAuth()
-  const [students, setStudents] = useState([])
-  const [batches, setBatches] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const [modalOpen, setModalOpen] = useState(false)
-  const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ name: '', email: '', phone: '' })
-  const [saving, setSaving] = useState(false)
-  const [expandedBatches, setExpandedBatches] = useState(new Set())
-
-  const toggleBatchExpand = (id) => setExpandedBatches(prev => {
-    const next = new Set(prev)
-    next.has(id) ? next.delete(id) : next.add(id)
-    return next
+  const { data: studentsData, loading: studentsLoading, refetch: refetchStudents } = useAppQuery('students-list', async () => {
+    // Note: getStudents() in service might be generic, let's use direct supabase if needed or stick to service
+    // For consistency with other pages, let's use a cached query
+    const { data } = await supabase
+      .from('students')
+      .select('id, name, email, phone, created_at, batch_students(batches(id, name))')
+      .order('created_at', { ascending: false })
+    return data || []
   })
 
-  const fetchData = async () => {
-    try {
-      const s = await getStudents()
-      setStudents(s)
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }
+  const students = studentsData || []
+  const loading = studentsLoading && !studentsData
+
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' })
+  const [modalOpen, setModalOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [search, setSearch] = useState('')
+  const [expandedBatches, setExpandedBatches] = useState(() => new Set())
+
+  const toggleBatchExpand = (studentId) => {
+    setExpandedBatches(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(studentId)) {
+        newSet.delete(studentId);
+      } else {
+        newSet.add(studentId);
+      }
+      return newSet;
+    })
   }
+
+  const fetchData = () => refetchStudents()
 
   useEffect(() => { fetchData() }, [])
 
@@ -123,13 +133,13 @@ const StudentsPage = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={(e) => { e.stopPropagation(); openEdit(row) }}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-purple-400 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             <Pencil className="w-4 h-4" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); handleDelete(row.id) }}
-            className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-red-400 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/10 text-[var(--text-secondary)] hover:text-red-400 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -142,33 +152,40 @@ const StudentsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+      <div className="space-y-6">
+        <div className="h-24 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-subtle)] animate-pulse" />
+        <TableSkeleton rows={10} cols={6} />
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      {/* Header card */}
-      <div className="flex justify-between items-center bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
-        <div>
-          <motion.h1
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-          >
-            Students
-          </motion.h1>
-          <p className="text-[var(--text-secondary)] mt-1 font-medium">Manage enrolled students for your institute</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-500 border border-cyan-500/20 shadow-sm shadow-cyan-500/5">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+            >
+              Students
+            </motion.h1>
+            <p className="text-[var(--text-secondary)] mt-1 font-medium">Manage enrolled students for your institute</p>
+          </div>
         </div>
         {role === 'admin' && (
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={openAdd}
-            className="flex items-center px-5 py-2.5 bg-[var(--color-purple)] text-white rounded-xl hover:opacity-90 transition-all font-semibold shadow-lg shadow-purple-500/20 active:scale-95"
+            className="flex items-center px-5 py-2.5 rounded-xl transition-all font-bold shadow-lg bg-white text-black hover:bg-gray-200"
           >
             <Plus className="w-5 h-5 mr-2" /> Add Student
-          </button>
+          </motion.button>
         )}
       </div>
 
@@ -183,7 +200,7 @@ const StudentsPage = () => {
               placeholder="Search students..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-[var(--color-purple)] transition-all text-sm font-medium"
+              className={`w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-cyan-500/40 transition-all text-sm font-medium`}
             />
           </div>
           <span className="text-xs text-[var(--text-secondary)] font-medium">{students.length} total enrolled</span>
@@ -210,13 +227,13 @@ const StudentsPage = () => {
                   </td>
                   <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">
                     <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-[var(--color-purple)]" />
+                      <Phone className="w-3.5 h-3.5 text-[var(--text-secondary)] opacity-60" />
                       {student.phone || '-'}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">
                     <div className="flex items-center gap-2">
-                      <Mail className="w-3.5 h-3.5 text-blue-400" />
+                      <Mail className="w-3.5 h-3.5 text-[var(--text-secondary)] opacity-60" />
                       {student.email || '-'}
                     </div>
                   </td>
@@ -227,23 +244,23 @@ const StudentsPage = () => {
                         .filter(Boolean)
                       if (batchNames.length === 0) return '-'
                       if (batchNames.length === 1) return (
-                        <span className="px-2 py-0.5 rounded-lg bg-purple-500/10 text-purple-300 text-xs font-medium">{batchNames[0]}</span>
+                        <span className="px-2 py-0.5 rounded-lg bg-[var(--border-subtle)] text-[var(--text-primary)] text-xs font-medium">{batchNames[0]}</span>
                       )
-                      const isOpen = expandedBatches.has(student.id)
+                      const isOpen = expandedBatches?.has?.(student.id)
                       return (
                         <div className="space-y-1">
                           <button
                             onClick={() => toggleBatchExpand(student.id)}
-                            className="flex items-center gap-1.5 text-xs font-semibold text-purple-300 hover:text-purple-200 transition-colors"
+                            className={`flex items-center gap-1.5 text-xs font-semibold ${isDark ? 'text-white hover:text-white/80' : 'text-slate-700 hover:text-slate-900'} transition-colors`}
                           >
-                            <span className="px-2 py-0.5 rounded-lg bg-purple-500/10">{batchNames[0]}</span>
+                            <span className={`px-2 py-0.5 rounded-lg ${isDark ? 'bg-white/10' : 'bg-slate-100 border border-slate-200'}`}>{batchNames[0]}</span>
                             <span className="text-[var(--text-secondary)]">+{batchNames.length - 1}</span>
                             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                           </button>
                           {isOpen && (
                             <div className="flex flex-col gap-1 pl-1 pt-1">
                               {batchNames.slice(1).map((name, i) => (
-                                <span key={i} className="px-2 py-0.5 rounded-lg bg-purple-500/10 text-purple-300 text-xs font-medium w-fit">{name}</span>
+                                <span key={i} className={`px-2 py-0.5 rounded-lg ${isDark ? 'bg-white/10 text-white/70' : 'bg-slate-50 text-slate-500 border border-slate-100'} text-xs font-medium w-fit`}>{name}</span>
                               ))}
                             </div>
                           )}
@@ -258,13 +275,13 @@ const StudentsPage = () => {
                     <td className="px-6 py-4 text-right space-x-3 whitespace-nowrap">
                       <button
                         onClick={() => openEdit(student)}
-                        className="text-gray-400 hover:text-white transition"
+                        className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
                       >
                         <Edit2 className="w-4 h-4 inline" />
                       </button>
                       <button
                         onClick={() => handleDelete(student.id)}
-                        className="text-red-400 hover:text-red-300 transition"
+                        className="text-red-400 hover:text-red-500 transition"
                       >
                         <Trash2 className="w-4 h-4 inline" />
                       </button>
@@ -274,7 +291,7 @@ const StudentsPage = () => {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={role === 'admin' ? 6 : 5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={role === 'admin' ? 6 : 5} className="px-6 py-8 text-center text-[var(--text-secondary)]">
                     No students found. Click 'Add Student' to create one.
                   </td>
                 </tr>
@@ -316,27 +333,27 @@ const StudentsPage = () => {
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
           />
           {!editing && (
-            <div className="p-4 rounded-xl bg-[var(--color-purple)]/5 border border-[var(--color-purple)]/20 flex flex-col items-center justify-center text-center mt-2">
-              <Users className="w-6 h-6 text-[var(--color-purple)] mb-2" />
+            <div className={`p-4 rounded-xl flex flex-col items-center justify-center text-center mt-2 ${isDark ? 'bg-white/5 border border-white/10' : 'bg-slate-50 border border-slate-200'}`}>
+              <Users className="w-6 h-6 mb-2 text-[var(--text-secondary)] opacity-60" />
               <p className="text-sm font-medium text-[var(--text-primary)]">Batch Enrollment</p>
               <p className="text-xs text-[var(--text-secondary)] mt-1">
                 Students will join batches themselves using a Join Code after their account is created.
               </p>
             </div>
           )}
-          <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border-subtle)]">
             <button
               onClick={() => setModalOpen(false)}
-              className="px-4 py-2 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="px-4 py-2 rounded-xl text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-subtle)] transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={saving || !form.name.trim()}
-              className="px-4 py-2 bg-[var(--color-purple)] text-white rounded-lg hover:opacity-90 transition disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all flex items-center gap-2 bg-white text-black hover:bg-gray-200"
             >
-              {saving && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              {saving && <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />}
               {saving ? 'Saving...' : editing ? 'Update Student' : 'Add Student'}
             </button>
           </div>

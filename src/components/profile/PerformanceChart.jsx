@@ -31,16 +31,16 @@ const PerformanceChart = ({ testScores, loading }) => {
         {
           label: 'Score',
           data: testScores.scores,
-          borderColor: '#9333ea',
+          borderColor: '#ffffff',
           backgroundColor: (ctx) => {
             const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height)
-            gradient.addColorStop(0, 'rgba(147, 51, 234, 0.3)')
-            gradient.addColorStop(1, 'rgba(147, 51, 234, 0.0)')
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)')
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)')
             return gradient
           },
           borderWidth: 3,
-          pointBackgroundColor: '#9333ea',
-          pointBorderColor: '#fff',
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: '#0a0a0a',
           pointBorderWidth: 2,
           pointRadius: 5,
           pointHoverRadius: 7,
@@ -61,7 +61,7 @@ const PerformanceChart = ({ testScores, loading }) => {
           backgroundColor: 'rgba(0,0,0,0.8)',
           titleColor: '#fff',
           bodyColor: '#d4d4d8',
-          borderColor: 'rgba(147,51,234,0.3)',
+          borderColor: 'rgba(255,255,255,0.1)',
           borderWidth: 1,
           cornerRadius: 12,
           padding: 12,
@@ -104,7 +104,7 @@ const PerformanceChart = ({ testScores, loading }) => {
       className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
     >
       <div className="flex items-center gap-2 mb-6">
-        <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
+        <div className="p-2 rounded-lg bg-white/10 text-white border border-white/10">
           <TrendingUp className="w-5 h-5" />
         </div>
         <h3 className="text-lg font-bold text-[var(--text-primary)]">Performance Trend</h3>

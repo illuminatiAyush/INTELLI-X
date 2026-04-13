@@ -5,66 +5,53 @@ import { FileText, Clock, CheckCircle2, Lock, Play, Trophy, Sparkles } from 'luc
 import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { CardSkeleton } from '../../components/ui/Skeletons'
 
 const ActiveTestsPage = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [tests, setTests] = useState([])
-  const [results, setResults] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState('active') // active, upcoming, completed
+  const [tab, setTab] = useState('active')
 
-  const fetchTests = async () => {
-    if (!user) return
-    try {
-      // Get student record
-      const { data: students } = await supabase
-        .from('students')
-        .select('id')
-        .eq('profile_id', user.id)
-      const studentId = students?.[0]?.id
-      if (!studentId) { setLoading(false); return }
+  const { data: pageData, loading: pageLoading, refetch: refetchPage } = useAppQuery(`active-tests-${user?.id}`, async () => {
+    if (!user) return { tests: [], results: {} }
+    
+    // Get student's batch IDs using profile_id
+    const { data: batchStudents } = await supabase
+      .from('batch_students')
+      .select('batch_id')
+      .eq('student_id', user.id)
+    const batchIds = (batchStudents || []).map(bs => bs.batch_id)
 
-      // Get student's batch IDs using profile_id
-      const { data: batchStudents } = await supabase
-        .from('batch_students')
-        .select('batch_id')
-        .eq('student_id', user.id)
-      const batchIds = (batchStudents || []).map(bs => bs.batch_id)
+    if (batchIds.length === 0) return { tests: [], results: {} }
 
-      if (batchIds.length === 0) { setLoading(false); return }
+    // Get all tests with questions for these batches
+    const { data: testData } = await supabase
+      .from('tests')
+      .select('id, title, start_time, end_time, duration_minutes, created_at, total_marks, batches(name), questions(id)')
+      .in('batch_id', batchIds)
+      .order('created_at', { ascending: false })
 
-      // Get all tests with questions for these batches
-      const { data: testData } = await supabase
-        .from('tests')
-        .select('*, batches(name), questions(id)')
-        .in('batch_id', batchIds)
-        .order('created_at', { ascending: false })
+    // Only show tests that have questions (AI-generated tests)
+    const testsWithQuestions = (testData || []).filter(t => t.questions && t.questions.length > 0)
 
-      // Only show tests that have questions (AI-generated tests)
-      const testsWithQuestions = (testData || []).filter(t => t.questions && t.questions.length > 0)
-      setTests(testsWithQuestions)
+    // Get student's results
+    const { data: resultData } = await supabase
+      .from('results')
+      .select('id, test_id, marks, rank, violation_count')
+      .eq('student_id', user.id)
 
-      // Get student's results
-      const { data: resultData } = await supabase
-        .from('results')
-        .select('*')
-        .eq('student_id', user.id)
+    const resultMap = {}
+    ;(resultData || []).forEach(r => { resultMap[r.test_id] = r })
 
-      const resultMap = {}
-        ; (resultData || []).forEach(r => { resultMap[r.test_id] = r })
-      setResults(resultMap)
-    } catch (err) {
-      console.error('Failed to load tests:', err)
-      toast.error('Failed to load tests')
-    } finally {
-      setLoading(false)
-    }
-  }
+    return { tests: testsWithQuestions, results: resultMap }
+  }, { enabled: !!user })
 
-  useEffect(() => {
-    if (user) fetchTests()
-  }, [user])
+  const tests = pageData?.tests || []
+  const results = pageData?.results || {}
+  const loading = pageLoading && !pageData
+
+  const fetchTests = () => refetchPage()
 
   // Realtime updates for tests
   useEffect(() => {
@@ -151,8 +138,14 @@ const ActiveTestsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+      <div className="space-y-8">
+        <div className="h-24 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-subtle)] animate-pulse" />
+        <div className="space-y-4">
+           <div className="h-8 w-48 bg-[var(--bg-surface)] rounded-xl animate-pulse" />
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardSkeleton /><CardSkeleton />
+           </div>
+        </div>
       </div>
     )
   }
@@ -171,8 +164,7 @@ const ActiveTestsPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.05 }}
-        className={`rounded-2xl border bg-[var(--bg-surface)] p-5 transition-all group ${
-          isUpcoming ? 'border-[var(--border-subtle)] opacity-75' : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)]'
+        className={`rounded-2xl border bg-[var(--bg-surface)] p-5 transition-all group ${ isUpcoming ? 'border-[var(--border-subtle)] opacity-75' : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)]'
         }`}
       >
         <div className="flex items-start justify-between mb-4">
@@ -207,7 +199,7 @@ const ActiveTestsPage = () => {
           {status.canAttempt ? (
             <button
               onClick={() => handleStartTest(test)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-xs font-bold shadow-lg shadow-purple-500/25 active:scale-95 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold shadow-xl active:scale-95 transition-all"
             >
               <Play className="w-3.5 h-3.5" /> Start Test
             </button>
@@ -240,7 +232,7 @@ const ActiveTestsPage = () => {
           animate={{ opacity: 1, x: 0 }}
           className="text-3xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-3"
         >
-          <Sparkles className="w-7 h-7 text-purple-400" />
+          <Sparkles className="w-7 h-7 text-white" />
           AI Tests
         </motion.h1>
         <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
@@ -291,11 +283,11 @@ const ActiveTestsPage = () => {
       {/* 3. COMPLETED SECTION */}
       <section>
         <div className="flex items-center gap-2 mb-5 pt-4">
-          <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+          <div className="p-2 rounded-lg bg-white/10 text-white">
             <FileText className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-bold text-[var(--text-primary)]">Exam History</h2>
-          <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-[10px] font-bold border border-purple-500/20">{completedTests.length}</span>
+          <span className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold border border-white/20">{completedTests.length}</span>
         </div>
         {completedTests.length === 0 ? (
           <div className="py-10 text-center bg-[var(--bg-surface)]/30 rounded-3xl border border-dashed border-[var(--border-subtle)]">

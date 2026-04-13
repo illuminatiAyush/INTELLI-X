@@ -14,13 +14,11 @@ const Toggle = ({ enabled, onToggle }) => (
     role="switch"
     aria-checked={enabled}
     onClick={onToggle}
-    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-      enabled ? 'bg-purple-500' : 'bg-[var(--border-strong)]'
+    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${ enabled ? 'bg-white' : 'bg-[var(--border-strong)]'
     }`}
   >
     <span
-      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out ${
-        enabled ? 'translate-x-5' : 'translate-x-0'
+      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out ${ enabled ? 'translate-x-5' : 'translate-x-0'
       }`}
     />
   </button>
@@ -43,7 +41,7 @@ const Notifications = () => {
       className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
     >
       <div className="flex items-center gap-2 mb-5">
-        <div className="p-2 rounded-lg bg-purple-500/10 text-purple-500">
+        <div className="p-2 rounded-lg bg-white/10 text-white border border-white/10">
           <Bell className="w-5 h-5" />
         </div>
         <h3 className="text-lg font-bold text-[var(--text-primary)]">Notification Preferences</h3>

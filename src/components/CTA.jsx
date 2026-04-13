@@ -6,7 +6,7 @@ const CTA = () => {
   const { isDark } = useTheme()
   const shouldReduceMotion = useReducedMotion()
 
-  const bgClass = isDark ? 'bg-black' : 'bg-white'
+  const bgClass = isDark ? 'bg-[#000000]' : 'bg-white'
   const textColor = isDark ? 'text-gray-400' : 'text-gray-500'
 
   return (
@@ -48,9 +48,7 @@ const CTA = () => {
             WebkitBackdropFilter: 'blur(24px)',
             transition: { duration: 0.4, ease: "easeOut" }
           } : {}}
-           className={`relative w-full max-w-[800px] flex flex-col items-center rounded-[40px] border p-8 md:p-20 ${
-            isDark 
-              ? 'bg-black/40 border-[rgba(255,255,255,0.08)]' 
+           className={`relative w-full max-w-[800px] flex flex-col items-center rounded-[40px] border p-8 md:p-20 ${ isDark ? 'bg-black/40 border-[rgba(255,255,255,0.08)]' 
               : 'bg-black/[0.02] border-black/[0.04]'
           }`}
           style={{

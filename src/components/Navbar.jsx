@@ -16,8 +16,7 @@ const NavLink = ({ link, isActive, isDark, shouldReduceMotion }) => {
       initial={false}
       animate={{ opacity: isActive ? 1 : 0.7 }}
       whileHover={{ opacity: 1 }}
-      className={`relative text-xs font-semibold tracking-widest uppercase transition-opacity duration-200 ${
-        isDark ? 'text-white' : 'text-gray-900'
+      className={`relative text-xs font-semibold tracking-widest uppercase transition-opacity duration-200 ${ isDark ? 'text-white' : 'text-gray-900'
       }`}
     >
       {link.label}
@@ -78,7 +77,7 @@ const Navbar = () => {
         scrolled
           ? `rounded-[14px] py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border ${
               isDark 
-                ? 'bg-black/80 border-white/[0.08] backdrop-blur-[12px]' 
+                ? 'bg-[#000000]/80 border-white/[0.08] backdrop-blur-[12px]' 
                 : 'bg-white/80 border-black/[0.08] backdrop-blur-[12px]'
             }`
           : 'bg-transparent py-5 border-transparent'
@@ -97,7 +96,7 @@ const Navbar = () => {
 
       {/* Desktop Navigation Group */}
       <div className="hidden md:flex items-center gap-8">
-        <div className="flex items-center gap-6 mr-4 border-r border-white/10 pr-8">
+        <div className="flex items-center gap-6 mr-4 border-r border-[var(--border-subtle)] pr-8">
           {navLinks.map((link) => (
             <NavLink
               key={link.label}
@@ -120,9 +119,7 @@ const Navbar = () => {
           
           <Link
             to="/login"
-            className={`px-6 py-2.5 rounded-full border transition-all duration-180 ease-out ${
-              isDark
-                ? 'border-white text-white hover:bg-white hover:text-black'
+            className={`px-6 py-2.5 rounded-full border transition-all duration-180 ease-out ${ isDark ? 'border-white text-white hover:bg-white hover:text-black'
                 : 'border-black text-black hover:bg-black hover:text-white'
             }`}
           >
@@ -146,8 +143,7 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className={`absolute top-full left-0 right-0 mt-3 p-6 rounded-[20px] border shadow-2xl ${
-              isDark ? 'bg-black/95 border-white/[0.08] backdrop-blur-2xl' : 'bg-white/98 border-black/[0.08] backdrop-blur-2xl'
+            className={`absolute top-full left-0 right-0 mt-3 p-6 rounded-[20px] border shadow-2xl ${ isDark ? 'bg-black/95 border-white/[0.08] backdrop-blur-2xl' : 'bg-white/98 border-black/[0.08] backdrop-blur-2xl'
             }`}
           >
             <div className="flex flex-col gap-6">
@@ -161,7 +157,7 @@ const Navbar = () => {
                   {link.label}
                 </a>
               ))}
-              <div className="flex flex-col gap-4 pt-4 border-t border-white/10">
+              <div className="flex flex-col gap-4 pt-4 border-t border-[var(--border-subtle)]">
                 <button onClick={() => {toggleTheme(); setMenuOpen(false)}} className={`text-[10px] font-bold tracking-widest uppercase text-left ${isDark ? 'text-white/40' : 'text-black/40'}`}>
                   Toggle {isDark ? 'Light' : 'Dark'} Mode
                 </button>

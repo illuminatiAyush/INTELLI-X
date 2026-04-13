@@ -13,7 +13,7 @@ const ScrollStory = () => {
   const inView2 = useInView(ref2, { once: true, margin: '-100px' })
   const inView3 = useInView(ref3, { once: true, margin: '-100px' })
 
-  const bgClass = isDark ? 'bg-[#0B0B0F]' : 'bg-gray-50'
+  const bgClass = isDark ? 'bg-[#000000]' : 'bg-gray-50'
   const cardBg = isDark ? 'bg-white/3 border-white/8' : 'bg-white border-gray-200'
   const textPrimary = isDark ? 'text-white' : 'text-gray-900'
   const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600'
@@ -29,7 +29,7 @@ const ScrollStory = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <p className="text-purple-400 text-sm font-semibold tracking-widest uppercase mb-4">The Transformation</p>
+          <p className="text-white/40 text-[10px] font-bold tracking-[0.25em] uppercase mb-4">The Transformation</p>
           <h2 className={`text-4xl md:text-5xl font-black ${textPrimary}`}>
             The Problem.{' '}
             <span className="text-gradient">The Solution.</span>
@@ -104,8 +104,7 @@ const ScrollStory = () => {
                     row.map((cell, ci) => (
                       <div
                         key={`${ri}-${ci}`}
-                        className={`py-1 px-1 text-xs border-b ${
-                          isDark ? 'border-gray-800' : 'border-gray-200'
+                        className={`py-1 px-1 text-xs border-b ${ isDark ? 'border-gray-800' : 'border-gray-200'
                         } ${
                           cell === 'A' ? 'text-red-400 font-bold' :
                           cell === 'P' ? 'text-green-400' :
@@ -137,9 +136,9 @@ const ScrollStory = () => {
             >
               {/* Futuristic dashboard mockup */}
               <div className={`rounded-2xl border overflow-hidden ${isDark ? 'bg-[#0d0d14] border-purple-500/20' : 'bg-white border-purple-200 shadow-xl'}`}>
-                <div className={`flex items-center gap-3 px-4 py-3 border-b ${isDark ? 'border-white/5 bg-purple-500/5' : 'border-gray-100 bg-purple-50'}`}>
-                  <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-                  <span className={`text-xs font-semibold ${isDark ? 'text-purple-300' : 'text-purple-700'}`}>IntelliX AI Dashboard — Live</span>
+                <div className={`flex items-center gap-3 px-4 py-3 border-b ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
+                  <div className="w-2 h-2 rounded-full bg-white/40 animate-pulse" />
+                  <span className={`text-[10px] font-bold uppercase tracking-tight ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>IntelliX AI Dashboard — Live</span>
                 </div>
                 <div className="p-4 grid grid-cols-3 gap-3">
                   {[
@@ -161,11 +160,11 @@ const ScrollStory = () => {
                     </motion.div>
                   ))}
                 </div>
-                <div className={`mx-4 mb-4 rounded-xl p-3 ${isDark ? 'bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20' : 'bg-purple-50 border border-purple-100'}`}>
-                  <p className={`text-xs font-semibold mb-2 ${isDark ? 'text-purple-300' : 'text-purple-700'}`}>🤖 AI Recommendations</p>
-                  <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>✅ Fee reminder sent to 12 students automatically</p>
-                  <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>📊 3 students at risk — intervention scheduled</p>
-                  <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>🎯 Test performance report ready for parents</p>
+                <div className={`mx-4 mb-4 rounded-xl p-3 ${isDark ? 'bg-white/5 border border-white/10' : 'bg-gray-50 border border-gray-100'}`}>
+                  <p className={`text-[10px] font-bold uppercase tracking-tight mb-2 ${isDark ? 'text-white/60' : 'text-gray-900/60'}`}>🤖 AI Recommendations</p>
+                  <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>✅ Fee reminder sent up automatically</p>
+                  <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>📊 Risk flags analyzed — actions surfacing</p>
+                  <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>🎯 Performance reports generated</p>
                 </div>
               </div>
             </motion.div>
@@ -216,8 +215,8 @@ const ScrollStory = () => {
               transition={{ duration: 0.8 }}
               className="text-center"
             >
-              <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 px-4 py-2 rounded-full mb-6">
-                <span className="text-purple-400 text-sm font-semibold">🧠 Powered by AI</span>
+              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-6">
+                <span className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em]">Neural Engine</span>
               </div>
               <h3 className={`text-3xl md:text-4xl font-black mb-4 ${textPrimary}`}>
                 Automation & Intelligence{' '}
@@ -240,7 +239,7 @@ const ScrollStory = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={inView3 ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.6, delay: 0.2 + i * 0.15 }}
-                  className={`glass-card p-6 text-center hover:border-purple-500/30 transition-all`}
+                  className={`glass-card p-6 text-center hover:border-white/20 transition-all`}
                 >
                   <div className="text-4xl mb-4">{icon}</div>
                   <h4 className={`text-lg font-bold mb-2 ${textPrimary}`}>{title}</h4>

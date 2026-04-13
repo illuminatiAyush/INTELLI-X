@@ -72,7 +72,7 @@ const AcademicStats = ({ stats, loading }) => {
                 <s.icon className="w-5 h-5" />
               </div>
             </div>
-            <div className={`absolute -bottom-10 -right-10 w-32 h-32 rounded-full ${c.glow} opacity-[0.03] group-hover:opacity-[0.06] blur-3xl transition-opacity`} />
+            <div className="absolute inset-0 bg-gradient-to-tr from-[var(--border-subtle)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </motion.div>
         )
       })}

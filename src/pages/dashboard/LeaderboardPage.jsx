@@ -5,47 +5,40 @@ import { Select } from '../../components/ui/FormField'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { CardSkeleton } from '../../components/ui/Skeletons'
 
 const LeaderboardPage = () => {
   const { user, role } = useAuth()
-  const [batches, setBatches] = useState([])
+  const { data: initialData, loading: initialLoading } = useAppQuery(`leaderboard-init-${role}-${user?.id}`, async () => {
+    if (!user) return { batches: [] }
+    let query = supabase.from('batches').select('id, name').order('name')
+    if (role === 'teacher') query = query.eq('teacher_id', user.id)
+    if (role === 'student') {
+      const { data: batchStudents } = await supabase.from('batch_students').select('batch_id').eq('student_id', user.id)
+      const batchIds = (batchStudents || []).map(bs => bs.batch_id)
+      if (batchIds.length > 0) query = query.in('id', batchIds)
+      else return { batches: [] }
+    }
+    const { data } = await query
+    return { batches: data || [] }
+  }, { enabled: !!user })
+
+  useEffect(() => {
+    if (initialData?.batches?.length > 0 && !selectedBatch) {
+      setSelectedBatch(initialData.batches[0].id)
+    }
+  }, [initialData])
+
+  const batches = initialData?.batches || []
+  const isInitialLoading = initialLoading && !initialData
   const [selectedBatch, setSelectedBatch] = useState('')
   const [tests, setTests] = useState([])
   const [selectedTest, setSelectedTest] = useState('')
   const [leaderboard, setLeaderboard] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    const fetchBatches = async () => {
-      try {
-        let query = supabase.from('batches').select('*').order('name')
-        if (role === 'teacher') query = query.eq('teacher_id', user.id)
-        if (role === 'student') {
-          const { data: batchStudents } = await supabase
-            .from('batch_students')
-            .select('batch_id')
-            .eq('student_id', user.id)
-          
-          const batchIds = (batchStudents || []).map(bs => bs.batch_id)
-          if (batchIds.length > 0) {
-            query = query.in('id', batchIds)
-          } else {
-            setLoading(false)
-            return
-          }
-        }
-        const { data } = await query
-        setBatches(data || [])
-        if (data?.length > 0) setSelectedBatch(data[0].id)
-      } catch (err) {
-        console.error('Error fetching batches:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchBatches()
-  }, [])
 
   useEffect(() => {
     const fetchTests = async () => {
@@ -143,11 +136,11 @@ const LeaderboardPage = () => {
   }, [selectedBatch])
 
   const getRankStyle = (rank, isCurrentUser) => {
-    if (isCurrentUser) return 'from-purple-500/30 to-purple-500/10 border-purple-500 shadow-lg shadow-purple-500/20'
-    if (rank === 1) return 'from-amber-500/20 to-amber-500/5 border-amber-500/30 shadow-lg shadow-amber-500/10'
-    if (rank === 2) return 'from-slate-400/20 to-slate-400/5 border-slate-400/30 shadow-lg shadow-slate-400/10'
-    if (rank === 3) return 'from-orange-600/20 to-orange-600/5 border-orange-600/30 shadow-lg shadow-orange-600/10'
-    return 'bg-[var(--bg-card)] border-[var(--border-subtle)]'
+    if (isCurrentUser) return 'bg-white/5 border-white/30 shadow-md'
+    if (rank === 1) return 'bg-[#0a0a0a] border-amber-500/30'
+    if (rank === 2) return 'bg-[#0a0a0a] border-slate-400/30'
+    if (rank === 3) return 'bg-[#0a0a0a] border-orange-600/30'
+    return 'bg-[#0a0a0a] border-[var(--border-subtle)]'
   }
 
   const getRankIcon = (rank) => {
@@ -162,21 +155,26 @@ const LeaderboardPage = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <motion.h1 
-            initial={{ opacity: 0, x: -10 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-          >
-            Leaderboard
-          </motion.h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">Batch rankings and top performers • Updates in real-time</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20 shadow-sm shadow-gold-500/5">
+            <Trophy className="w-6 h-6" />
+          </div>
+          <div>
+            <motion.h1 
+              initial={{ opacity: 0, x: -10 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+            >
+              Leaderboard
+            </motion.h1>
+            <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">Batch rankings and top performers • Updates in real-time</p>
+          </div>
         </div>
         <button
           onClick={fetchLeaderboard}
           disabled={refreshing || !selectedTest}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition-all shadow-sm"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           Refresh
@@ -206,9 +204,9 @@ const LeaderboardPage = () => {
         <div className="text-center py-20 bg-[var(--bg-surface)]/50 rounded-3xl border border-dashed border-[var(--border-subtle)]">
           <p className="text-[var(--text-secondary)] font-medium">No published tests found for this batch</p>
         </div>
-      ) : loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-10 h-10 border-4 border-[var(--color-purple)]/20 border-t-[var(--color-purple)] rounded-full animate-spin" />
+      ) : (isInitialLoading || loading) ? (
+        <div className="space-y-4 max-w-4xl">
+          {[...Array(6)].map((_, i) => <CardSkeleton key={i} />)}
         </div>
       ) : leaderboard.length === 0 ? (
         <div className="text-center py-20 bg-[var(--bg-surface)]/50 rounded-3xl border border-dashed border-[var(--border-subtle)]">
@@ -225,7 +223,7 @@ const LeaderboardPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className={`flex items-center justify-between px-6 py-5 rounded-2xl border transition-all hover:scale-[1.01] bg-gradient-to-r ${getRankStyle(entry.rank, isCurrentUser)}`}
+                className={`flex items-center justify-between px-6 py-5 rounded-2xl border transition-all hover:scale-[1.01] ${getRankStyle(entry.rank, isCurrentUser)}`}
               >
                 <div className="flex items-center gap-6">
                   <div className="w-12 h-12 flex items-center justify-center shrink-0">
@@ -235,7 +233,7 @@ const LeaderboardPage = () => {
                     <div className="flex items-center gap-2">
                       <p className="text-base font-bold text-[var(--text-primary)]">{entry.name}</p>
                       {isCurrentUser && (
-                        <span className="px-2 py-0.5 rounded-full bg-purple-500 text-[10px] font-bold text-white uppercase tracking-wider">You</span>
+                        <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-bold text-black uppercase tracking-wider">You</span>
                       )}
                     </div>
                     <p className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">

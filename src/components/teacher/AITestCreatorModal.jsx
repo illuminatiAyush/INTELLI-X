@@ -283,10 +283,10 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
           className="relative w-full max-w-4xl max-h-[90vh] bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-3xl shadow-2xl overflow-hidden flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] bg-gradient-to-r from-purple-500/5 to-cyan-500/5">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] bg-white/5">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-purple-500/20">
-                <Brain className="w-5 h-5 text-purple-400" />
+              <div className="p-2 rounded-xl bg-white/10 border border-white/20">
+                <Brain className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h2 className="text-lg font-bold text-[var(--text-primary)]">IntelliX AI Test Generator</h2>
@@ -312,14 +312,11 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
             <div className="flex items-center gap-2">
               {['Upload PDF', 'Configure', 'Generate', 'Review', 'Save'].map((label, i) => (
                 <div key={label} className="flex items-center gap-2 flex-1">
-                  <div className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${
-                    step > i + 1 ? 'text-green-400' : step === i + 1 ? 'text-purple-400' : 'text-[var(--text-secondary)]/50'
+                  <div className={`flex items-center gap-1.5 text-xs font-medium transition-colors ${ step > i + 1 ? 'text-green-400' : step === i + 1 ? 'text-white' : 'text-[var(--text-secondary)]/50'
                   }`}>
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all ${
-                      step > i + 1 
-                        ? 'bg-green-500/20 border-green-500/30 text-green-400' 
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all ${ step > i + 1 ? 'bg-green-500/20 border-green-500/30 text-green-400' 
                         : step === i + 1 
-                          ? 'bg-purple-500/20 border-purple-500/30 text-purple-400' 
+                          ? 'bg-white text-black border-white' 
                           : 'bg-[var(--bg-card)] border-[var(--border-subtle)] text-[var(--text-secondary)]/50'
                     }`}>
                       {step > i + 1 ? '✓' : i + 1}
@@ -346,14 +343,14 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                 />
                 <div 
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full max-w-md border-2 border-dashed border-[var(--border-subtle)] hover:border-purple-500/50 rounded-3xl p-12 text-center cursor-pointer transition-all hover:bg-purple-500/5 group"
+                  className="w-full max-w-md border-2 border-dashed border-[var(--border-subtle)] hover:border-white/50 rounded-3xl p-12 text-center cursor-pointer transition-all hover:bg-white/5 group"
                 >
-                  <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Upload className="w-10 h-10 text-purple-400" />
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Upload className="w-10 h-10 text-white/70" />
                   </div>
                   <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">Drop your PDF here</h3>
                   <p className="text-sm text-[var(--text-secondary)] mb-4">or click to browse • Max 50MB</p>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-500/10 text-purple-400 text-xs font-medium border border-purple-500/20">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-white/70 text-xs font-medium border border-white/10">
                     <FileText className="w-3.5 h-3.5" />
                     Supports any educational PDF
                   </div>
@@ -387,7 +384,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                     value={testTitle}
                     onChange={(e) => setTestTitle(e.target.value)}
                     placeholder="e.g., Physics Chapter 5 Test"
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-purple-500/50 transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-white/30 transition-all"
                   />
                 </div>
 
@@ -397,7 +394,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                   <select
                     value={selectedBatch}
                     onChange={(e) => setSelectedBatch(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-purple-500/50 transition-all appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-white/30 transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Select a batch</option>
                     {batches.map((b) => (
@@ -417,7 +414,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                       onChange={(e) => setPrompt(e.target.value)}
                       placeholder="e.g., Generate 15 MCQs from Chapter 5 till Section 5.3"
                       rows={3}
-                      className="w-full px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-purple-500/50 transition-all resize-none"
+                      className="w-full px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-white/30 transition-all resize-none"
                     />
                     <div className="absolute right-3 bottom-3">
                       <Sparkles className="w-4 h-4 text-purple-400/50" />
@@ -429,9 +426,9 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                 </div>
 
                 {/* AI auto-detects question count from prompt. Show info. */}
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-purple-500/5 border border-purple-500/20">
-                  <Sparkles className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                  <p className="text-xs text-purple-400/80 font-medium">
+                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10">
+                  <Sparkles className="w-4 h-4 text-white/50 flex-shrink-0" />
+                  <p className="text-xs text-white/80 font-medium">
                     💡 AI will auto-detect question count from your prompt. E.g., "Generate <strong>15</strong> MCQs from Chapter 3". Default: 10 if not specified.
                   </p>
                 </div>
@@ -448,7 +445,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                         type="datetime-local"
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs outline-none focus:border-purple-500/50 transition-all"
+                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs outline-none focus:border-white/30 transition-all"
                       />
                     </div>
                     <div>
@@ -459,7 +456,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                         max={180}
                         value={durationMinutes}
                         onChange={(e) => setDurationMinutes(e.target.value === '' ? '' : Number(e.target.value))}
-                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs outline-none focus:border-purple-500/50 transition-all"
+                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs outline-none focus:border-white/30 transition-all"
                       />
                     </div>
                   </div>
@@ -487,7 +484,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                   <button
                     onClick={handleGenerate}
                     disabled={!prompt.trim() || !selectedBatch || !testTitle.trim()}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-sm font-bold shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white text-black text-sm font-bold shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
                   >
                     <Sparkles className="w-4 h-4" />
                     Generate Questions
@@ -499,15 +496,28 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
             {/* Step 3: Generating / Processing */}
             {step === 3 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-20">
-                <div className="relative w-20 h-20 mb-6">
-                  <div className="absolute inset-0 rounded-full border-4 border-purple-500/20" />
-                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-purple-500 animate-spin" />
-                  <div className="absolute inset-3 rounded-full bg-gradient-to-br from-purple-500/10 to-cyan-500/10 flex items-center justify-center">
-                    <Brain className="w-8 h-8 text-purple-400 animate-pulse" />
+                <div className="relative w-24 h-24 mb-8">
+                  <div className="absolute inset-0 rounded-full border-4 border-white/5" />
+                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-white animate-spin" />
+                  <div className="absolute inset-0 rounded-full bg-white/5 animate-pulse" />
+                  <div className="absolute inset-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
+                    <Brain className="w-10 h-10 text-white relative z-10" />
+                    <motion.div 
+                      animate={{ y: [-40, 40] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                      className="absolute inset-x-0 h-px bg-white/30 shadow-[0_0_10px_white]"
+                    />
                   </div>
                 </div>
-                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">AI Processing</h3>
-                <p className="text-sm text-purple-400 font-medium animate-pulse">{progress || 'Please wait...'}</p>
+                <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">Neural Architect Processing</h3>
+                <div className="w-full max-w-xs h-1.5 bg-[var(--border-subtle)] rounded-full mb-4 overflow-hidden">
+                  <motion.div 
+                    animate={{ x: ['-100%', '100%'] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                    className="w-1/2 h-full bg-gradient-to-r from-transparent via-white to-transparent"
+                  />
+                </div>
+                <p className="text-sm text-white font-bold tracking-tight animate-pulse uppercase">{progress || 'Synthesizing knowledge...'}</p>
               </motion.div>
             )}
 
@@ -515,16 +525,16 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
             {step === 4 && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                 {/* Summary */}
-                <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-400" />
-                    <span className="text-sm font-medium text-purple-400">
+                    <Sparkles className="w-5 h-5 text-white/70" />
+                    <span className="text-sm font-bold text-white/70">
                       {questions.length} questions generated for "{testTitle}"
                     </span>
                   </div>
                   <button
                     onClick={addQuestion}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-400 text-xs font-medium hover:bg-purple-500/30 transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" /> Add
                   </button>
@@ -535,9 +545,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                   {questions.map((q, qIdx) => (
                     <div
                       key={q.local_id || qIdx}
-                      className={`rounded-2xl border transition-all ${
-                        editingIndex === qIdx
-                          ? 'border-purple-500/30 bg-purple-500/5'
+                      className={`rounded-2xl border transition-all ${ editingIndex === qIdx ? 'border-white/30 bg-white/5'
                           : 'border-[var(--border-subtle)] bg-[var(--bg-card)] hover:border-[var(--border-strong)]'
                       }`}
                     >
@@ -569,7 +577,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
-                          {editingIndex === qIdx ? <ChevronUp className="w-4 h-4 text-purple-400" /> : <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />}
+                          {editingIndex === qIdx ? <ChevronUp className="w-4 h-4 text-white" /> : <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />}
                         </div>
                       </div>
 
@@ -590,9 +598,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                                   <div key={oIdx} className="flex items-center gap-3">
                                     <button
                                       onClick={() => updateQuestion(qIdx, 'answer', optionLetter)}
-                                      className={`flex-shrink-0 w-8 h-8 rounded-lg border text-xs font-bold transition-all ${
-                                        isCorrect
-                                          ? 'bg-green-500/20 border-green-500/30 text-green-400'
+                                      className={`flex-shrink-0 w-8 h-8 rounded-lg border text-xs font-bold transition-all ${ isCorrect ? 'bg-green-500/20 border-green-500/30 text-green-400'
                                           : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-green-500/30 hover:text-green-400'
                                       }`}
                                     >
@@ -601,9 +607,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                                     <input
                                       value={opt}
                                       onChange={(e) => updateOption(qIdx, oIdx, e.target.value)}
-                                      className={`flex-1 px-3 py-2 rounded-lg border text-sm outline-none transition-all ${
-                                        isCorrect
-                                          ? 'bg-green-500/5 border-green-500/20 text-green-400 focus:border-green-500/40'
+                                      className={`flex-1 px-3 py-2 rounded-lg border text-sm outline-none transition-all ${ isCorrect ? 'bg-green-500/5 border-green-500/20 text-green-400 focus:border-green-500/40'
                                           : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)] focus:border-purple-500/50'
                                       }`}
                                     />
@@ -630,7 +634,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                   <button
                     onClick={handleSaveTest}
                     disabled={saving || questions.length === 0}
-                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500 text-white text-sm font-bold shadow-lg shadow-purple-500/25 disabled:opacity-50 transition-all active:scale-95"
+                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-white text-black text-sm font-bold shadow-xl disabled:opacity-50 transition-all active:scale-95"
                   >
                     <Send className="w-4 h-4" />
                     Publish Test ({questions.length} Qs)
@@ -641,10 +645,13 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
 
             {/* Step 5: Saving */}
             {step === 5 && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="w-12 h-12 text-purple-400 animate-spin mb-4" />
-                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Publishing Test</h3>
-                <p className="text-sm text-[var(--text-secondary)]">{progress}</p>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-24">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6 relative">
+                  <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+                  <div className="absolute -inset-2 rounded-2xl border border-emerald-500/10 animate-ping" />
+                </div>
+                <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">Syncing Terminal</h3>
+                <p className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-[0.2em]">{progress || 'Writing to database...'}</p>
               </motion.div>
             )}
           </div>

@@ -4,44 +4,36 @@ import { Settings, Save, Building2, Mail, Phone, User } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import { useAppQuery } from '../../hooks/useAppQuery'
+import { DashboardSkeleton } from '../../components/ui/Skeletons'
 
 const SettingsPage = () => {
   const { isDark } = useTheme()
   const { role, profile } = useAuth()
-  const [institute, setInstitute] = useState(null)
-  const [form, setForm] = useState({ name: '', email: '', phone: '', owner_name: '' })
-  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [form, setForm] = useState({ name: '', email: '', phone: '', owner_name: '' })
+
+  const { data: institute, loading: instituteLoading } = useAppQuery(`institute-settings-${profile?.institute_id}`, async () => {
+    if (!profile?.institute_id) return null
+    const { data, error } = await supabase.from('institutes').select('*').eq('id', profile.institute_id).single()
+    if (error) throw error
+    return data
+  }, { enabled: !!profile?.institute_id })
 
   useEffect(() => {
-    fetchInstitute()
-  }, [profile])
-
-  const fetchInstitute = async () => {
-    try {
-      if (!profile?.institute_id) { setLoading(false); return }
-      const { data, error } = await supabase
-        .from('institutes')
-        .select('*')
-        .eq('id', profile.institute_id)
-        .single()
-      if (error) throw error
-      if (data) {
-        setInstitute(data)
-        setForm({
-          name: data.name || '',
-          email: data.email || '',
-          phone: data.phone || '',
-          owner_name: data.owner_name || '',
-        })
-      }
-    } catch (err) {
-      console.error('Error fetching institute:', err)
-    } finally {
-      setLoading(false)
+    if (institute) {
+      setForm({
+        name: institute.name || '',
+        email: institute.email || '',
+        phone: institute.phone || '',
+        owner_name: institute.owner_name || '',
+      })
     }
-  }
+  }, [institute])
+
+  const loading = instituteLoading && !institute
+
 
   const handleSave = async () => {
     if (!institute) return
@@ -62,13 +54,7 @@ const SettingsPage = () => {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-[var(--color-purple)]/30 border-t-[var(--color-purple)] rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (loading) return <DashboardSkeleton />
 
   const isMaster = role === 'master_admin'
 
@@ -98,7 +84,7 @@ const SettingsPage = () => {
           className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
         >
           <div className="flex items-center gap-2 mb-6">
-            <div className="p-2 rounded-lg bg-[var(--color-purple)]/10 text-[var(--color-purple)]">
+            <div className="p-2 rounded-lg bg-[var(--border-subtle)] text-[var(--text-primary)] border border-[var(--border-subtle)] shadow-sm">
               <Settings className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-bold text-[var(--text-primary)]">Institute Details</h2>
@@ -114,10 +100,8 @@ const SettingsPage = () => {
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
                 disabled={isMaster}
-                className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${
-                  isDark
-                    ? 'bg-white/5 border border-white/10 text-white focus:border-purple-500/40'
-                    : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-purple-400'
+                className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${ isDark ? 'bg-white/5 border border-white/10 text-white focus:border-white/40'
+                    : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-gray-400'
                 } ${isMaster ? 'opacity-60 cursor-not-allowed' : ''}`}
               />
             </div>
@@ -130,10 +114,8 @@ const SettingsPage = () => {
                 value={form.owner_name}
                 onChange={e => setForm({ ...form, owner_name: e.target.value })}
                 disabled={isMaster}
-                className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${
-                  isDark
-                    ? 'bg-white/5 border border-white/10 text-white focus:border-purple-500/40'
-                    : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-purple-400'
+                className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${ isDark ? 'bg-white/5 border border-white/10 text-white focus:border-white/40'
+                    : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-gray-400'
                 } ${isMaster ? 'opacity-60 cursor-not-allowed' : ''}`}
               />
             </div>
@@ -146,10 +128,8 @@ const SettingsPage = () => {
                 value={form.email}
                 onChange={e => setForm({ ...form, email: e.target.value })}
                 disabled={isMaster}
-                className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${
-                  isDark
-                    ? 'bg-white/5 border border-white/10 text-white focus:border-purple-500/40'
-                    : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-purple-400'
+                className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${ isDark ? 'bg-white/5 border border-white/10 text-white focus:border-white/40'
+                    : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-gray-400'
                 } ${isMaster ? 'opacity-60 cursor-not-allowed' : ''}`}
               />
             </div>
@@ -162,10 +142,8 @@ const SettingsPage = () => {
                 value={form.phone}
                 onChange={e => setForm({ ...form, phone: e.target.value })}
                 disabled={isMaster}
-                className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${
-                  isDark
-                    ? 'bg-white/5 border border-white/10 text-white focus:border-purple-500/40'
-                    : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-purple-400'
+                className={`w-full px-4 py-3 rounded-xl text-sm transition-all outline-none ${ isDark ? 'bg-white/5 border border-white/10 text-white focus:border-white/40'
+                    : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-gray-400'
                 } ${isMaster ? 'opacity-60 cursor-not-allowed' : ''}`}
               />
             </div>
@@ -176,7 +154,7 @@ const SettingsPage = () => {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-600 text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 bg-white text-black hover:bg-gray-200"
               >
                 <Save className="w-4 h-4" />
                 {saving ? 'Saving...' : 'Save Changes'}

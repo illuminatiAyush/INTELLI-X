@@ -99,7 +99,7 @@ const featuresData = {
   ]
 }
 
-const FeatureCard = ({ feature, index }) => {
+const FeatureCard = ({ feature, index, tabColor }) => {
   const { isDark } = useTheme()
   const Icon = feature.icon
 
@@ -116,8 +116,8 @@ const FeatureCard = ({ feature, index }) => {
     >
       <div className="flex flex-col h-full">
         {/* Icon */}
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 ${
-          isDark ? 'bg-white/5 text-white/40' : 'bg-black/5 text-black/40'
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-all duration-500 ${
+          isDark ? `bg-${tabColor}-500/10 text-${tabColor}-400 border border-${tabColor}-500/20 shadow-[0_0_20px_-5px_rgba(var(--${tabColor}-rgb),0.3)]` : `bg-${tabColor}-50 text-${tabColor}-600 border border-${tabColor}-100`
         }`}>
           <Icon size={24} strokeWidth={1.5} />
         </div>
@@ -136,7 +136,7 @@ const FeatureCard = ({ feature, index }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 mt-auto pt-4 border-t border-white/[0.05]">
           {feature.points.map((point, i) => (
             <div key={i} className="flex items-center gap-2">
-              <div className={`w-1 h-1 rounded-full ${isDark ? 'bg-purple-500/50' : 'bg-purple-500/30'}`} />
+              <div className={`w-1 h-1 rounded-full ${isDark ? 'bg-white/40' : 'bg-gray-400'}`} />
               <span className={`text-[11px] md:text-xs tracking-tight ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
                 {point}
               </span>
@@ -152,10 +152,17 @@ const Features = () => {
   const { isDark } = useTheme()
   const [activeTab, setActiveTab] = useState('Institute')
 
-  const tabs = ['Institute', 'Teachers', 'Students']
+  const tabConfigs = {
+    Institute: { label: 'Institute', color: 'cyan' },
+    Teachers: { label: 'Teachers', color: 'purple' },
+    Students: { label: 'Students', color: 'emerald' }
+  }
+
+  const tabs = Object.values(tabConfigs)
+  const activeConfig = tabConfigs[activeTab]
 
   return (
-    <section id="features" className={`py-20 md:py-32 relative overflow-hidden ${isDark ? 'bg-black' : 'bg-white'}`}>
+    <section id="features" className={`py-20 md:py-32 relative overflow-hidden ${isDark ? 'bg-[#000000]' : 'bg-white'}`}>
       {/* Background Architectural Grid Texture */}
       <div 
         className="absolute inset-0 pointer-events-none"
@@ -182,7 +189,7 @@ const Features = () => {
               fontFamily: "'Playfair Display', Georgia, serif"
             }}
           >
-            Everything your <span className="italic font-normal">{activeTab}</span> needs
+            Everything your <span className={`italic font-normal transition-colors duration-500 ${isDark ? `text-${activeConfig.color}-400` : `text-${activeConfig.color}-600`}`}>{activeTab}</span> needs
           </h2>
           <p className={`text-lg max-w-2xl mx-auto ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
             Powerful, specialized modules built for administrators, educators, and learners.
@@ -194,22 +201,22 @@ const Features = () => {
           <div className={`inline-flex p-1 rounded-full ${isDark ? 'bg-white/5 border border-white/10' : 'bg-gray-100 border border-gray-200'}`}>
             {tabs.map(tab => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
+                key={tab.label}
+                onClick={() => setActiveTab(tab.label)}
                 className={`relative px-8 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${
-                  activeTab === tab 
-                    ? (isDark ? 'text-white' : 'text-black') 
+                  activeTab === tab.label 
+                    ? (isDark ? `text-${tab.color}-400` : `text-${tab.color}-700`) 
                     : (isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-500 hover:text-black')
                 }`}
               >
-                {activeTab === tab && (
+                {activeTab === tab.label && (
                   <motion.div
                     layoutId="activeFeatureTab"
-                    className={`absolute inset-0 rounded-full shadow-lg ${isDark ? 'bg-white/10 border border-white/10' : 'bg-white shadow-sm'}`}
+                    className={`absolute inset-0 rounded-full shadow-lg ${isDark ? `bg-${tab.color}-500/10 border border-${tab.color}-500/20` : 'bg-white shadow-sm border border-gray-200'}`}
                     transition={{ type: 'spring', bounce: 0.15, duration: 0.6 }}
                   />
                 )}
-                <span className="relative z-10">{tab}</span>
+                <span className="relative z-10">{tab.label}</span>
               </button>
             ))}
           </div>
@@ -222,7 +229,7 @@ const Features = () => {
         >
           <AnimatePresence mode="popLayout" initial={false}>
             {featuresData[activeTab].map((feature, i) => (
-              <FeatureCard key={`${activeTab}-${feature.title}`} feature={feature} index={i} />
+              <FeatureCard key={`${activeTab}-${feature.title}`} feature={feature} index={i} tabColor={activeConfig.color} />
             ))}
           </AnimatePresence>
         </motion.div>
