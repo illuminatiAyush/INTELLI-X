@@ -7,69 +7,17 @@ const Hero = () => {
   const { isDark } = useTheme()
   const canvasRef = useRef(null)
 
-  // Subtle radial canvas glow
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas || !isDark) return
-    const ctx = canvas.getContext('2d')
-    let raf
-
-    const draw = () => {
-      canvas.width = canvas.offsetWidth
-      canvas.height = canvas.offsetHeight
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      const cx = canvas.width / 2
-      const cy = canvas.height * 0.42
-
-      // Deep center glow
-      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, canvas.width * 0.6)
-      glow.addColorStop(0, 'rgba(120, 80, 200, 0.13)')
-      glow.addColorStop(0.5, 'rgba(60, 40, 130, 0.06)')
-      glow.addColorStop(1, 'rgba(0, 0, 0, 0)')
-      ctx.fillStyle = glow
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-    }
-
-    draw()
-    const ro = new ResizeObserver(draw)
-    ro.observe(canvas)
-    return () => { ro.disconnect(); cancelAnimationFrame(raf) }
-  }, [isDark])
-
-  const bgClass = isDark
-    ? 'bg-[#000000]'
-    : 'bg-gradient-to-b from-slate-50 to-white'
-
-  const eyebrowColor = isDark ? 'text-gray-500' : 'text-gray-400'
-  const headlineColor = isDark ? 'text-white' : 'text-gray-950'
-  const quoteColor = isDark ? 'text-gray-400' : 'text-gray-500'
+  const bgClass = isDark ? 'bg-[#000000]' : 'bg-white'
+  const eyebrowColor = isDark ? 'text-gray-400' : 'text-slate-500'
+  const headlineColor = isDark ? 'text-white' : 'text-slate-900'
+  const quoteColor = isDark ? 'text-gray-400' : 'text-slate-600'
 
   return (
     <section
       id="hero"
       className={`relative min-h-[90vh] sm:min-h-screen py-20 sm:py-0 flex flex-col items-center justify-center overflow-hidden ${bgClass}`}
     >
-      {/* Canvas radial glow */}
-      {isDark && (
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ zIndex: 0 }}
-        />
-      )}
 
-      {/* Light mode soft blob */}
-      {!isDark && (
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(ellipse 70% 50% at 50% 40%, rgba(139,92,246,0.07) 0%, transparent 70%)',
-            zIndex: 0,
-          }}
-        />
-      )}
 
       <div className="relative w-full max-w-5xl mx-auto px-6 flex flex-col items-center text-center" style={{ zIndex: 1 }}>
 
@@ -166,8 +114,7 @@ const Hero = () => {
         style={{ zIndex: 1 }}
       >
         <div
-          className={`w-5 h-8 rounded-full border flex items-start justify-center pt-1.5 ${
-            isDark ? 'border-white/15' : 'border-gray-300'
+          className={`w-5 h-8 rounded-full border flex items-start justify-center pt-1.5 ${ isDark ? 'border-white/15' : 'border-gray-300'
           }`}
         >
           <motion.div
