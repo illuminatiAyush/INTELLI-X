@@ -13,7 +13,7 @@ import toast from 'react-hot-toast'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { TableSkeleton } from '../../components/ui/Skeletons'
 
-const ResultsPage = () => {
+const ResultsPage = ({ hideHeader = false }) => {
   const { user, role } = useAuth()
   const { isDark } = useTheme()
   const [selectedBatch, setSelectedBatch] = useState('')
@@ -63,8 +63,13 @@ const ResultsPage = () => {
       
       doc.setFontSize(12)
       doc.setTextColor('#000000')
-      const studentName = role === 'student' ? user?.user_metadata?.full_name : r.students?.name
-      doc.text(`Student: ${studentName || 'Student'}`, 14, 40)
+      
+      // DATA MAPPING FIX: Prioritize full_name
+      const studentName = role === 'student' 
+        ? user?.user_metadata?.full_name 
+        : (r.students?.full_name || r.students?.name || "Unknown");
+        
+      doc.text(`Student: ${studentName}`, 14, 40)
       doc.text(`Test Name: ${r.tests?.title || 'Unknown Test'}`, 14, 50)
       
       const total = r.tests?.total_marks || '-'
@@ -143,9 +148,13 @@ const ResultsPage = () => {
       try {
         const { data } = await supabase
           .from('results')
-          .select('*, students(name), tests(title, total_marks)')
+          .select('*, students(name, full_name), tests(title, total_marks)')
           .eq('test_id', selectedTest)
           .order('rank', { ascending: true, nullsFirst: false })
+        
+        // DEBUG SAFETY
+        if (data && data.length > 0) console.log('Results Sample:', data[0]);
+
         // violation_count is auto-included with '*'
         setResults(data || [])
       } catch (err) {
@@ -202,7 +211,14 @@ const ResultsPage = () => {
         { key: 'actions', label: '', render: renderActions }
       ]
     : [
-        { key: 'student', label: 'Student', render: (r) => <span className="font-medium text-[var(--text-primary)]">{r.students?.name || '-'}</span> },
+        { 
+          key: 'student', 
+          label: 'Student', 
+          render: (r) => {
+            const studentName = r.students?.full_name || r.students?.name || 'Unknown';
+            return <span className="font-medium text-[var(--text-primary)]">{studentName}</span>
+          } 
+        },
         { key: 'marks', label: 'Marks', render: (r) => <span className="font-bold text-[var(--text-primary)]">{r.marks}</span> },
         { key: 'percentage', label: '%', render: (r) => r.tests?.total_marks ? `${((r.marks / r.tests.total_marks) * 100).toFixed(1)}%` : '-' },
         {
@@ -232,30 +248,32 @@ const ResultsPage = () => {
           }
         },
         { key: 'actions', label: '', render: renderActions }
-      ]
+      ];
 
   const batchOptions = batches.map((b) => ({ value: b.id, label: b.name }))
   const testOptions = tests.map((t) => ({ value: t.id, label: `${t.title} (${new Date(t.date).toLocaleDateString()})` }))
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20 shadow-sm shadow-amber-500/5">
-          <BarChart3 className="w-6 h-6" />
+      {!hideHeader && (
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20 shadow-sm shadow-amber-500/5">
+            <BarChart3 className="w-6 h-6" />
+          </div>
+          <div>
+            <motion.h1 
+              initial={{ opacity: 0, x: -10 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+            >
+              Results & Insights
+            </motion.h1>
+            <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
+              {role === 'student' ? 'Your test scores and rankings' : 'View and manage test results across your batches'}
+            </p>
+          </div>
         </div>
-        <div>
-          <motion.h1 
-            initial={{ opacity: 0, x: -10 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-          >
-            Results & Insights
-          </motion.h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
-            {role === 'student' ? 'Your test scores and rankings' : 'View and manage test results across your batches'}
-          </p>
-        </div>
-      </div>
+      )}
 
       {role !== 'student' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[var(--bg-card)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">

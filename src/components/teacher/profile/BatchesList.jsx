@@ -23,12 +23,12 @@ const BatchesList = ({ batches, loading }) => {
       className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
     >
       <div className="flex items-center gap-2 mb-5">
-        <div className="p-2 rounded-lg bg-[var(--color-purple)]/10 text-[var(--color-purple)]">
+        <div className="p-2 rounded-lg bg-white/10 text-white">
           <Layers className="w-5 h-5" />
         </div>
         <h3 className="text-lg font-bold text-[var(--text-primary)]">Assigned Batches</h3>
         {batches && batches.length > 0 && (
-          <span className="ml-auto px-2.5 py-0.5 rounded-full bg-[var(--color-purple)]/10 text-[var(--color-purple)] text-xs font-bold border border-[var(--color-purple)]/20">
+          <span className="ml-auto px-2.5 py-0.5 rounded-full bg-white/10 text-white text-xs font-bold border border-white/20">
             {batches.length}
           </span>
         )}
@@ -53,11 +53,11 @@ const BatchesList = ({ batches, loading }) => {
               className="flex items-center justify-between px-4 py-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] transition-all group"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-[var(--color-purple)]/10 text-[var(--color-purple)] flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center flex-shrink-0">
                   <Layers className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-purple)] transition-colors truncate">
+                  <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-white transition-colors truncate">
                     {batch.name}
                   </p>
                   {batch.subject && (

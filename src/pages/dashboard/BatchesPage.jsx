@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Pencil, Trash2, Users, Search, Copy, Link as LinkIcon, CheckCircle, AlertCircle, Play } from 'lucide-react'
+import { Plus, Pencil, Trash2, Users, Search, Copy, Link as LinkIcon, CheckCircle, AlertCircle, Play, Trophy, ClipboardCheck, BarChart3, TrendingUp, ChevronLeft, PlusCircle, Layers } from 'lucide-react'
 import Modal from '../../components/ui/Modal'
+import StatsCard from '../../components/ui/StatsCard'
 import { Input, Select } from '../../components/ui/FormField'
 import { getBatches, createBatch, updateBatch, deleteBatch } from '../../services/batchService'
 import { supabase } from '../../lib/supabase'
@@ -9,7 +10,12 @@ import { useAuth } from '../../context/AuthContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { CardSkeleton } from '../../components/ui/Skeletons'
 
-const BatchesPage = () => {
+import StudentsPage from './StudentsPage'
+import TeachersPage from './TeachersPage'
+import AttendancePage from './AttendancePage'
+import JoinBatch from './JoinBatch'
+
+const BatchList = () => {
   const { role, profile } = useAuth()
   const { data: batchesData, loading: batchesLoading, refetch: refetchBatches } = useAppQuery(`batches-${role}-${profile?.id}`, async () => {
     if (!profile) return { batches: [], teachers: [] }
@@ -44,6 +50,7 @@ const BatchesPage = () => {
   const [toast, setToast] = useState({ show: false, message: '', type: '' })
   const [expandedBatch, setExpandedBatch] = useState(null)
   const [studentsModalOpen, setStudentsModalOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState(null)
   const [batchStudents, setBatchStudents] = useState([])
   const [search, setSearch] = useState('')
 
@@ -130,17 +137,75 @@ const BatchesPage = () => {
   const handleRowClick = async (batch) => {
     setExpandedBatch(batch)
     setStudentsModalOpen(true)
-    const { data } = await supabase
-      .from('batch_students')
-      .select('students(id, name, email)')
-      .eq('batch_id', batch.id)
-    // Flatten: each row is { students: {id, name, email} } → extract inner object
-    const studentList = (data || [])
+    setSelectedStudent(null)
+    
+    // Optimized single-shot query batch fetch for drilldown
+    const [
+      { data: studentData },
+      { data: attendanceData },
+      { data: resultsData }
+    ] = await Promise.all([
+      supabase.from('batch_students').select('students(id, name, full_name, email)').eq('batch_id', batch.id),
+      supabase.from('attendance').select('student_id, status').eq('batch_id', batch.id),
+      supabase.from('results').select('student_id, marks, created_at, tests!inner(batch_id, total_marks)').eq('tests.batch_id', batch.id)
+    ])
+
+    const studentList = (studentData || [])
       .map(row => row.students)
       .filter(Boolean)
-      .filter((s, index, self) => self.findIndex(t => t.id === s.id) === index) // Unique students only
+      .filter((s, index, self) => self.findIndex(t => t.id === s.id) === index)
+
+    const attendanceRecords = attendanceData || []
+    const rawResults = resultsData || []
+
+    const studentScores = {}
+    rawResults.forEach(r => {
+      const sid = r.student_id;
+      if (!studentScores[sid]) studentScores[sid] = { total: 0 }
+      studentScores[sid].total += (r.marks || 0)
+    })
     
-    setBatchStudents(studentList)
+    const rankedStudents = Object.keys(studentScores).sort((a, b) => studentScores[b].total - studentScores[a].total)
+    
+    const enrichedStudents = studentList.map(student => {
+      const sId = student.id
+      
+      const sAtt = attendanceRecords.filter(a => a.student_id === sId)
+      const totalClasses = sAtt.length || 0
+      const present = sAtt.filter(a => a.status === 'present').length || 0
+      const absent = totalClasses - present
+      const attendancePercent = totalClasses ? ((present / totalClasses) * 100).toFixed(1) : 0
+      
+      const sRes = rawResults.filter(r => r.student_id === sId).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+      const totalTests = sRes.length || 0
+      const totalPossible = sRes.reduce((acc, r) => acc + (r.tests?.total_marks || 100), 0)
+      const totalMarks = sRes.reduce((acc, r) => acc + (r.marks || 0), 0)
+      const avgMarks = totalPossible ? ((totalMarks / totalPossible) * 100).toFixed(1) : 0
+      const latestScore = sRes.length > 0 ? (sRes[0].marks || 0) : '-'
+      
+      const rankIndex = rankedStudents.indexOf(sId)
+      const rank = rankIndex !== -1 ? rankIndex + 1 : '-'
+      const percentile = rankIndex !== -1 && rankedStudents.length > 0 ? ((1 - (rankIndex / rankedStudents.length)) * 100).toFixed(1) : '-'
+      
+      return {
+        ...student,
+        analytics: {
+          attendance: { total: totalClasses, present, absent, percent: attendancePercent },
+          tests: { total: totalTests, avg: avgMarks, latest: latestScore },
+          leaderboard: { rank, percentile }
+        }
+      }
+    })
+
+    // Sort alphabetically naturally, but top ranked first if available
+    enrichedStudents.sort((a, b) => {
+      if (a.analytics.leaderboard.rank !== '-' && b.analytics.leaderboard.rank !== '-') {
+        return a.analytics.leaderboard.rank - b.analytics.leaderboard.rank
+      }
+      return (a.name || '').localeCompare(b.name || '')
+    })
+    
+    setBatchStudents(enrichedStudents)
   }
 
   const filtered = batches.filter(
@@ -331,41 +396,118 @@ const BatchesPage = () => {
               </div>
             </div>
 
-            {/* Students List */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-[var(--color-cyan)]" />
-                  <h4 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider">Enrolled Students ({batchStudents.length})</h4>
+            {/* Students List or Drilldown */}
+            {selectedStudent ? (
+              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+                <div className="flex items-center gap-3 mb-6">
+                  <button onClick={() => setSelectedStudent(null)} className="p-2 sm:p-2.5 rounded-xl bg-[var(--bg-app)] hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors border border-[var(--border-subtle)] active:scale-95">
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <div>
+                    <h4 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">{selectedStudent.name}</h4>
+                    <p className="text-xs sm:text-sm text-[var(--text-secondary)]">{selectedStudent.email}</p>
+                  </div>
                 </div>
-                {role === 'admin' && (
-                   <button
-                    onClick={() => { setStudentsModalOpen(false); handleDelete(expandedBatch.id); }}
-                    className="flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-300 transition-colors"
-                   >
-                     <Trash2 className="w-3.5 h-3.5" /> Delete Batch
-                   </button>
-                )}
-              </div>
-              
-              <div className="p-1 max-h-[40vh] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                {batchStudents.length === 0 ? (
-                  <div className="p-8 text-center border-2 border-dashed border-[var(--border-subtle)] rounded-xl">
-                    <p className="text-[var(--text-secondary)] text-sm">No students currently enrolled.</p>
-                    <p className="text-gray-600 text-xs mt-1">Share the invite link to add students.</p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <StatsCard title="Attendance" value={`${selectedStudent?.analytics?.attendance?.percent || 0}%`} icon={ClipboardCheck} color={parseFloat(selectedStudent?.analytics?.attendance?.percent) >= 75 ? 'green' : 'amber'} />
+                  <StatsCard title="Tests Taken" value={selectedStudent?.analytics?.tests?.total || 0} icon={BarChart3} color="white" />
+                  <StatsCard title="Avg Score" value={`${selectedStudent?.analytics?.tests?.avg || 0}%`} icon={TrendingUp} color="white" />
+                  <StatsCard title="Batch Rank" value={selectedStudent?.analytics?.leaderboard?.rank === '-' ? '-' : `#${selectedStudent?.analytics?.leaderboard?.rank}`} icon={Trophy} color="white" />
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  <div className="bg-[var(--bg-app)] p-5 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+                    <p className="text-[10px] sm:text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mb-3">Attendance details</p>
+                    <div className="flex justify-between items-center text-sm py-1.5 border-b border-[var(--border-subtle)]">
+                      <span className="text-[var(--text-secondary)] font-medium">Total Classes</span>
+                      <span className="font-bold text-[var(--text-primary)]">{selectedStudent?.analytics?.attendance?.total || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm py-1.5 border-b border-[var(--border-subtle)]">
+                      <span className="text-[var(--text-secondary)] font-medium">Present</span>
+                      <span className="font-bold text-green-500">{selectedStudent?.analytics?.attendance?.present || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm py-1.5">
+                      <span className="text-[var(--text-secondary)] font-medium">Absent</span>
+                      <span className="font-bold text-red-500">{selectedStudent?.analytics?.attendance?.absent || 0}</span>
+                    </div>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {batchStudents.map((s) => (
-                      <div key={s.id} className="flex flex-col px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-[var(--border-subtle)]">
-                        <span className="text-sm font-medium text-[var(--text-primary)]">{s.name}</span>
-                        <span className="text-xs text-[var(--text-secondary)] truncate">{s.email}</span>
-                      </div>
-                    ))}
+                  
+                  <div className="bg-[var(--bg-app)] p-5 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+                    <p className="text-[10px] sm:text-xs text-[var(--text-secondary)] font-bold uppercase tracking-widest mb-3">Performance details</p>
+                    <div className="flex justify-between items-center text-sm py-1.5 border-b border-[var(--border-subtle)]">
+                      <span className="text-[var(--text-secondary)] font-medium">Latest Score</span>
+                      <span className="font-bold text-[var(--text-primary)]">{selectedStudent?.analytics?.tests?.latest || '-'}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm py-1.5 border-b border-[var(--border-subtle)]">
+                      <span className="text-[var(--text-secondary)] font-medium">Percentile (Batch)</span>
+                      <span className="font-bold text-blue-400">{selectedStudent?.analytics?.leaderboard?.percentile === '-' ? '-' : `${selectedStudent?.analytics?.leaderboard?.percentile}%`}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm py-1.5">
+                      <span className="text-[var(--text-secondary)] font-medium">Active Status</span>
+                      <span className="font-bold text-green-500">Enrolled</span>
+                    </div>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-white" />
+                    <h4 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider">Enrolled Students ({batchStudents.length})</h4>
+                  </div>
+                  {role === 'admin' && (
+                     <button
+                      onClick={() => { setStudentsModalOpen(false); handleDelete(expandedBatch.id); }}
+                      className="flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-300 transition-colors"
+                     >
+                       <Trash2 className="w-3.5 h-3.5" /> Delete Batch
+                     </button>
+                  )}
+                </div>
+                
+                <div className="p-1 max-h-[40vh] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                  {batchStudents.length === 0 ? (
+                    <div className="p-8 text-center border-2 border-dashed border-[var(--border-subtle)] rounded-xl">
+                      <p className="text-[var(--text-secondary)] text-sm">No students currently enrolled.</p>
+                      <p className="text-gray-600 text-xs mt-1">Share the invite link to add students.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {batchStudents.map((s) => (
+                        <div 
+                          key={s.id} 
+                          onClick={() => setSelectedStudent(s)}
+                          className="flex flex-col px-4 py-3 rounded-xl bg-white/5 hover:bg-[var(--border-subtle)] transition-colors border border-[var(--border-subtle)] cursor-pointer hover:border-white/20 group relative overflow-hidden"
+                        >
+                          <div className="flex items-center justify-between z-10">
+                            <span className="text-sm font-medium text-[var(--text-primary)] group-hover:text-white transition-colors">{s.full_name || s.name || "Unknown"}</span>
+                            <ChevronLeft className="w-4 h-4 opacity-0 group-hover:opacity-100 rotate-180 text-[var(--text-secondary)] transition-all transform group-hover:translate-x-1" />
+                          </div>
+                          <span className="text-xs text-[var(--text-secondary)] truncate z-10">{s.email}</span>
+                          
+                          {/* Quick indicators */}
+                          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-[var(--border-subtle)]/50 z-10">
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${parseFloat(s.analytics?.attendance?.percent) >= 75 ? 'text-green-500 bg-green-500/10' : 'text-amber-500 bg-amber-500/10'}`}>
+                              {s.analytics?.attendance?.percent || 0}% Att.
+                            </span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-white/10">
+                              {s.analytics?.tests?.total || 0} Tests
+                            </span>
+                            {s.analytics?.leaderboard?.rank !== '-' && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded text-white bg-white/10 ml-auto">
+                                Rank #{s.analytics?.leaderboard?.rank}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
           </div>
         )}
       </Modal>
@@ -426,6 +568,56 @@ const BatchesPage = () => {
           </div>
         </div>
       </Modal>
+    </div>
+  )
+}
+
+const BatchesPage = () => {
+  const { role } = useAuth()
+  const [activeTab, setActiveTab] = useState('batches')
+
+  const tabs = [
+    { id: 'batches', label: role === 'student' ? 'My Batches' : 'Batches', icon: Layers, roles: ['admin', 'teacher', 'student', 'master_admin'] },
+    { id: 'join', label: 'Join Batch', icon: PlusCircle, roles: ['student'] },
+    { id: 'students', label: 'Students', icon: Users, roles: ['admin', 'master_admin'] },
+    { id: 'teachers', label: 'Teachers', icon: Users, roles: ['admin', 'master_admin'] },
+    { id: 'attendance', label: 'Attendance', icon: ClipboardCheck, roles: ['admin', 'teacher', 'student', 'master_admin'] },
+  ].filter(t => t.roles.includes(role))
+
+  return (
+    <div className="space-y-6">
+      <div className="flex border-b border-[var(--border-subtle)] gap-8 mb-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`pb-4 text-sm font-bold transition-all relative ${
+              activeTab === tab.id 
+                ? 'text-[var(--text-primary)]' 
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </div>
+            {activeTab === tab.id && (
+              <motion.div 
+                layoutId="activeTabBatch"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"
+              />
+            )}
+          </button>
+        ))}
+      </div>
+
+      <div className="pt-2">
+        {activeTab === 'batches' && <BatchList />}
+        {activeTab === 'join' && <JoinBatch hideHeader={true} />}
+        {activeTab === 'students' && <StudentsPage hideHeader={true} />}
+        {activeTab === 'teachers' && <TeachersPage hideHeader={true} />}
+        {activeTab === 'attendance' && <AttendancePage hideHeader={true} />}
+      </div>
     </div>
   )
 }

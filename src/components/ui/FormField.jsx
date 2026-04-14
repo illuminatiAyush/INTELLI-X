@@ -11,7 +11,7 @@ const FormField = ({ label, error, children, className = '' }) => (
 export const Input = ({ label, error, className = '', ...props }) => (
   <FormField label={label} error={error}>
     <input
-      className={`w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-[var(--color-purple)] focus:bg-[var(--bg-surface)] transition-all ${error ? 'border-red-500/50' : ''} ${className}`}
+      className={`w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-white/40 focus:bg-[var(--bg-surface)] transition-all ${error ? 'border-red-500/50' : ''} ${className}`}
       {...props}
     />
   </FormField>
@@ -21,7 +21,7 @@ export const Select = ({ label, error, options = [], placeholder, className = ''
   <FormField label={label} error={error}>
     <div className="relative">
       <select
-        className={`w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-[var(--color-purple)] focus:bg-[var(--bg-surface)] transition-all appearance-none cursor-pointer ${error ? 'border-red-500/50' : ''} ${className}`}
+        className={`w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-white/40 focus:bg-[var(--bg-surface)] transition-all appearance-none cursor-pointer ${error ? 'border-red-500/50' : ''} ${className}`}
         {...props}
       >
         {placeholder && <option value="" className="bg-[var(--bg-surface)] text-[var(--text-primary)]">{placeholder}</option>}

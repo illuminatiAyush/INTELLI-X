@@ -466,8 +466,8 @@ const AdminAttendanceView = ({ user, role }) => {
                   }`}>
                     {student.name.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <p className="text-base font-bold text-[var(--text-primary)]">{student.name}</p>
+                   <div>
+                    <p className="text-base font-bold text-[var(--text-primary)]">{student.full_name || student.name || "Unknown"}</p>
                     <p className="text-xs text-[var(--text-secondary)] font-medium">{student.email || 'No email provided'}</p>
                   </div>
                 </div>
@@ -523,32 +523,34 @@ const AdminAttendanceView = ({ user, role }) => {
 }
 
 // ─── Page root ────────────────────────────────────────────────────────────────
-const AttendancePage = () => {
+const AttendancePage = ({ hideHeader = false }) => {
   const { user, role } = useAuth()
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-sm shadow-emerald-500/5">
-          <ClipboardCheck className="w-6 h-6" />
+      {!hideHeader && (
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-sm shadow-emerald-500/5">
+            <ClipboardCheck className="w-6 h-6" />
+          </div>
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+            >
+              Attendance
+            </motion.h1>
+            <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
+              {role === 'student'
+                ? 'Your attendance across all enrolled subjects'
+                : role === 'admin' || role === 'master_admin'
+                  ? 'View and manage attendance records across all subjects'
+                  : 'Mark and view attendance records across subjects'}
+            </p>
+          </div>
         </div>
-        <div>
-          <motion.h1
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-          >
-            Attendance
-          </motion.h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
-            {role === 'student'
-              ? 'Your attendance across all enrolled subjects'
-              : role === 'admin' || role === 'master_admin'
-                ? 'View and manage attendance records across all subjects'
-                : 'Mark and view attendance records across subjects'}
-          </p>
-        </div>
-      </div>
+      )}
 
       {role === 'student'
         ? <StudentAttendanceView user={user} />

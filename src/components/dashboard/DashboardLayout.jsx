@@ -42,12 +42,12 @@ const DashboardLayout = () => {
 
   const roleLabel = roleLabels[role] || 'User'
 
-  let displayName = profile?.name || 
-                   profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : 
-                   user?.user_metadata?.full_name || 
-                   user?.email?.split('@')[0] || 
-                   'User'
-  
+  let displayName = profile?.name ||
+    profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() :
+    user?.user_metadata?.full_name ||
+    user?.email?.split('@')[0] ||
+    'User'
+
   if (role === 'master_admin' && (displayName.toLowerCase() === 'admin' || displayName === 'User')) {
     displayName = 'Master'
   }
@@ -56,7 +56,7 @@ const DashboardLayout = () => {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-5 py-5 border-b border-[var(--border-subtle)] flex-shrink-0">
-        <img src="/intellix-icon.svg" alt="IntelliX Logo" className="w-8 h-8" />
+        <img src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"} alt="IntelliX Logo" className="w-8 h-8" />
         <AnimatePresence>
           {isExpanded && (
             <motion.span
@@ -71,7 +71,7 @@ const DashboardLayout = () => {
         </AnimatePresence>
       </div>
 
-      <nav className="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto custom-scrollbar text-white">
+      <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto custom-scrollbar">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
@@ -79,17 +79,19 @@ const DashboardLayout = () => {
             end={item.path === '/dashboard'}
             onClick={() => setMobileOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-1.5 rounded-xl text-sm font-bold transition-all duration-200 group relative overflow-hidden ${
-                isActive
-                  ? 'bg-[var(--text-primary)] text-[var(--bg-app)] shadow-sm'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--text-primary)]/5'
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 group relative overflow-hidden ${isActive
+                ? 'bg-white text-black shadow-lg shadow-white/10'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 z-10 transition-colors`}>
-                  <item.icon className="w-[18px] h-[18px]" />
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 z-10 transition-all duration-300 ${isActive
+                    ? 'bg-black/10'
+                    : 'bg-white/5 group-hover:bg-white/10 group-hover:scale-110'
+                  }`}>
+                  <item.icon className={`w-[18px] h-[18px] transition-colors ${isActive ? 'text-black' : 'text-gray-500 group-hover:text-white'}`} />
                 </div>
                 <AnimatePresence>
                   {isExpanded && (
@@ -103,11 +105,11 @@ const DashboardLayout = () => {
                     </motion.span>
                   )}
                 </AnimatePresence>
-                {/* Active Indicator */}
+                {/* Active Indicator Line */}
                 {isActive && (
                   <motion.div
-                    layoutId="active-nav"
-                    className="absolute left-0 w-1 h-6 bg-[var(--text-primary)]/20 rounded-r-full mix-blend-difference"
+                    layoutId="active-indicator"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-black rounded-r-full"
                   />
                 )}
               </>
@@ -139,7 +141,7 @@ const DashboardLayout = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleLogout}
-            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/10 text-[var(--text-secondary)] hover:text-red-400 transition-colors text-xs"
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors text-xs font-semibold"
           >
             <LogOut className="w-4 h-4" />
             {isExpanded && <span>Logout</span>}
@@ -147,7 +149,7 @@ const DashboardLayout = () => {
         </div>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="min-h-screen bg-[var(--bg-app)] flex">
@@ -180,7 +182,7 @@ const DashboardLayout = () => {
               className="lg:hidden fixed left-0 top-0 bottom-0 w-[260px] z-50 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)]"
             >
               <SidebarContent isExpanded={true} />
-            </motion.aside> 
+            </motion.aside>
           </>
         )}
       </AnimatePresence>
@@ -222,8 +224,8 @@ const DashboardLayout = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               <NotificationsMenu />
-              <button 
-                onClick={toggleTheme} 
+              <button
+                onClick={toggleTheme}
                 className="p-2.5 rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shadow-sm"
               >
                 {isDark ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}

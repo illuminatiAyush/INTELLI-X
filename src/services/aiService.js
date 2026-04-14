@@ -1,3 +1,12 @@
+/**
+ * AI Service — Groq-primary engine for the landing page chatbot.
+ * RAG-ready structure with conversation history support.
+ */
+
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const GROQ_MODEL = 'llama3-70b-8192'
+const GROQ_FALLBACK_MODEL = 'llama-3.1-8b-instant'
+
 const SYSTEM_PROMPT = `You are IntelliX AI, an advanced academic assistant integrated into a coaching management platform.
 
 You assist students, teachers, and admins with highly structured, context-aware, and actionable responses.
@@ -32,22 +41,19 @@ STRICT RULES:
 
 GOAL: Act like a smart academic assistant embedded inside IntelliX, giving precise, structured, and context-aware responses.`;
 
-// Level 5: Response Cleaner
+// Response Cleaner
 const cleanResponse = (text) => {
   if (!text) return "I couldn't generate a response.";
   
   let cleaned = text
-    // Remove excessive markdown symbols
     .replace(/#{1,6}\s/g, '')
     .replace(/\*\*/g, '')
     .replace(/\*/g, '• ')
     .replace(/---/g, '')
     .replace(/```/g, '')
-    // Clean up excessive newlines
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
-  // Limit response length (max ~2000 chars to keep chat readable)
   if (cleaned.length > 2000) {
     cleaned = cleaned.substring(0, 2000) + '\n\n[Response trimmed for readability]';
   }
@@ -55,83 +61,97 @@ const cleanResponse = (text) => {
   return cleaned;
 };
 
-// Level 3 + 4: Context injection + Chat history
-export const sendMessage = async (message, history = [], role = 'student', contextData = {}) => {
+/**
+ * Send a message to the AI engine.
+ * @param {string} message - User query
+ * @param {Array} history - Chat history [{role, text}]
+ * @param {string} role - User role (student/teacher/admin)
+ * @param {Object} contextData - Platform context data
+ * @param {string[]} [contextChunks] - Future RAG chunks
+ * @returns {Promise<string>} Cleaned AI response
+ */
+export const sendMessage = async (message, history = [], role = 'student', contextData = {}, contextChunks = []) => {
   const groqKey = import.meta.env.VITE_GROQ_API_KEY;
-  const geminiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-  if (!groqKey && !geminiKey) {
-    throw new Error("AI credits not configured. Please set API keys in your environment.");
+  if (!groqKey) {
+    throw new Error("AI assistant is not configured. Please set VITE_GROQ_API_KEY in your environment.");
   }
 
-  // Formatting history
-  const formattedHistory = history.map(msg => ({
+  // Build context string
+  let contextStr = `User Role: ${role}\nContext Data: ${JSON.stringify(contextData)}`;
+  
+  // RAG-ready: inject pre-retrieved chunks
+  if (contextChunks.length > 0) {
+    contextStr += `\n\nRELEVANT CONTEXT:\n${contextChunks.join('\n---\n')}`;
+  }
+
+  // Format conversation history (last 10 messages)
+  const formattedHistory = history.slice(-10).map(msg => ({
     role: msg.role === 'ai' ? 'assistant' : 'user',
     content: msg.text
   }));
 
   const messages = [
     { role: "system", content: SYSTEM_PROMPT },
-    { role: "system", content: `User Role: ${role}` },
-    { role: "system", content: `Context Data: ${JSON.stringify(contextData)}` },
+    { role: "system", content: contextStr },
     ...formattedHistory,
     { role: "user", content: message }
   ];
 
-  // Logic: Try Gemini first if available, else Groq
-  if (geminiKey) {
+  // Try primary model, then fallback
+  try {
+    return await callGroq(groqKey, messages, GROQ_MODEL);
+  } catch (primaryErr) {
+    console.warn('Primary model failed, trying fallback:', primaryErr.message);
+    
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ 
-            parts: [{ 
-              text: `${SYSTEM_PROMPT}\n\nUser Role: ${role}\nContext: ${JSON.stringify(contextData)}\n\nQuery: ${message}` 
-            }] 
-          }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        return cleanResponse(raw);
-      }
-    } catch (err) {
-      console.warn("Gemini Chat failed, falling back to Groq:", err);
+      return await callGroq(groqKey, messages, GROQ_FALLBACK_MODEL);
+    } catch (fallbackErr) {
+      console.error('AI Service Error (all models failed):', fallbackErr);
+      throw new Error('AI service is temporarily unavailable. Please try again shortly.');
     }
   }
+};
 
-  // Groq Fallback
+/**
+ * Internal: Call Groq chat completions API.
+ */
+async function callGroq(apiKey, messages, model) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
   try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const response = await fetch(GROQ_API_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${groqKey}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        messages: messages,
-        model: "llama-3.1-8b-instant",
+        messages,
+        model,
         temperature: 0.7,
-        max_tokens: 1024
-      })
+        max_tokens: 1024,
+        top_p: 0.9,
+        stream: false
+      }),
+      signal: controller.signal
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `API Error: ${response.status}`);
+      const msg = errorData.error?.message || `API Error: ${response.status}`;
+      
+      if (response.status === 429) {
+        throw new Error('AI rate limit reached. Please wait a moment and try again.');
+      }
+      throw new Error(msg);
     }
 
     const data = await response.json();
     const rawResponse = data.choices?.[0]?.message?.content || "I couldn't generate a response.";
     return cleanResponse(rawResponse);
-
-  } catch (error) {
-    console.error("AI Service Error:", error);
-    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-};
+}

@@ -153,8 +153,8 @@ const Features = () => {
   const [activeTab, setActiveTab] = useState('Institute')
 
   const tabConfigs = {
-    Institute: { label: 'Institute', color: 'cyan' },
-    Teachers: { label: 'Teachers', color: 'purple' },
+    Institute: { label: 'Institute', color: 'white' },
+    Teachers: { label: 'Teachers', color: 'white' },
     Students: { label: 'Students', color: 'emerald' }
   }
 

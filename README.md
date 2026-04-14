@@ -1,98 +1,200 @@
-# IntelliX – AI-Powered Coaching Institute OS
+IntelliX – AI-Powered Coaching Institute Operating System
 
-**IntelliX** is the comprehensive digital operating system designed specifically for modern coaching institutes. With IntelliX, you can transform your institute with AI-powered automation, intelligent analytics, and seamless real-time management. Run your entire coaching institute like a well-oiled, AI-driven machine.
+IntelliX is a next-generation AI-driven operating system built for modern coaching institutes.
+It transforms traditional institute workflows into a fully automated, data-driven, intelligent ecosystem — enabling real-time management, personalized analytics, and AI-assisted decision making.
 
-## 🚀 Features
+⚡ Built to scale from a single institute to a full SaaS platform.
 
-- **Performant & Modern UI**: Built with React 19 and Tailwind CSS for rapid, scalable client-side rendering.
-- **Engaging Animations**: Bringing the UI to life utilizing Framer Motion.
-- **3D Graphics & Visualizations**: Interactive 3D charts and elements using Three.js, React Three Fiber, and Drei.
-- **Intelligent Data Insights**: Rich, interactive data visualisations powered by Chart.js and React-Chartjs-2.
-- **Robust Backend**: Integrated with Supabase for robust Authentication, Database management, Role-Based Access Control (RBAC), and Data Storage.
-- **Scroll Tracking & UI Polish**: Intersection Observer and React Scroll for scroll-based triggers and deeply immersive navigation.
+🧠 Vision
 
-## 🛠 Tech Stack
+Traditional coaching systems are:
 
-- **Frontend**: React 19, Vite, Tailwind CSS, Headless UI
-- **Animations & Interaction**: Framer Motion, React Intersection Observer, React Scroll
-- **3D Elements**: Three.js, React Three Fiber, React Three Drei
-- **Data Visualization**: Chart.js, React-Chartjs-2
-- **Icons**: Lucide React
-- **Backend & Database**: Supabase (PostgreSQL, Realtime, Auth, Storage)
-- **Deployment & Tooling**: ESLint, Vite
+fragmented ❌
+manual ❌
+inefficient ❌
 
-## 📂 Project Structure
+IntelliX converts them into:
 
-```bash
+Centralized + Automated + AI-Augmented System
+⚙️ Core Capabilities
+🧑‍💼 Admin Control System
+Institute-wide analytics dashboard
+Batch-wise & student-wise drilldowns
+Attendance + test + performance insights
+Real-time monitoring
+👨‍🏫 Teacher System
+Test creation & evaluation
+Batch management
+Student performance tracking
+AI-assisted insights
+👨‍🎓 Student System
+Personalized dashboard
+Test attempts & results
+Leaderboard ranking
+AI doubt-solving assistant (WIP)
+🤖 AI Layer (Next-Gen Feature)
+AI chatbot → evolving into full Doubt Solver
+Image + text input support (OCR pipeline)
+Structured teaching responses (step-by-step)
+Future-ready for RAG (Retrieval Augmented Generation)
+🧩 System Architecture (Current)
+                ┌────────────────────────┐
+                │      Frontend (React)  │
+                │  UI + State + Routing  │
+                └──────────┬─────────────┘
+                           │
+                           ▼
+                ┌────────────────────────┐
+                │   Service Layer        │
+                │ (API + Logic Handling) │
+                └──────────┬─────────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        ▼                  ▼                  ▼
+┌──────────────┐  ┌────────────────┐  ┌────────────────┐
+│  Supabase    │  │   AI Layer     │  │  Realtime Sync │
+│ (PostgreSQL) │  │ (Groq / LLM)   │  │ (WebSockets)   │
+└──────────────┘  └────────────────┘  └────────────────┘
+        │
+        ▼
+┌────────────────────────────┐
+│ Auth + RBAC + Storage      │
+└────────────────────────────┘
+🧠 AI Doubt Solver Flow (Upcoming Core Feature)
+User (Image / Text)
+        ↓
+Image Crop Tool (Frontend)
+        ↓
+OCR (Text Extraction)
+        ↓
+LLM (Groq / AI)
+        ↓
+Structured Answer (Teacher Style)
+        ↓
+Chat Interface
+🛠 Tech Stack
+🎨 Frontend
+React 19
+Vite
+Tailwind CSS
+Headless UI
+⚡ Interaction & Animations
+Framer Motion
+Intersection Observer
+React Scroll
+📊 Visualization
+Chart.js
+React-Chartjs-2
+🧠 AI / Future ML Stack
+Groq API (LLM)
+OCR (Tesseract.js – planned)
+RAG (planned: pgvector / Pinecone)
+🗄 Backend & Infra
+Supabase
+PostgreSQL
+Auth
+Realtime
+Storage
+RBAC
+📂 Project Structure
 📦 INTELLI-X
- ┣ 📂 public/          # Static assets including favicons and logos
- ┣ 📂 scripts/         # Utility and tool scripts
- ┣ 📂 src/             # Source code
- ┃ ┣ 📂 animations/    # Framer Motion animation configurations
- ┃ ┣ 📂 assets/        # Project images, fonts, media
- ┃ ┣ 📂 components/    # Reusable React UI Components
- ┃ ┣ 📂 config/        # Environment and project configuration files
- ┃ ┣ 📂 context/       # React Context Providers for global state
- ┃ ┣ 📂 lib/           # Utility functions and library helpers
- ┃ ┣ 📂 pages/         # Full-page components mapping to Routes
- ┃ ┣ 📂 sections/      # Distinct page sections (e.g., Hero, Footer)
- ┃ ┣ 📂 services/      # External API & Backend integrations (Supabase services)
- ┃ ┣ 📜 App.jsx        # Main App component with Routing
- ┃ ┣ 📜 main.jsx       # Entry point for React DOM
- ┃ ┗ 📜 index.css      # Core standard CSS, Tailwind directives
- ┣ 📜 *.sql            # Supabase database migration and configuration files
- ┣ 📜 index.html       # Vite HTML Entry Point
- ┣ 📜 package.json     # Node Dependencies & Scripts
- ┣ 📜 vite.config.js   # Vite module bundler configuration
- ┗ 📜 tailwind.config.js # Tailwind CSS configuration
-```
+ ┣ 📂 public/
+ ┣ 📂 scripts/
+ ┣ 📂 src/
+ ┃ ┣ 📂 animations/
+ ┃ ┣ 📂 assets/
+ ┃ ┣ 📂 components/
+ ┃ ┃ ┣ 📂 dashboard/
+ ┃ ┃ ┣ 📂 teacher/
+ ┃ ┃ ┣ 📂 profile/
+ ┃ ┃ ┗ 📂 ui/
+ ┃ ┣ 📂 config/
+ ┃ ┣ 📂 context/
+ ┃ ┣ 📂 lib/
+ ┃ ┣ 📂 pages/
+ ┃ ┃ ┗ 📂 dashboard/
+ ┃ ┣ 📂 sections/
+ ┃ ┣ 📂 services/
+ ┃ ┣ 📜 App.jsx
+ ┃ ┣ 📜 main.jsx
+ ┃ ┗ 📜 index.css
+ ┣ 📂 supabase/
+ ┃ ┗ 📂 migrations/
+ ┣ 📜 package.json
+ ┣ 📜 vite.config.js
+ ┗ 📜 tailwind.config.js
+🔐 Database Architecture (Simplified)
+Users
+ ├── role (admin / teacher / student)
+ ├── institute_id
 
-## 💻 Getting Started
+Institutes
+Batches
+Students
+Teachers
+Tests
+Test_Attempts
+Attendance
+Results
+Leaderboard
+Materials
+⚡ Key Engineering Highlights
+🔒 Strict RBAC (Role-Based Access Control)
+⚡ Real-time updates using Supabase subscriptions
+🧠 Optimized batch-wise analytics (no N+1 queries)
+🛡 Crash-safe UI with null-safe rendering
+🔄 Modular service architecture
+🚀 SaaS-ready multi-institute design
+💻 Getting Started
+Prerequisites
+Node.js (v18+)
+npm
+Installation
+git clone https://github.com/your-username/INTELLI-X-master.git
+cd INTELLI-X-master
+npm install
+Environment Setup
+VITE_SUPABASE_URL=your-url
+VITE_SUPABASE_ANON_KEY=your-key
+VITE_GROQ_API_KEY=your-ai-key
+Run Dev Server
+npm run dev
+Build
+npm run build
+🧪 Current Status
+✔ Admin Dashboard (Functional)
+✔ Batch & Student Management
+✔ Analytics System (Drilldown Enabled)
+✔ Auth + RBAC
+✔ UI System (Refined Minimal Theme)
 
-### Prerequisites
+🚧 AI Doubt Solver (MVP in progress)
+🚧 Test Creation Engine (Upcoming Core)
+🚧 RAG-based Learning System
+🚀 Roadmap
+Phase 1 (Current)
+Admin + Teacher + Student system
+Analytics + dashboards
+Core UI/UX
+Phase 2
+AI doubt solver (image + text)
+Test creation engine
+Performance insights AI
+Phase 3
+RAG-based intelligent learning
+SaaS multi-institute scaling
+Advanced analytics + predictions
+🧠 Philosophy
 
-Ensure you have **Node.js** (v18+ recommended) and `npm` installed.
+“The best systems are not managed — they are engineered.”
 
-### Installation
+IntelliX is not just software.
+It is an operating system for education.
 
-1. **Clone the repository** (if pushed to remote):
-   ```bash
-   git clone https://github.com/your-username/INTELLI-X-master.git
-   cd INTELLI-X-master
-   ```
+🤝 Contributing
 
-2. **Install the dependencies**:
-   ```bash
-   npm install
-   ```
+Currently under active development. Contributions will be opened soon.
 
-3. **Configure Environment Variables**:
-   Create a `.env` file referencing `.env.example` in the root and add your Supabase credentials and other configuration keys:
-   ```env
-   VITE_SUPABASE_URL=your-supabase-url
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
+📜 License
 
-4. **Start the Development Server**:
-   ```bash
-   npm run dev
-   ```
-
-5. **Build for Production**:
-   ```bash
-   npm run build
-   ```
-
-## 🗄️ Database Set Up (Supabase)
-
-You can run the existing SQL scripts directly in the Supabase shell to scaffold the DB schema and RLS policies:
-- `supabase_rbac_setup.sql` — Injects RBAC (Role-Based Access Control) setup
-- `supabase_add_phone_selfregister.sql` / `supabase_fix_student_selfregister.sql` — Handles authentication forms/profiles
-- `supabase_saas_migration.sql` — Main structural application setups
-
-## 🛡️ Linting
-
-We maintain code quality using ESLint. Check code health by running:
-```bash
-npm run lint
-```
+Private project (for now)

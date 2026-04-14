@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, FileText, Trash2, Search, ListOrdered, Sparkles, Brain, Clock, CheckCircle2, FileDown, AlertTriangle } from 'lucide-react'
+import { Plus, FileText, Trash2, Search, ListOrdered, Sparkles, Brain, Clock, CheckCircle2, FileDown, AlertTriangle, Trophy, BarChart3, ChevronLeft, Play, Lock } from 'lucide-react'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import DataTable from '../../components/ui/DataTable'
@@ -18,7 +18,11 @@ import AITestCreatorModal from '../../components/teacher/AITestCreatorModal'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { TableSkeleton } from '../../components/ui/Skeletons'
 
-const TestsPage = () => {
+import ResultsPage from './ResultsPage'
+import LeaderboardPage from './LeaderboardPage'
+import ActiveTestsPage from './ActiveTestsPage'
+
+const TestManagement = () => {
   const { user, role } = useAuth()
   const { isDark } = useTheme()
   const { data: testsData, loading: testsLoading, refetch: refetchTests } = useAppQuery(`tests-${role}-${user?.id}`, async () => {
@@ -706,6 +710,54 @@ const TestsPage = () => {
           </div>
         </div>
       </Modal>
+    </div>
+  )
+}
+
+const TestsPage = () => {
+  const { role } = useAuth()
+  const [activeTab, setActiveTab] = useState('tests')
+
+  const tabs = [
+    { id: 'tests', label: 'All Tests', icon: FileText, roles: ['admin', 'teacher', 'master_admin'] },
+    { id: 'active', label: 'Active Tests', icon: Sparkles, roles: ['student'] },
+    { id: 'results', label: 'Results', icon: BarChart3, roles: ['admin', 'teacher', 'student', 'master_admin'] },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, roles: ['admin', 'teacher', 'student', 'master_admin'] },
+  ].filter(t => t.roles.includes(role))
+
+  return (
+    <div className="space-y-6">
+      <div className="flex border-b border-[var(--border-subtle)] gap-8 mb-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`pb-4 text-sm font-bold transition-all relative ${
+              activeTab === tab.id 
+                ? 'text-[var(--text-primary)]' 
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </div>
+            {activeTab === tab.id && (
+              <motion.div 
+                layoutId="activeTabTest"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-white"
+              />
+            )}
+          </button>
+        ))}
+      </div>
+
+      <div className="pt-2">
+        {activeTab === 'tests' && <TestManagement />}
+        {activeTab === 'active' && <ActiveTestsPage hideHeader={true} />}
+        {activeTab === 'results' && <ResultsPage hideHeader={true} />}
+        {activeTab === 'leaderboard' && <LeaderboardPage hideHeader={true} />}
+      </div>
     </div>
   )
 }

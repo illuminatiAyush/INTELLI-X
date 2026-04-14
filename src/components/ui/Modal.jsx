@@ -37,7 +37,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
               <h2 className="text-lg font-bold text-[var(--text-primary)]">{title}</h2>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-[var(--color-purple)]/10 text-[var(--text-secondary)] hover:text-[var(--color-purple)] transition-all"
+                className="p-1.5 rounded-lg hover:bg-white/10 text-[var(--text-secondary)] hover:text-white transition-all"
               >
                 <X className="w-5 h-5" />
               </button>

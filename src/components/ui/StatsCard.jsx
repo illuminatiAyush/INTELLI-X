@@ -1,18 +1,15 @@
 import { motion } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
 
-const StatsCard = ({ title, value, icon: Icon, trend, color = 'purple' }) => {
+const StatsCard = ({ title, value, icon: Icon, trend, color = 'white' }) => {
   const { isDark } = useTheme()
   const getColors = (c) => {
     switch (c) {
       case 'emerald': return 'text-emerald-500 border-emerald-500/20 shadow-emerald-500/10';
       case 'green': return 'text-emerald-500 border-emerald-500/20 shadow-emerald-500/10';
-      case 'cyan': return 'text-cyan-500 border-cyan-500/20 shadow-cyan-500/10';
-      case 'violet': return 'text-violet-500 border-violet-500/20 shadow-violet-500/10';
-      case 'purple': return 'text-purple-500 border-purple-500/20 shadow-purple-500/10';
       case 'amber': return 'text-amber-500 border-amber-500/20 shadow-amber-500/10';
       case 'rose': return 'text-rose-500 border-rose-500/20 shadow-rose-500/10';
-      case 'blue': return 'text-blue-500 border-blue-500/20 shadow-blue-500/10';
+      case 'white': return 'text-white border-white/20 shadow-white/10';
       default: return 'text-[var(--text-primary)] border-[var(--text-primary)]/20 shadow-[var(--text-primary)]/5';
     }
   };

@@ -135,15 +135,15 @@ const ScrollStory = () => {
               className="order-2 md:order-1 relative"
             >
               {/* Futuristic dashboard mockup */}
-              <div className={`rounded-2xl border overflow-hidden ${isDark ? 'bg-[#0d0d14] border-purple-500/20' : 'bg-white border-purple-200 shadow-xl'}`}>
+              <div className={`rounded-2xl border overflow-hidden ${isDark ? 'bg-[#0d0d14] border-white/10' : 'bg-white border-gray-200 shadow-xl'}`}>
                 <div className={`flex items-center gap-3 px-4 py-3 border-b ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
                   <div className="w-2 h-2 rounded-full bg-white/40 animate-pulse" />
                   <span className={`text-[10px] font-bold uppercase tracking-tight ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>IntelliX AI Dashboard — Live</span>
                 </div>
                 <div className="p-4 grid grid-cols-3 gap-3">
                   {[
-                    { label: 'Students', value: '1,248', color: 'from-purple-500 to-blue-500', up: true },
-                    { label: 'Attendance', value: '94.2%', color: 'from-cyan-500 to-blue-500', up: true },
+                    { label: 'Students', value: '1,248', color: 'from-white/10 to-white/5', up: true },
+                    { label: 'Attendance', value: '94.2%', color: 'from-white/10 to-white/5', up: true },
                     { label: 'Revenue', value: '₹14.2L', color: 'from-green-500 to-emerald-500', up: true },
                   ].map(({ label, value, color, up }, i) => (
                     <motion.div

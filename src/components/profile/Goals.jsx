@@ -65,7 +65,7 @@ const Goals = ({ currentStats }) => {
       className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
     >
       <div className="flex items-center gap-2 mb-5">
-        <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-500">
+        <div className="p-2 rounded-lg bg-white/10 text-white">
           <Target className="w-5 h-5" />
         </div>
         <h3 className="text-lg font-bold text-[var(--text-primary)]">Personal Goals</h3>

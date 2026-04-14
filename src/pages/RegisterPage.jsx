@@ -51,7 +51,7 @@ const RegisterPage = () => {
       const { data: institute, error: instError } = await supabase
         .rpc('get_institute_by_code', { code: form.instituteCode.toUpperCase() })
         .single()
-        
+
       if (instError || !institute) {
         setErrors({ instituteCode: 'Invalid Institute Code.' })
         setLoading(false)
@@ -74,13 +74,13 @@ const RegisterPage = () => {
       })
 
       if (authError) {
-        setErrors({ email: authError.message }) 
+        setErrors({ email: authError.message })
         setLoading(false)
         return
       }
 
       setSubmitted(true)
-      
+
       // Auto redirect to login after 2 seconds
       setTimeout(() => {
         navigate('/login', { replace: true })
@@ -137,7 +137,7 @@ const RegisterPage = () => {
           className="text-center mb-8"
         >
           <Link to="/" className="inline-flex items-center gap-2 group mb-4">
-            <img src="/intellix-icon.svg" alt="IntelliX Logo" className="w-10 h-10" />
+            <img src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"} alt="IntelliX Logo" className="w-10 h-10" />
             <span className={`text-2xl font-bold ${headingColor}`}>
               IntelliX
             </span>
@@ -181,7 +181,7 @@ const RegisterPage = () => {
 
               {/* Form */}
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                
+
                 {/* Role Switcher (Matched styling) */}
                 <div className={`p-1 border rounded-xl flex gap-1 relative ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-200'}`}>
                   <button
@@ -198,7 +198,7 @@ const RegisterPage = () => {
                   >
                     <Briefcase className="w-4 h-4" /> Teacher
                   </button>
-                  
+
                   {/* Highlight background */}
                   <motion.div
                     className="absolute top-1 bottom-1 w-[calc(50%-6px)] bg-white rounded-lg -z-0"
@@ -227,9 +227,9 @@ const RegisterPage = () => {
                           value={form.subject}
                           onChange={handleChange}
                           placeholder="Subject you teach (e.g. Mathematics) *"
-                          className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${ isDark ? 'bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-white/50'
-                              : 'bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-400 focus:border-gray-400'
-                          } ${errors.subject ? 'border-red-500/60 focus:border-red-500' : ''}`}
+                          className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 ${isDark ? 'bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-white/50'
+                            : 'bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-400 focus:border-gray-400'
+                            } ${errors.subject ? 'border-red-500/60 focus:border-red-500' : ''}`}
                         />
                       </div>
                       {errors.subject && (
@@ -251,9 +251,9 @@ const RegisterPage = () => {
                       value={form.instituteCode}
                       onChange={handleChange}
                       placeholder="Institute Join Code (e.g. A9B2X)"
-                      className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 uppercase tracking-widest font-bold ${ isDark ? 'bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-white/50' 
-                          : 'bg-gray-50 border-gray-200 text-gray-700 placeholder-gray-400 focus:border-gray-400'
-                      } ${errors.instituteCode ? 'border-red-500/60 focus:border-red-500' : ''}`}
+                      className={`w-full pl-10 pr-4 py-3.5 rounded-xl border text-sm outline-none transition-all duration-200 uppercase tracking-widest font-bold ${isDark ? 'bg-white/5 border-white/10 text-white placeholder-white/30 focus:border-white/50'
+                        : 'bg-gray-50 border-gray-200 text-gray-700 placeholder-gray-400 focus:border-gray-400'
+                        } ${errors.instituteCode ? 'border-red-500/60 focus:border-red-500' : ''}`}
                     />
                   </div>
                   {errors.instituteCode && (

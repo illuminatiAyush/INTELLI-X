@@ -1,67 +1,50 @@
 import {
   LayoutDashboard,
   Users,
-  Layers,
-  ClipboardCheck,
   FileText,
-  Trophy,
   BookOpen,
-  BarChart3,
-  Settings,
-  CreditCard,
   PieChart,
-  User,
-  Activity,
-  Sparkles,
-  PlusCircle
+  Settings,
+  Layers,
+  HelpCircle
 } from 'lucide-react'
 
 const navConfig = {
   master_admin: [
-    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, color: 'text-gray-400', bg: 'bg-gray-500/10' },
-    { label: 'Institutes', path: '/dashboard/institutes', icon: Layers, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-    { label: 'Teachers', path: '/dashboard/teachers', icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { label: 'Students', path: '/dashboard/students', icon: Users, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-    { label: 'Batches', path: '/dashboard/batches', icon: Layers, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-    { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { label: 'System Analytics', path: '/dashboard/analytics', icon: Activity, color: 'text-pink-400', bg: 'bg-pink-500/10' },
-    { label: 'Subscriptions', path: '/dashboard/subscriptions', icon: CreditCard, color: 'text-violet-400', bg: 'bg-violet-500/10' },
-    { label: 'Settings', path: '/dashboard/settings', icon: Settings, color: 'text-slate-400', bg: 'bg-slate-500/10' },
-    { label: 'System Logs', path: '/dashboard/logs', icon: FileText, color: 'text-orange-400', bg: 'bg-orange-500/10' },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers }, // Includes Institutes, Teachers, Students, Attendance
+    { label: 'Tests', path: '/dashboard/tests', icon: FileText },
+    { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart },
+    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
+
+    { label: 'Settings', path: '/dashboard/settings', icon: Settings }, // Includes Logs, Subscriptions
   ],
   admin: [
-    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, color: 'text-gray-400', bg: 'bg-gray-500/10' },
-    { label: 'Teachers', path: '/dashboard/teachers', icon: Users, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { label: 'Students', path: '/dashboard/students', icon: Users, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-    { label: 'Batches', path: '/dashboard/batches', icon: Layers, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-    { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { label: 'Tests', path: '/dashboard/tests', icon: FileText, color: 'text-rose-400', bg: 'bg-rose-500/10' },
-    { label: 'Results', path: '/dashboard/results', icon: BarChart3, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen, color: 'text-teal-400', bg: 'bg-teal-500/10' },
-    { label: 'Leaderboard', path: '/dashboard/leaderboard', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-    { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
-    { label: 'Settings', path: '/dashboard/settings', icon: Settings, color: 'text-slate-400', bg: 'bg-slate-500/10' },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers }, // Hub for Students, Teachers, Attendance
+    { label: 'Tests', path: '/dashboard/tests', icon: FileText }, // Hub for Results, Leaderboard
+    { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart },
+    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
+
+    { label: 'Settings', path: '/dashboard/settings', icon: Settings },
   ],
   teacher: [
-    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, color: 'text-gray-400', bg: 'bg-gray-500/10' },
-    { label: 'Students', path: '/dashboard/students', icon: Users, color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-    { label: 'Batches', path: '/dashboard/batches', icon: Layers, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-    { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { label: 'Tests', path: '/dashboard/tests', icon: FileText, color: 'text-rose-400', bg: 'bg-rose-500/10' },
-    { label: 'Results', path: '/dashboard/results', icon: BarChart3, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen, color: 'text-teal-400', bg: 'bg-teal-500/10' },
-    { label: 'Leaderboard', path: '/dashboard/leaderboard', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-    { label: 'Profile', path: '/dashboard/profile', icon: User, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers },
+    { label: 'Tests', path: '/dashboard/tests', icon: FileText },
+    { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart },
+    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
+
+    { label: 'Settings', path: '/dashboard/profile', icon: Settings },
   ],
   student: [
-    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, color: 'text-gray-400', bg: 'bg-gray-500/10' },
-    { label: 'Join Batch', path: '/dashboard/join', icon: PlusCircle, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    { label: 'AI Tests', path: '/dashboard/active-tests', icon: Sparkles, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-    { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-    { label: 'Results', path: '/dashboard/results', icon: BarChart3, color: 'text-amber-400', bg: 'bg-amber-500/10' },
-    { label: 'Leaderboard', path: '/dashboard/leaderboard', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen, color: 'text-teal-400', bg: 'bg-teal-500/10' },
-    { label: 'Profile', path: '/dashboard/profile', icon: User, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers }, // Hub for "Join Batch" & My Batches
+    { label: 'Tests', path: '/dashboard/tests', icon: FileText }, // Hub for "Active Tests", Results, Leaderboard
+    { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart },
+    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
+
+    { label: 'Settings', path: '/dashboard/profile', icon: Settings },
   ],
 }
 

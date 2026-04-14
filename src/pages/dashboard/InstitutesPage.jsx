@@ -147,7 +147,7 @@ const InstitutesPage = () => {
               placeholder="Search institutes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-cyan-500/40 transition-all text-sm font-medium`}
+              className={`w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-white/40 transition-all text-sm font-medium`}
             />
           </div>
         </div>

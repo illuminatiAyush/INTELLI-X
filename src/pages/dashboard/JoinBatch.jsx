@@ -5,7 +5,7 @@ import { CheckCircle, AlertCircle, ArrowRight, BookOpen } from 'lucide-react'
 import { joinBatch } from '../../services/batchService'
 import { useAuth } from '../../context/AuthContext'
 
-const JoinBatch = () => {
+const JoinBatch = ({ hideHeader = false }) => {
   const { code } = useParams()
   const navigate = useNavigate()
   const { profile, role } = useAuth()
@@ -61,7 +61,7 @@ const JoinBatch = () => {
   if (role !== 'student') return null
 
   return (
-    <div className="max-w-md mx-auto mt-12">
+    <div className={hideHeader ? "w-full" : "max-w-md mx-auto mt-12"}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

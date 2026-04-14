@@ -16,12 +16,21 @@ const AnalyticsPage = () => {
     const { data: batches } = await supabase.from('batches').select('id, name, subject')
     // Fetch all attendance records
     const { data: attendance } = await supabase.from('attendance').select('batch_id, status')
-    // Fetch all results with test info
-    const { data: results } = await supabase.from('results').select('student_id, marks, tests(total_marks, batch_id)')
+    // Fetch all results with test and student info
+    const { data: results } = await supabase
+      .from('results')
+      .select(`
+        student_id, 
+        marks, 
+        tests(total_marks, batch_id),
+        students(id, name, full_name)
+      `)
+    
     // Fetch all student to batch mappings
     const { data: batch_students } = await supabase.from('batch_students').select('student_id, batch_id')
-    // Fetch students
-    const { data: students } = await supabase.from('students').select('id, name')
+    
+    // Fetch students list for overall count (can be used to verify data)
+    const { data: students } = await supabase.from('students').select('id, name, full_name')
     // Fetch test count
     const { count: testCount } = await supabase.from('tests').select('id', { count: 'exact', head: true })
 
@@ -42,16 +51,34 @@ const AnalyticsPage = () => {
     })
 
     const studentScores = {}
-    resultsList.forEach(r => {
-      if (!studentScores[r.student_id]) studentScores[r.student_id] = { totalMarks: 0, totalPossible: 0, count: 0 }
+    resultsList.forEach((r, i) => {
+      // DEBUG SAFETY
+      if (i === 0) console.log('Analytics Result Sample:', r);
+      
+      if (!studentScores[r.student_id]) {
+        studentScores[r.student_id] = { 
+          totalMarks: 0, 
+          totalPossible: 0, 
+          count: 0,
+          student: r.students // Store joined student info
+        }
+      }
       studentScores[r.student_id].totalMarks += r.marks
       studentScores[r.student_id].totalPossible += (r.tests?.total_marks || 100)
       studentScores[r.student_id].count += 1
     })
 
     const scoredStudents = Object.entries(studentScores).map(([sid, s]) => {
-      const student = studentList.find(st => st.id === sid)
-      return { id: sid, name: student?.name || 'Unknown', percentage: s.totalPossible ? ((s.totalMarks / s.totalPossible) * 100).toFixed(1) : 0, testsAttempted: s.count }
+      // Find fallback from studentList if joined students is missing (should not happen with inner join but for safety)
+      const student = s.student || studentList.find(st => st.id === sid)
+      const studentName = student?.full_name || student?.name || "Unknown";
+      
+      return { 
+        id: sid, 
+        name: studentName, 
+        percentage: s.totalPossible ? ((s.totalMarks / s.totalPossible) * 100).toFixed(1) : 0, 
+        testsAttempted: s.count 
+      }
     }).sort((a, b) => b.percentage - a.percentage)
 
     const totalAttendance = attendanceList.length

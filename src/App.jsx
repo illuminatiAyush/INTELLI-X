@@ -113,6 +113,7 @@ const AppContent = () => {
         <Route path="join/:code" element={<ProtectedRoute allowedRoles={['student']}><JoinBatch /></ProtectedRoute>} />
         <Route path="active-tests" element={<ProtectedRoute allowedRoles={['student']}><ActiveTestsPage /></ProtectedRoute>} />
         <Route path="test-attempt/:testId" element={<ProtectedRoute allowedRoles={['student']}><TestAttemptPage /></ProtectedRoute>} />
+
       </Route>
       <Route path="/join/:code" element={<JoinRedirect />} />
       {/* Fallback route - unknown routes go to index or login */}

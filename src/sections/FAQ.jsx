@@ -37,7 +37,7 @@ const faqData = [
   }
 ]
 
-const FAQItem = ({ question, answer, isOpen, onClick }) => {
+const FAQItem = ({ question, answer, isOpen, onClick, color }) => {
   const { isDark } = useTheme()
 
   return (
@@ -108,8 +108,8 @@ const FAQ = () => {
       {/* Dynamic Background Glows for Dark Mode */}
       {isDark && (
         <>
-          <div className="absolute top-1/4 -left-20 w-[45rem] h-[45rem] bg-indigo-500/[0.08] rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute bottom-1/4 -right-20 w-[45rem] h-[45rem] bg-blue-500/[0.08] rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-1/4 -left-20 w-[45rem] h-[45rem] bg-white/[0.02] rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute bottom-1/4 -right-20 w-[45rem] h-[45rem] bg-white/[0.02] rounded-full blur-[120px] pointer-events-none" />
         </>
       )}
 
@@ -133,7 +133,7 @@ const FAQ = () => {
 
         <div className="grid md:grid-cols-2 gap-4">
           {faqData.map((item, index) => {
-            const colors = ['indigo', 'rose', 'amber', 'emerald', 'purple', 'cyan']
+            const colors = ['gray', 'gray', 'gray', 'gray', 'gray', 'gray']
             const color = colors[index % colors.length]
             return (
               <FAQItem

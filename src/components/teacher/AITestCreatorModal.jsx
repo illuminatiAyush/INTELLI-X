@@ -417,7 +417,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                       className="w-full px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-white/30 transition-all resize-none"
                     />
                     <div className="absolute right-3 bottom-3">
-                      <Sparkles className="w-4 h-4 text-purple-400/50" />
+                      <Sparkles className="w-4 h-4 text-white/50" />
                     </div>
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] mt-1.5">
@@ -505,7 +505,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                     <motion.div 
                       animate={{ y: [-40, 40] }}
                       transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-                      className="absolute inset-x-0 h-px bg-white/30 shadow-[0_0_10px_white]"
+                      className="absolute inset-x-0 h-px bg-white/30"
                     />
                   </div>
                 </div>
@@ -564,7 +564,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                               onChange={(e) => updateQuestion(qIdx, 'question', e.target.value)}
                               onClick={(e) => e.stopPropagation()}
                               rows={2}
-                              className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-purple-500/50 resize-none"
+                              className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-white/30 resize-none"
                             />
                           ) : (
                             <p className="text-sm font-medium text-[var(--text-primary)] leading-relaxed">{q.question}</p>
@@ -608,7 +608,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                                       value={opt}
                                       onChange={(e) => updateOption(qIdx, oIdx, e.target.value)}
                                       className={`flex-1 px-3 py-2 rounded-lg border text-sm outline-none transition-all ${ isCorrect ? 'bg-green-500/5 border-green-500/20 text-green-400 focus:border-green-500/40'
-                                          : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)] focus:border-purple-500/50'
+                                          : 'bg-[var(--bg-app)] border-[var(--border-subtle)] text-[var(--text-primary)] focus:border-white/30'
                                       }`}
                                     />
                                   </div>

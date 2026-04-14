@@ -38,7 +38,7 @@ const DataTable = ({ columns, data, onRowClick, emptyMessage = 'No data found' }
                 <div className="flex items-center gap-1.5">
                   {col.label}
                   {sortKey === col.key && (
-                    <div className="text-[var(--color-purple)]">
+                    <div className="text-white">
                       {sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                     </div>
                   )}
@@ -62,7 +62,7 @@ const DataTable = ({ columns, data, onRowClick, emptyMessage = 'No data found' }
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
                 onClick={() => onRowClick?.(row)}
-                className={`border-b border-[var(--border-subtle)]/50 ${onRowClick ? 'cursor-pointer hover:bg-[var(--color-purple)]/5' : ''} transition-colors last:border-0`}
+                className={`border-b border-[var(--border-subtle)]/50 ${onRowClick ? 'cursor-pointer hover:bg-white/5' : ''} transition-colors last:border-0`}
               >
                 {columns.map((col) => (
                   <td key={col.key} className="px-5 py-4 text-[var(--text-primary)] font-medium">

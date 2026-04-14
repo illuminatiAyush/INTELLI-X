@@ -86,7 +86,7 @@ const ChangePassword = () => {
                 value={form[f.key]}
                 onChange={(e) => handleChange(f.key, e.target.value)}
                 placeholder={f.placeholder}
-                className="w-full px-4 py-3 pr-11 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-medium placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-all"
+                className="w-full px-4 py-3 pr-11 rounded-xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-medium placeholder:text-[var(--text-secondary)]/50 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all"
               />
               <button
                 type="button"

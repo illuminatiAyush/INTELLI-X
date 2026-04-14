@@ -101,9 +101,9 @@ const AdminDashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Total Students" value={stats.students} icon={Users} color="purple" />
-        <StatsCard title="Total Batches" value={stats.batches} icon={Layers} color="blue" />
-        <StatsCard title="Tests Conducted" value={stats.tests} icon={FileText} color="cyan" />
+        <StatsCard title="Total Students" value={stats.students} icon={Users} color="white" />
+        <StatsCard title="Total Subjects" value={stats.batches} icon={Layers} color="white" />
+        <StatsCard title="Tests Conducted" value={stats.tests} icon={FileText} color="white" />
         <StatsCard title="Attendance Rate" value={`${stats.attendance}%`} icon={ClipboardCheck} color="green" />
       </div>
 

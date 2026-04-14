@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import { Plus, Search, Edit2, Trash2, Mail, BookOpen, Phone, Users } from 'lucide-react'
+import { Plus, Search, Pencil, Trash2, Mail, BookOpen, Phone, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
 import { createPortal } from 'react-dom'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { TableSkeleton } from '../../components/ui/Skeletons'
 
-const TeachersPage = () => {
+const TeachersPage = ({ hideHeader = false }) => {
   const { isDark } = useTheme()
   const { user, profile } = useAuth()
   const { data: teachersData, loading: teachersLoading, refetch: refetchTeachers } = useAppQuery('teachers-list', async () => {
@@ -134,31 +134,33 @@ const TeachersPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-500 border border-cyan-500/20 shadow-sm shadow-cyan-500/5">
-            <Users className="w-6 h-6" />
+      {!hideHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white border border-white/20 shadow-sm shadow-white/5">
+              <Users className="w-6 h-6" />
+            </div>
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+              >
+                Teachers
+              </motion.h1>
+              <p className="text-[var(--text-secondary)] mt-1 font-medium">Manage and organize teaching staff</p>
+            </div>
           </div>
-          <div>
-            <motion.h1
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-            >
-              Teachers
-            </motion.h1>
-            <p className="text-[var(--text-secondary)] mt-1 font-medium">Manage and organize teaching staff</p>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => { setEditingTeacher(null); setFormData({ name: '', email: '', password: '', subject: '', phone: '' }); setShowModal(true); }}
+            className="flex items-center px-5 py-2.5 bg-white text-black rounded-xl hover:bg-gray-200 transition-all font-bold shadow-lg"
+          >
+            <Plus className="w-5 h-5 mr-2" /> Add Teacher
+          </motion.button>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => { setEditingTeacher(null); setFormData({ name: '', email: '', password: '', subject: '', phone: '' }); setShowModal(true); }}
-          className="flex items-center px-5 py-2.5 bg-white text-black rounded-xl hover:bg-gray-200 transition-all font-bold shadow-lg"
-        >
-          <Plus className="w-5 h-5 mr-2" /> Add Teacher
-        </motion.button>
-      </div>
+      )}
 
       <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
         <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-[var(--bg-app)]/50">
@@ -169,7 +171,7 @@ const TeachersPage = () => {
               placeholder="Search teachers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-cyan-500/40 transition-all text-sm font-medium`}
+              className={`w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-white/40 transition-all text-sm font-medium`}
             />
           </div>
         </div>
@@ -218,7 +220,7 @@ const TeachersPage = () => {
                       onClick={() => handleOpenEdit(teacher)}
                       className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
                     >
-                      <Edit2 className="w-4 h-4 inline" />
+                      <Pencil className="w-4 h-4 inline" />
                     </button>
                     <button 
                       onClick={() => handleDelete(teacher.id)}

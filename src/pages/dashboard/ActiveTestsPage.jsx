@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { CardSkeleton } from '../../components/ui/Skeletons'
 
-const ActiveTestsPage = () => {
+const ActiveTestsPage = ({ hideHeader = false }) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [tab, setTab] = useState('active')
@@ -226,19 +226,21 @@ const ActiveTestsPage = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <motion.h1
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-3xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-3"
-        >
-          <Sparkles className="w-7 h-7 text-white" />
-          AI Tests
-        </motion.h1>
-        <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
-          Attempt AI-generated tests from your classes
-        </p>
-      </div>
+      {!hideHeader && (
+        <div>
+          <motion.h1
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-3"
+          >
+            <Sparkles className="w-7 h-7 text-white" />
+            AI Tests
+          </motion.h1>
+          <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
+            Attempt AI-generated tests from your classes
+          </p>
+        </div>
+      )}
 
       {/* 1. ACTIVE SECTION */}
       <section>

@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { CardSkeleton } from '../../components/ui/Skeletons'
 
-const LeaderboardPage = () => {
+const LeaderboardPage = ({ hideHeader = false }) => {
   const { user, role } = useAuth()
   const { data: initialData, loading: initialLoading } = useAppQuery(`leaderboard-init-${role}-${user?.id}`, async () => {
     if (!user) return { batches: [] }
@@ -74,7 +74,7 @@ const LeaderboardPage = () => {
         .select(`
           student_id, 
           marks, 
-          students!inner(name, email), 
+          students!inner(name, full_name, email), 
           tests!inner(total_marks)
         `)
         .eq('test_id', selectedTest)
@@ -83,14 +83,21 @@ const LeaderboardPage = () => {
 
       // PART 3: SORT LEADERBOARD by marks DESC
       const sorted = (data || [])
-        .map((r) => ({
-          student_id: r.student_id,
-          name: r.students?.name || 'Unknown',
-          email: r.students?.email,
-          totalMarks: r.marks,
-          totalPossible: r.tests?.total_marks || 100,
-          percentage: r.tests?.total_marks ? ((r.marks / r.tests.total_marks) * 100).toFixed(1) : 0
-        }))
+        .map((r, i) => {
+          // DEBUG SAFETY
+          if (i === 0) console.log('Leaderboard Result Sample:', r);
+
+          const studentName = r.students?.full_name || r.students?.name || 'Unknown';
+
+          return {
+            student_id: r.student_id,
+            name: studentName,
+            email: r.students?.email,
+            totalMarks: r.marks,
+            totalPossible: r.tests?.total_marks || 100,
+            percentage: r.tests?.total_marks ? ((r.marks / r.tests.total_marks) * 100).toFixed(1) : 0
+          }
+        })
         .sort((a, b) => b.totalMarks - a.totalMarks)
         // PART 4: RANK CALCULATION
         .map((s, i) => ({ ...s, rank: i + 1 }))
@@ -155,31 +162,33 @@ const LeaderboardPage = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20 shadow-sm shadow-gold-500/5">
-            <Trophy className="w-6 h-6" />
+      {!hideHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20 shadow-sm shadow-gold-500/5">
+              <Trophy className="w-6 h-6" />
+            </div>
+            <div>
+              <motion.h1 
+                initial={{ opacity: 0, x: -10 }} 
+                animate={{ opacity: 1, x: 0 }} 
+                className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
+              >
+                Leaderboard
+              </motion.h1>
+              <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">Batch rankings and top performers • Updates in real-time</p>
+            </div>
           </div>
-          <div>
-            <motion.h1 
-              initial={{ opacity: 0, x: -10 }} 
-              animate={{ opacity: 1, x: 0 }} 
-              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-            >
-              Leaderboard
-            </motion.h1>
-            <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">Batch rankings and top performers • Updates in real-time</p>
-          </div>
+          <button
+            onClick={fetchLeaderboard}
+            disabled={refreshing || !selectedTest}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition-all shadow-sm"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
         </div>
-        <button
-          onClick={fetchLeaderboard}
-          disabled={refreshing || !selectedTest}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-medium transition-all shadow-sm"
-        >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
-      </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--border-subtle)] shadow-sm">

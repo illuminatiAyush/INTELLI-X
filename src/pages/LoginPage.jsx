@@ -136,7 +136,7 @@ const LoginPage = () => {
               className={`w-36 h-36 rounded-[2.8rem] flex items-center justify-center shadow-3xl group-hover:scale-105 transition-all duration-700 relative overflow-hidden ${isDark ? 'bg-white' : 'bg-black shadow-black/20'}`}
             >
               <img 
-                src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"} 
+                src={isDark ? "/intellix-icon-black.svg" : "/intellix-icon-white.svg"} 
                 alt="IntelliX Logo" 
                 className="w-full h-full object-cover"
               />

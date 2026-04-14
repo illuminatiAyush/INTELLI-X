@@ -33,7 +33,7 @@ class ErrorBoundary extends React.Component {
           >
             Refresh IntelliX
           </button>
-          {process.env.NODE_ENV === 'development' && (
+          {import.meta.env.DEV && (
              <div className="mt-8 p-4 bg-black/40 rounded-lg text-left overflow-auto max-w-2xl border border-[var(--border-subtle)]">
                 <p className="text-red-400 text-xs font-mono">{this.state.error?.toString()}</p>
              </div>
