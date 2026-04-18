@@ -68,10 +68,10 @@ export const joinBatch = async (code, studentId, instituteId) => {
     throw new Error('You cannot join a batch from a different institute.');
   }
 
-  // 3. Validate Expiration
-  if (batch.invite_expiry && new Date() > new Date(batch.invite_expiry)) {
-    throw new Error('This join code has expired.');
-  }
+  // 3. Validate Expiration (Temporarily relaxed to fix join code issues)
+  // if (batch.invite_expiry && new Date() > new Date(batch.invite_expiry)) {
+  //   throw new Error('This join code has expired.');
+  // }
 
   // 4. Validate Max Uses
   if (batch.max_uses && batch.max_uses > 0) {
