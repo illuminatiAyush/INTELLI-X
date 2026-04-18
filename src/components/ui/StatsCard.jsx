@@ -1,16 +1,21 @@
 import { motion } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
+import IconWrapper from './IconWrapper'
 
 const StatsCard = ({ title, value, icon: Icon, trend, color = 'white' }) => {
   const { isDark } = useTheme()
   const getColors = (c) => {
     switch (c) {
-      case 'emerald': return 'text-emerald-500 border-emerald-500/20 shadow-emerald-500/10';
-      case 'green': return 'text-emerald-500 border-emerald-500/20 shadow-emerald-500/10';
-      case 'amber': return 'text-amber-500 border-amber-500/20 shadow-amber-500/10';
-      case 'rose': return 'text-rose-500 border-rose-500/20 shadow-rose-500/10';
-      case 'white': return 'text-white border-white/20 shadow-white/10';
-      default: return 'text-[var(--text-primary)] border-[var(--text-primary)]/20 shadow-[var(--text-primary)]/5';
+      case 'emerald': 
+      case 'green': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+      case 'amber': return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
+      case 'rose': return 'text-rose-500 bg-rose-500/10 border-rose-500/20';
+      case 'blue': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+      case 'purple': return 'text-purple-500 bg-purple-500/10 border-purple-500/20';
+      case 'indigo': return 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20';
+      case 'cyan': return 'text-cyan-500 bg-cyan-500/10 border-cyan-500/20';
+      case 'white': return isDark ? 'text-white bg-white/10 border-white/20' : 'text-slate-800 bg-slate-100 border-slate-200';
+      default: return 'text-[var(--text-primary)] bg-[var(--text-primary)]/5 border-[var(--border-subtle)]';
     }
   };
   const colorStyle = getColors(color);
@@ -41,9 +46,13 @@ const StatsCard = ({ title, value, icon: Icon, trend, color = 'white' }) => {
           )}
         </div>
         {Icon && (
-          <div className={`p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-subtle)] ${colorStyle.split(' ')[0]} shadow-[0_0_20px_rgba(0,0,0,0.1)] group-hover:scale-110 transition-transform duration-500 border-b-white/10`}>
-            <Icon className={`w-5 h-5 sm:w-6 sm:h-6`} strokeWidth={2.5} />
-          </div>
+          <IconWrapper 
+            icon={Icon} 
+            colorOverride={true}
+            className={`${colorStyle} shadow-sm group-hover:scale-110 transition-transform duration-500`}
+            wrapperSize={56}
+            iconSize={24}
+          />
         )}
       </div>
     </motion.div>

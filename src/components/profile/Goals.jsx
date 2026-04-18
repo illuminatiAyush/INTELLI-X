@@ -29,10 +29,10 @@ const GoalRow = ({ icon: Icon, label, current, target, setTarget, suffix = '', p
               type="number"
               value={target}
               onChange={(e) => setTarget(Number(e.target.value))}
-              className="w-20 bg-transparent text-2xl font-bold text-white outline-none border-b-2 border-white/30 focus:border-white transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-20 bg-transparent text-2xl font-bold text-[var(--text-primary)] outline-none border-b-2 border-[var(--border-strong)] focus:border-[var(--text-primary)] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               min={0}
             />
-            <span className="text-white text-lg font-bold">{suffix}</span>
+            <span className="text-[var(--text-primary)] text-lg font-bold">{suffix}</span>
           </div>
         </div>
       </div>
@@ -44,7 +44,7 @@ const GoalRow = ({ icon: Icon, label, current, target, setTarget, suffix = '', p
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(progress, 100)}%` }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className={`h-full rounded-full ${isAhead ? 'bg-emerald-500' : 'bg-white'}`}
+            className={`h-full rounded-full ${isAhead ? 'bg-emerald-500' : 'bg-[var(--text-primary)]'}`}
           />
         </div>
       )}
@@ -65,7 +65,7 @@ const Goals = ({ currentStats }) => {
       className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
     >
       <div className="flex items-center gap-2 mb-5">
-        <div className="p-2 rounded-lg bg-white/10 text-white">
+        <div className="p-2 rounded-lg bg-[var(--border-subtle)] text-[var(--text-primary)]">
           <Target className="w-5 h-5" />
         </div>
         <h3 className="text-lg font-bold text-[var(--text-primary)]">Personal Goals</h3>

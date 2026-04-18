@@ -428,9 +428,9 @@ const StudentsPage = ({ hideHeader = false }) => {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatsCard title="Attendance" value={`${studentAnalytics?.attendance?.percent || 0}%`} icon={ClipboardCheck} color={parseFloat(studentAnalytics?.attendance?.percent) >= 75 ? 'green' : 'amber'} />
-                  <StatsCard title="Tests Taken" value={studentAnalytics?.tests?.total || 0} icon={BarChart3} color="white" />
-                  <StatsCard title="Avg Score" value={`${studentAnalytics?.tests?.avg || 0}%`} icon={TrendingUp} color="white" />
-                  <StatsCard title="Batch Rank" value={studentAnalytics?.rank || '-'} icon={Trophy} color="white" />
+                  <StatsCard title="Tests Taken" value={studentAnalytics?.tests?.total || 0} icon={BarChart3} color="blue" />
+                  <StatsCard title="Avg Score" value={`${studentAnalytics?.tests?.avg || 0}%`} icon={TrendingUp} color="emerald" />
+                  <StatsCard title="Batch Rank" value={studentAnalytics?.rank || '-'} icon={Trophy} color="amber" />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

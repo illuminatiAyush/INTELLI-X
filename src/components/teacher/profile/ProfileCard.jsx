@@ -46,13 +46,13 @@ const ProfileCard = ({ profile, user, teacher, role, loading, onEdit }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center text-black text-2xl font-bold flex-shrink-0 shadow-lg shadow-white/10">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--text-primary)] flex items-center justify-center text-[var(--bg-app)] text-2xl font-bold flex-shrink-0 shadow-sm">
             {displayName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
             <h2 className="text-xl font-bold text-[var(--text-primary)] truncate">{displayName}</h2>
             <div className="flex items-center gap-3 mt-1">
-              <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-white/10 text-white border border-white/20 capitalize">
+              <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-[var(--border-subtle)]/50 text-[var(--text-primary)] border border-[var(--border-strong)] capitalize">
                 {role || 'Teacher'}
               </span>
               <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
@@ -64,7 +64,7 @@ const ProfileCard = ({ profile, user, teacher, role, loading, onEdit }) => {
 
         <button
           onClick={onEdit}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/20 text-sm font-bold transition-all active:scale-[0.97]"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--border-subtle)]/50 text-[var(--text-primary)] border border-[var(--border-strong)] hover:bg-[var(--border-subtle)] text-sm font-bold transition-all active:scale-[0.97]"
         >
           <Pencil className="w-4 h-4" />
           <span className="hidden sm:inline">Edit Profile</span>

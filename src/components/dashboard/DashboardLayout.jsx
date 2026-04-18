@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import IconWrapper from '../ui/IconWrapper'
 import navConfig from '../../config/navConfig'
 import {
   LogOut,
@@ -71,47 +72,41 @@ const DashboardLayout = () => {
         </AnimatePresence>
       </div>
 
-      <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+      <nav className={`flex-1 py-6 space-y-2 overflow-y-auto custom-scrollbar ${isExpanded ? 'px-4' : 'px-3'}`}>
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             end={item.path === '/dashboard'}
             onClick={() => setMobileOpen(false)}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 group relative overflow-hidden ${isActive
-                ? 'bg-white text-black shadow-lg shadow-white/10'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`
-            }
+            className="flex items-center gap-3 w-full group relative"
           >
             {({ isActive }) => (
               <>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 z-10 transition-all duration-300 ${isActive
-                    ? 'bg-black/10'
-                    : 'bg-white/5 group-hover:bg-white/10 group-hover:scale-110'
-                  }`}>
-                  <item.icon className={`w-[18px] h-[18px] transition-colors ${isActive ? 'text-black' : 'text-gray-500 group-hover:text-white'}`} />
-                </div>
+                {/* Active Indicator Line on far left edge of sidebar */}
+                {isActive && (
+                  <motion.div
+                    layoutId="active-indicator"
+                    className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-6 bg-[var(--text-primary)] rounded-r-full ${isExpanded ? '-left-4' : '-left-3'}`}
+                  />
+                )}
+                
+                <IconWrapper icon={item.icon} active={isActive} wrapperSize={48} />
+
                 <AnimatePresence>
                   {isExpanded && (
                     <motion.span
                       initial={{ opacity: 0, x: -4 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -4 }}
-                      className="whitespace-nowrap z-10"
+                      className={`whitespace-nowrap font-bold text-sm transition-colors ${
+                        isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'
+                      }`}
                     >
                       {item.label}
                     </motion.span>
                   )}
                 </AnimatePresence>
-                {/* Active Indicator Line */}
-                {isActive && (
-                  <motion.div
-                    layoutId="active-indicator"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-black rounded-r-full"
-                  />
-                )}
               </>
             )}
           </NavLink>

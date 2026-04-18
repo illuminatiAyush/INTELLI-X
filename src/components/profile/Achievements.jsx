@@ -20,10 +20,10 @@ const badges = [
     description: 'Maintained above-average scores for 5+ tests',
     icon: TrendingUp,
     color: {
-      bg: 'bg-white/10',
-      border: 'border-white/20',
-      text: 'text-white',
-      glow: 'shadow-white/10',
+      bg: 'bg-[var(--border-subtle)]',
+      border: 'border-[var(--border-strong)]',
+      text: 'text-[var(--text-primary)]',
+      glow: 'shadow-sm',
     },
   },
   {

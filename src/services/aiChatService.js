@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase'
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const GROQ_MODEL = 'llama3-70b-8192'
+const GROQ_MODEL = 'llama-3.3-70b-versatile'
 const GROQ_FALLBACK_MODEL = 'llama-3.1-8b-instant'
 
 const SYSTEM_PROMPT = `You are "IntelliX AI", a premium educational assistant embedded inside the IntelliX SaaS platform.

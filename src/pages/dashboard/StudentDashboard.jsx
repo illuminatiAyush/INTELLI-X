@@ -262,10 +262,10 @@ const StudentDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Tests Taken" value={stats.tests} icon={BookOpen} color="white" />
-        <StatsCard title="Avg Score" value={`${stats.avgScore}%`} icon={TrendingUp} color="white" />
-        <StatsCard title="Attendance" value={`${stats.attendanceRate}%`} icon={ClipboardCheck} color="green" />
-        <StatsCard title="Last Rank" value={`#${stats.rank}`} icon={Trophy} color="white" />
+        <StatsCard title="Tests Taken" value={stats.tests} icon={BookOpen} color="blue" />
+        <StatsCard title="Avg Score" value={`${stats.avgScore}%`} icon={TrendingUp} color="emerald" />
+        <StatsCard title="Attendance" value={`${stats.attendanceRate}%`} icon={ClipboardCheck} color="indigo" />
+        <StatsCard title="Last Rank" value={`#${stats.rank}`} icon={Trophy} color="amber" />
       </div>
 
       {/* My Enrolled Batches (Subjects) */}

@@ -43,8 +43,8 @@ const SubscriptionsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatsCard title="Total Institutes" value={institutes.length} icon={Building2} color="white" />
-        <StatsCard title="Total Users" value={institutes.reduce((s, i) => s + i.userCount, 0)} icon={Users} color="white" />
+        <StatsCard title="Total Institutes" value={institutes.length} icon={Building2} color="purple" />
+        <StatsCard title="Total Users" value={institutes.reduce((s, i) => s + i.userCount, 0)} icon={Users} color="blue" />
         <StatsCard title="Plan" value="Free Tier" icon={CreditCard} color="green" />
       </div>
 

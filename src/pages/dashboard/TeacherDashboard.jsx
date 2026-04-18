@@ -112,10 +112,10 @@ const TeacherDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="My Batches" value={stats.batches} icon={Layers} color="white" />
-        <StatsCard title="Total Students" value={stats.students} icon={Users} color="white" />
-        <StatsCard title="Tests Created" value={stats.tests} icon={FileText} color="white" />
-        <StatsCard title="AI Tests" value={stats.aiTests} icon={Sparkles} color="white" />
+        <StatsCard title="My Batches" value={stats.batches} icon={Layers} color="purple" />
+        <StatsCard title="Total Students" value={stats.students} icon={Users} color="blue" />
+        <StatsCard title="Tests Created" value={stats.tests} icon={FileText} color="emerald" />
+        <StatsCard title="AI Tests" value={stats.aiTests} icon={Sparkles} color="indigo" />
       </div>
 
       {/* My Batches */}

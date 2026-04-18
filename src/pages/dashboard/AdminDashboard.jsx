@@ -101,10 +101,10 @@ const AdminDashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Total Students" value={stats.students} icon={Users} color="white" />
-        <StatsCard title="Total Subjects" value={stats.batches} icon={Layers} color="white" />
-        <StatsCard title="Tests Conducted" value={stats.tests} icon={FileText} color="white" />
-        <StatsCard title="Attendance Rate" value={`${stats.attendance}%`} icon={ClipboardCheck} color="green" />
+        <StatsCard title="Total Students" value={stats.students} icon={Users} color="blue" />
+        <StatsCard title="Total Subjects" value={stats.batches} icon={Layers} color="purple" />
+        <StatsCard title="Tests Conducted" value={stats.tests} icon={FileText} color="emerald" />
+        <StatsCard title="Attendance Rate" value={`${stats.attendance}%`} icon={ClipboardCheck} color="amber" />
       </div>
 
       {/* Analytics Grid */}

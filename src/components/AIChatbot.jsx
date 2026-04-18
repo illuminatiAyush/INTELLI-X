@@ -4,6 +4,10 @@ import { useTheme } from '../context/ThemeContext'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { X, Send, Bot, User, Sparkles } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
+import 'highlight.js/styles/github-dark.css'
 
 // Role-based quick questions
 const roleQuickQuestions = {
@@ -181,7 +185,31 @@ const AIChatbot = () => {
                         : isDark ? 'bg-white/[0.03] border border-white/[0.05] text-gray-300' : 'bg-gray-50 border border-gray-100 text-gray-700'
                     }`}
                   >
-                    {msg.text}
+                    {msg.role === 'user' ? (
+                      msg.text
+                    ) : (
+                      <div className={`react-markdown flex flex-col space-y-3
+                        [&>h1]:text-xl [&>h1]:font-bold [&>h1]:mt-4 [&>h1]:mb-1 ${isDark ? '[&>h1]:text-white' : '[&>h1]:text-black'}
+                        [&>h2]:text-lg [&>h2]:font-bold [&>h2]:mt-3 [&>h2]:mb-1 ${isDark ? '[&>h2]:text-white' : '[&>h2]:text-black'}
+                        [&>h3]:text-base [&>h3]:font-bold [&>h3]:mt-2 [&>h3]:mb-1 ${isDark ? '[&>h3]:text-white' : '[&>h3]:text-black'}
+                        [&>p]:leading-relaxed [&>p]:whitespace-pre-wrap
+                        [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:space-y-1
+                        [&>ol]:list-decimal [&>ol]:pl-5 [&>ol]:space-y-1
+                        [&_strong]:font-bold ${isDark ? '[&_strong]:text-white' : '[&_strong]:text-black'}
+                        [&_em]:italic
+                        [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded-md [&>code]:text-[0.9em] [&>code]:font-mono ${isDark ? '[&>code]:bg-white/10 [&>code]:text-gray-200' : '[&>code]:bg-black/5 [&>code]:text-gray-800'}
+                        [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:overflow-x-auto [&_pre]:my-2 ${isDark ? '[&_pre]:bg-[#0d0d0d] [&_pre]:border [&_pre]:border-white/[0.05]' : '[&_pre]:bg-gray-800 [&_pre]:text-gray-100'}
+                        [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-sm
+                        [&_blockquote]:border-l-4 ${isDark ? '[&_blockquote]:border-gray-600 [&_blockquote]:text-gray-400' : '[&_blockquote]:border-gray-300 [&_blockquote]:text-gray-500'} [&_blockquote]:pl-4 [&_blockquote]:italic
+                      `}>
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm]} 
+                          rehypePlugins={[rehypeHighlight]}
+                        >
+                          {msg.text}
+                        </ReactMarkdown>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}

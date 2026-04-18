@@ -14,9 +14,9 @@ const colorMap = {
     glow: 'bg-emerald-500',
   },
   blue: {
-    iconBg: 'bg-white/10',
-    iconText: 'text-white',
-    glow: 'bg-white',
+    iconBg: 'bg-[var(--border-subtle)]',
+    iconText: 'text-[var(--text-primary)]',
+    glow: 'bg-[var(--border-strong)]',
   },
   amber: {
     iconBg: 'bg-amber-500/10',

@@ -79,7 +79,7 @@ export const generateMCQs = async (content, numQuestions, onProgress) => {
 }
 
 // ── GROQ GENERATOR ───────────────────────────────────────────────────
-const generateWithGroq = async (content, numQuestions, apiKey, onProgress, model = 'llama3-70b-8192') => {
+const generateWithGroq = async (content, numQuestions, apiKey, onProgress, model = 'llama-3.3-70b-versatile') => {
   const prompt = `Generate exactly ${numQuestions} high-quality MCQs from this content.
 Return ONLY a JSON array of objects with: "question", "options" (array of 4 strings), "answer" ("A", "B", "C", or "D").
 No markdown, no text, ONLY JSON.
@@ -186,7 +186,7 @@ Return ONLY valid JSON: { strengths: [], weak_topics: [], improvement_suggestion
       headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages: [{ role: 'system', content: 'JSON response bot.' }, { role: 'user', content: prompt }],
-        model: 'llama3-70b-8192',
+        model: 'llama-3.3-70b-versatile',
         temperature: 0.2,
       })
     })

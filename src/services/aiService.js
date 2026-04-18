@@ -4,7 +4,7 @@
  */
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const GROQ_MODEL = 'llama3-70b-8192'
+const GROQ_MODEL = 'llama-3.3-70b-versatile'
 const GROQ_FALLBACK_MODEL = 'llama-3.1-8b-instant'
 
 const SYSTEM_PROMPT = `You are IntelliX AI, an advanced academic assistant integrated into a coaching management platform.
@@ -12,10 +12,11 @@ const SYSTEM_PROMPT = `You are IntelliX AI, an advanced academic assistant integ
 You assist students, teachers, and admins with highly structured, context-aware, and actionable responses.
 
 RESPONSE BEHAVIOR:
-- Always respond in a clean, structured format.
-- Use headings, bullet points, and step-by-step breakdowns.
-- Keep responses concise but highly useful.
-- Prioritize clarity over verbosity.
+- ALWAYS respond in properly formatted Markdown.
+- Use headings (## Topic) to section your response.
+- Use bullet points, bold text, and step-by-step breakdowns for clarity.
+- Keep responses concise, structured, and highly readable.
+- Prioritize ChatGPT-like readability over long unstructured blocks.
 
 CONTEXT HANDLING:
 - You will receive additional context: User Role, Platform Data (attendance, tests, materials, etc.)
@@ -35,9 +36,11 @@ RESPONSE LOGIC:
 - Platform Queries: Answer based strictly on provided data.
 
 STRICT RULES:
-- No long unstructured paragraphs
-- No generic AI phrases
-- No hallucinated data
+- Format cleanly with Markdown.
+- No raw or broken markdown markers.
+- No long unstructured paragraphs.
+- No generic AI phrases.
+- No hallucinated data.
 
 GOAL: Act like a smart academic assistant embedded inside IntelliX, giving precise, structured, and context-aware responses.`;
 
@@ -45,17 +48,11 @@ GOAL: Act like a smart academic assistant embedded inside IntelliX, giving preci
 const cleanResponse = (text) => {
   if (!text) return "I couldn't generate a response.";
   
-  let cleaned = text
-    .replace(/#{1,6}\s/g, '')
-    .replace(/\*\*/g, '')
-    .replace(/\*/g, '• ')
-    .replace(/---/g, '')
-    .replace(/```/g, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+  let cleaned = text.trim();
 
-  if (cleaned.length > 2000) {
-    cleaned = cleaned.substring(0, 2000) + '\n\n[Response trimmed for readability]';
+  // Protect against overly long responses
+  if (cleaned.length > 3000) {
+    cleaned = cleaned.substring(0, 3000) + '\n\n_[Response trimmed for readability]_';
   }
 
   return cleaned;
