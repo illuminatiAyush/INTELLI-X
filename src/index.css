@@ -12,11 +12,12 @@
     /* Semantic Tokens - Dark (Default) - Pure Black Theme */
     --bg-app: #000000;
     --bg-surface: #0a0a0a;
-    --bg-card: #0a0a0a;
+    --bg-card: #111111;
     --text-primary: #ffffff;
-    --text-secondary: #9ca3af;
-    --border-subtle: rgba(255, 255, 255, 0.1);
-    --border-strong: rgba(255, 255, 255, 0.2);
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.12);
     --shadow-premium: 0 8px 30px rgba(0, 0, 0, 0.3);
   }
 

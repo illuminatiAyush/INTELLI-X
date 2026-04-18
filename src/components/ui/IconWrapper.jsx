@@ -17,8 +17,8 @@ const IconWrapper = ({ icon: Icon, active, className = '', wrapperSize = 48, ico
               ? 'bg-white text-black shadow-none' 
               : 'bg-black text-white shadow-none'
             : isDark
-              ? 'text-gray-400 hover:bg-white/10 hover:text-white'
-              : 'text-gray-400 hover:bg-black/5 hover:text-black'
+              ? 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'
+              : 'bg-black/5 text-gray-400 hover:bg-black/10 hover:text-black'
         )
       } ${className}`}
       style={{ width: `${wrapperSize}px`, height: `${wrapperSize}px` }}

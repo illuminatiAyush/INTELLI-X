@@ -9,6 +9,7 @@ import { supabase } from '../../lib/supabase'
 import { useTheme } from '../../context/ThemeContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { DashboardSkeleton } from '../../components/ui/Skeletons'
+import IconWrapper from '../../components/ui/IconWrapper'
 
 const StudentDashboard = () => {
   const { isDark } = useTheme()
@@ -174,9 +175,7 @@ const StudentDashboard = () => {
         className="min-h-[60vh] flex flex-col items-center justify-center text-center p-12 border border-[var(--border-subtle)] rounded-[2.5rem] bg-[var(--bg-card)] mt-8 relative overflow-hidden"
       >
 
-        <div className={`w-20 h-20 ${isDark ? 'bg-white/5 text-white/50 border-white/10 shadow-xl' : 'bg-slate-100 text-slate-700 border-slate-200 shadow-sm'} rounded-3xl flex items-center justify-center mb-8 border relative z-10`}>
-          <BookOpen className="w-10 h-10" />
-        </div>
+        <IconWrapper icon={BookOpen} wrapperSize={80} iconSize={40} className="mb-8 relative z-10" />
         <h2 className="text-4xl font-bold text-[var(--text-primary)] mb-4 relative z-10 tracking-tight">Welcome to IntelliX</h2>
         <p className="text-[var(--text-secondary)] text-lg max-w-lg mx-auto mb-10 leading-relaxed relative z-10">
           You are successfully registered but haven't joined any classes yet. Get your class Join Code from your teacher to begin exploring.
@@ -272,9 +271,7 @@ const StudentDashboard = () => {
       <section>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-2xl ${isDark ? 'bg-white/5 text-white/50 border border-white/10 shadow-xl' : 'bg-slate-100 text-slate-700 border border-slate-200 shadow-sm'}`}>
-              <BookOpen className="w-5 h-5" />
-            </div>
+            <IconWrapper icon={BookOpen} wrapperSize={40} iconSize={20} />
             <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">My Subjects</h2>
           </div>
         </div>
@@ -288,9 +285,12 @@ const StudentDashboard = () => {
               transition={{ delay: i * 0.07 }}
               className="p-8 rounded-[2rem] bg-[var(--bg-card)] border border-[var(--border-subtle)] shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all cursor-pointer group relative overflow-hidden"
             >
-              <div className="w-14 h-14 rounded-2xl bg-[var(--bg-card)] text-white/50 border-[var(--border-subtle)] group-hover:bg-white group-hover:text-black flex items-center justify-center mb-6 transition-all shadow-xl relative z-10 border">
-                <BookOpen className="w-7 h-7" />
-              </div>
+              <IconWrapper 
+                icon={BookOpen}
+                wrapperSize={56}
+                iconSize={28}
+                className="mb-6 relative z-10 group-hover:bg-white group-hover:text-black shadow-xl"
+              />
               <h3 className="font-bold text-[var(--text-primary)] text-lg mb-1 truncate relative z-10">{batch.name}</h3>
               <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] relative z-10">
                 {batch.subject || 'Subject'}
@@ -322,9 +322,7 @@ const StudentDashboard = () => {
           >
             <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className={`p-2.5 rounded-2xl ${isDark ? 'bg-white/5 text-white/50 border border-white/10 shadow-xl' : 'bg-slate-100 text-slate-700 border border-slate-200 shadow-sm'}`}>
-                <Sparkles className="w-5 h-5" />
-              </div>
+              <IconWrapper icon={Sparkles} wrapperSize={40} iconSize={20} />
               <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Active AI Tests</h2>
             </div>
             <button

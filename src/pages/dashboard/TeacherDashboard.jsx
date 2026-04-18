@@ -8,6 +8,7 @@ import { supabase } from '../../lib/supabase'
 import { useTheme } from '../../context/ThemeContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { DashboardSkeleton } from '../../components/ui/Skeletons'
+import IconWrapper from '../../components/ui/IconWrapper'
 
 const TeacherDashboard = () => {
   const { isDark } = useTheme()
@@ -129,9 +130,7 @@ const TeacherDashboard = () => {
 
         <div className="flex items-center justify-between mb-8 relative z-10">
           <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-2xl ${isDark ? 'bg-white/5 text-white/50 border border-white/10 shadow-xl' : 'bg-slate-100 text-slate-700 border border-slate-200 shadow-sm'}`}>
-              <Layers className="w-5 h-5" />
-            </div>
+            <IconWrapper icon={Layers} wrapperSize={40} iconSize={20} />
             <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Active Batches</h2>
           </div>
           <button onClick={() => navigate('/dashboard/batches')} className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-widest hover:text-[var(--text-primary)] transition-colors border-b border-transparent hover:border-[var(--text-primary)]/20 pb-1">

@@ -2,12 +2,36 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Users, Layers, FileText, ClipboardCheck, TrendingUp, Calendar, Activity, AlertTriangle, Brain } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  Filler
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
 import StatsCard from '../../components/ui/StatsCard'
 import { supabase } from '../../lib/supabase'
 import { useTheme } from '../../context/ThemeContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { DashboardSkeleton } from '../../components/ui/Skeletons'
+import IconWrapper from '../../components/ui/IconWrapper'
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  Filler
+)
 
 const AdminDashboard = () => {
   const { isDark } = useTheme()
@@ -31,24 +55,67 @@ const AdminDashboard = () => {
 
     const { data: allResults } = await supabase
       .from('results')
-      .select('marks, tests(title, total_marks)')
+      .select('id, marks, test_id, tests(id, title, total_marks, date, batch_id, batches(name))')
     
     let performanceData = []
     let weakTopics = []
+    let insights = { avg: 0, bestBatch: '-', worstBatch: '-' }
     
     if (allResults && allResults.length > 0) {
+      // 1. Trend Data (Chronological)
       const testMap = {}
       allResults.forEach(r => {
-         const title = r.tests?.title?.substring(0, 15) || 'Test'
-         if (!testMap[title]) testMap[title] = { name: title, totalScore: 0, count: 0, maxScore: r.tests?.total_marks || 100 }
-         testMap[title].totalScore += r.marks
-         testMap[title].count += 1
+         const testId = r.tests?.id
+         if (!testId) return
+         if (!testMap[testId]) {
+           testMap[testId] = { 
+             id: testId,
+             name: r.tests.title, 
+             date: new Date(r.tests.date), 
+             totalScore: 0, 
+             count: 0, 
+             maxScore: r.tests.total_marks || 100 
+           }
+         }
+         testMap[testId].totalScore += r.marks
+         testMap[testId].count += 1
       })
-      performanceData = Object.values(testMap).map(t => ({
-         name: t.name,
-         avg: Math.round(((t.totalScore / t.count) / t.maxScore) * 100)
-      })).slice(0, 5)
 
+      performanceData = Object.values(testMap)
+        .sort((a, b) => a.date - b.date)
+        .map(t => ({
+           name: t.name,
+           avg: Math.round(((t.totalScore / t.count) / t.maxScore) * 100),
+           date: t.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+        }))
+
+      // 2. Batch Insights
+      const batchMap = {}
+      allResults.forEach(r => {
+        const batchName = r.tests?.batches?.name
+        if (!batchName) return
+        if (!batchMap[batchName]) batchMap[batchName] = { name: batchName, total: 0, count: 0, max: 0 }
+        batchMap[batchName].total += r.marks
+        batchMap[batchName].count += 1
+        batchMap[batchName].max += (r.tests.total_marks || 100)
+      })
+
+      const batchStats = Object.values(batchMap).map(b => ({
+        name: b.name,
+        avg: b.max > 0 ? (b.total / b.max) * 100 : 0
+      })).sort((a, b) => b.avg - a.avg)
+
+      if (batchStats.length > 0) {
+        insights.bestBatch = batchStats[0].name
+        insights.worstBatch = batchStats[batchStats.length - 1].name
+      }
+
+      // 3. Global Avg
+      const totalPossible = allResults.reduce((sum, r) => sum + (r.tests?.total_marks || 100), 0)
+      const totalEarned = allResults.reduce((sum, r) => sum + r.marks, 0)
+      insights.avg = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0
+
+      // 4. Weak Topics
       const topicMap = {}
       allResults.forEach(r => {
         if (r.ai_feedback?.weak_topics) {
@@ -72,17 +139,19 @@ const AdminDashboard = () => {
       },
       recentTests: tests || [],
       performanceData,
-      weakTopics
+      weakTopics,
+      insights
     }
   })
 
   if (loading && !dashboardData) return <DashboardSkeleton />
 
-  const { stats, recentTests, performanceData, weakTopics } = dashboardData || {
+  const { stats, recentTests, performanceData, weakTopics, insights } = dashboardData || {
     stats: { students: 0, batches: 0, tests: 0, attendance: 0 },
     recentTests: [],
     performanceData: [],
-    weakTopics: []
+    weakTopics: [],
+    insights: { avg: 0, bestBatch: '-', worstBatch: '-' }
   }
 
   return (
@@ -117,46 +186,110 @@ const AdminDashboard = () => {
           transition={{ delay: 0.1 }}
           className="col-span-1 lg:col-span-2 rounded-[2.5rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.3)] relative overflow-hidden flex flex-col h-[450px]"
         >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 relative z-10 gap-4">
+            <div className="flex items-center gap-3">
+              <IconWrapper icon={Activity} wrapperSize={40} iconSize={20} />
+              <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Institutional Performance</h2>
+            </div>
+            
+            {/* Insight Header Pills */}
+            <div className="flex flex-wrap gap-2">
+              <div className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                 <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">Avg</span>
+                 <span className="text-sm font-black text-white">{insights.avg}%</span>
+              </div>
+              <div className="px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center gap-2">
+                 <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Best</span>
+                 <span className="text-sm font-black text-blue-400 truncate max-w-[80px]">{insights.bestBatch}</span>
+              </div>
+              <div className="px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-2">
+                 <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Attention</span>
+                 <span className="text-sm font-black text-red-400 truncate max-w-[80px]">{insights.worstBatch}</span>
+              </div>
+            </div>
+          </div>
 
-          <div className="flex items-center gap-3 mb-8 relative z-10">
-          <div className={`p-2.5 rounded-2xl ${isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-slate-100 text-slate-700 border border-slate-200'} shadow-lg`}>
-            <Activity className="w-5 h-5" />
-          </div>
-            <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Institutional Performance</h2>
-          </div>
           {performanceData.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-[var(--text-secondary)] text-sm font-bold border border-dashed border-[var(--border-subtle)] rounded-[2rem] m-2 bg-[var(--bg-card)] relative z-10 gap-3">
                <div className="p-4 rounded-2xl bg-[var(--bg-card)]">
                 <Activity className="w-8 h-8 opacity-20" />
               </div>
-              <p className="uppercase tracking-widest text-[10px]">Insufficient performance data</p>
+              <p className="uppercase tracking-widest text-[10px]">No performance data available yet</p>
             </div>
           ) : (
             <div className="flex-1 w-full h-full min-h-0 relative z-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={performanceData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isDark ? '#9ca3af' : '#64748b', fontWeight: 600 }} dy={15} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isDark ? '#9ca3af' : '#64748b', fontWeight: 600 }} domain={[0, 100]} />
-                  <Tooltip 
-                    cursor={{ fill: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', radius: 8 }}
-                    contentStyle={{ 
-                      backgroundColor: isDark ? '#111827' : '#ffffff', 
-                      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', 
-                      borderRadius: '16px', 
-                      color: isDark ? '#fff' : '#000', 
-                      fontSize: '12px', 
-                      fontWeight: 'bold',
-                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-                    }} 
-                  />
-                  <Bar dataKey="avg" name="Avg Score %" radius={[8, 8, 0, 0]}>
-                    {performanceData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={index % 2 === 0 ? (isDark ? '#ffffff' : '#64748b') : (isDark ? '#4b5563' : '#cbd5e1')} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <Line
+                data={{
+                  labels: performanceData.map(d => d.date),
+                  datasets: [
+                    {
+                      label: 'Avg Score %',
+                      data: performanceData.map(d => d.avg),
+                      borderColor: '#60A5FA',
+                      borderWidth: 3,
+                      tension: 0.4,
+                      fill: true,
+                      backgroundColor: (context) => {
+                        const ctx = context.chart.ctx;
+                        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                        gradient.addColorStop(0, 'rgba(96, 165, 250, 0.2)');
+                        gradient.addColorStop(1, 'rgba(96, 165, 250, 0)');
+                        return gradient;
+                      },
+                      pointBackgroundColor: '#60A5FA',
+                      pointBorderColor: isDark ? '#111111' : '#ffffff',
+                      pointBorderWidth: 2,
+                      pointRadius: 4,
+                      pointHoverRadius: 7,
+                      pointHoverBackgroundColor: '#ffffff',
+                      pointHoverBorderColor: '#60A5FA',
+                      pointHoverBorderWidth: 2,
+                    }
+                  ]
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      backgroundColor: isDark ? '#111111' : '#ffffff',
+                      titleColor: isDark ? '#ffffff' : '#111111',
+                      bodyColor: isDark ? '#a1a1aa' : '#4b5563',
+                      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                      borderWidth: 1,
+                      padding: 12,
+                      cornerRadius: 12,
+                      displayColors: false,
+                      callbacks: {
+                        title: (items) => performanceData[items[0].dataIndex].name,
+                        label: (item) => `Average Score: ${item.formattedValue}%`
+                      }
+                    }
+                  },
+                  scales: {
+                    x: {
+                      grid: { display: false },
+                      ticks: {
+                        color: isDark ? '#71717a' : '#94a3b8',
+                        font: { size: 10, weight: '600' }
+                      }
+                    },
+                    y: {
+                      min: 0,
+                      max: 100,
+                      grid: {
+                        color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                      },
+                      ticks: {
+                        color: isDark ? '#71717a' : '#94a3b8',
+                        font: { size: 10, weight: '600' },
+                        stepSize: 20
+                      }
+                    }
+                  }
+                }}
+              />
             </div>
           )}
         </motion.div>
@@ -171,9 +304,7 @@ const AdminDashboard = () => {
         >
 
           <div className="flex items-center gap-3 mb-8 relative z-10">
-            <div className="p-2.5 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
+            <IconWrapper icon={AlertTriangle} wrapperSize={40} iconSize={20} colorOverride={true} className="bg-red-500/10 text-red-500 border border-red-500/20" />
             <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Focus Areas</h2>
           </div>
           {weakTopics.length === 0 ? (
@@ -206,9 +337,7 @@ const AdminDashboard = () => {
 
         <div className="flex items-center justify-between mb-8 relative z-10">
           <div className="flex items-center gap-3">
-          <div className={`p-2.5 rounded-2xl ${isDark ? 'bg-white/10 text-white border border-white/20 shadow-xl shadow-white/5' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
-            <Calendar className="w-5 h-5" />
-          </div>
+          <IconWrapper icon={Calendar} wrapperSize={40} iconSize={20} />
             <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Recent Sessions</h2>
           </div>
           <button className={`text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-widest hover:text-[var(--text-primary)] transition-colors border-b border-transparent hover:border-[var(--border-subtle)] pb-1`}>
@@ -253,9 +382,7 @@ const AdminDashboard = () => {
       >
 
         <div className="flex items-center gap-3 mb-8 relative z-10">
-          <div className={`p-2.5 rounded-2xl ${isDark ? 'bg-white/10 text-white border border-white/20 shadow-xl shadow-white/5' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
-            <TrendingUp className="w-5 h-5" />
-          </div>
+          <IconWrapper icon={TrendingUp} wrapperSize={40} iconSize={20} />
           <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Access Control</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 relative z-10">
