@@ -98,13 +98,13 @@ const AppContent = () => {
         
         {/* Common Dashboard Routes */}
         <Route path="students" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><StudentsPage /></ProtectedRoute>} />
-        <Route path="batches" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><BatchesPage /></ProtectedRoute>} />
+        <Route path="batches" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><BatchesPage /></ProtectedRoute>} />
         <Route path="attendance" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><AttendancePage /></ProtectedRoute>} />
-        <Route path="tests" element={<ProtectedRoute allowedRoles={['admin', 'teacher']}><TestsPage /></ProtectedRoute>} />
+        <Route path="tests" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student']}><TestsPage /></ProtectedRoute>} />
         <Route path="results" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><ResultsPage /></ProtectedRoute>} />
         <Route path="leaderboard" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><LeaderboardPage /></ProtectedRoute>} />
         <Route path="materials" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><MaterialsPage /></ProtectedRoute>} />
-        <Route path="analytics" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><AnalyticsPage /></ProtectedRoute>} />
+        <Route path="analytics" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><AnalyticsPage /></ProtectedRoute>} />
         <Route path="settings" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><SettingsPage /></ProtectedRoute>} />
         <Route path="profile" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><ProfilePage /></ProtectedRoute>} />
         

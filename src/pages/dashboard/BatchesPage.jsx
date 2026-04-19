@@ -26,6 +26,14 @@ const BatchList = () => {
       batchQuery = batchQuery.eq('teacher_id', profile.id)
     } else if (role === 'admin') {
       batchQuery = batchQuery.eq('institute_id', profile.institute_id)
+    } else if (role === 'student') {
+      const { data: enrollment } = await supabase.from('batch_students').select('batch_id').eq('student_id', profile.id)
+      const enrolledBatchIds = (enrollment || []).map(e => e.batch_id)
+      if (enrolledBatchIds.length > 0) {
+        batchQuery = batchQuery.in('id', enrolledBatchIds)
+      } else {
+        return { batches: [], teachers: [] }
+      }
     }
 
     const [ { data: b }, { data: t } ] = await Promise.all([

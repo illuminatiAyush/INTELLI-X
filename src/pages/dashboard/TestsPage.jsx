@@ -204,7 +204,7 @@ const TestManagement = () => {
 
   const filtered = tests.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()))
   const canManage = role === 'teacher'          // create / delete / end / save marks
-  const canView   = role === 'admin' || role === 'teacher'  // view status + results
+  const canView   = role === 'admin' || role === 'teacher' || role === 'student'  // view status + results
 
   const columns = [
     { key: 'title', label: 'Test Title', render: (r) => (
@@ -716,7 +716,7 @@ const TestManagement = () => {
 
 const TestsPage = () => {
   const { role } = useAuth()
-  const [activeTab, setActiveTab] = useState('tests')
+  const [activeTab, setActiveTab] = useState(role === 'student' ? 'active' : 'tests')
 
   const tabs = [
     { id: 'tests', label: 'All Tests', icon: FileText, roles: ['admin', 'teacher', 'master_admin'] },
