@@ -23,11 +23,14 @@ const StudentAttendanceView = ({ user }) => {
   const { data: attendanceData, loading: attendanceLoading } = useAppQuery(`student-attendance-${user?.id}`, async () => {
     if (!user) return []
     
+    // Use user.id directly — attendance.student_id FK points to students.profile_id
+    const studentId = user.id
+
     // 1. Get enrolled batch IDs
     const { data: enrollments } = await supabase
       .from('batch_students')
       .select('batch_id')
-      .eq('student_id', user.id)
+      .eq('student_id', studentId)
 
     if (!enrollments?.length) return []
 
@@ -44,7 +47,7 @@ const StudentAttendanceView = ({ user }) => {
     // 3. For each batch fetch date-wise attendance records
     const subjectList = await Promise.all(
       batchRows.map(async (batch) => {
-        const records = await getStudentAttendanceForBatch(user.id, batch.id)
+        const records = await getStudentAttendanceForBatch(studentId, batch.id)
         const present = records.filter(r => r.status === 'present').length
         const rate = records.length
           ? Math.round((present / records.length) * 100)

@@ -35,12 +35,14 @@ const ResultsPage = ({ hideHeader = false }) => {
 
     let studentResults = []
     if (role === 'student') {
+      // Use user.id directly — results.student_id FK points to students.profile_id
+      const studentId = user.id
       const { data } = await supabase
-        .from('results')
-        .select('id, marks, rank, violation_count, tests(id, title, total_marks, date, batches(name))')
-        .eq('student_id', user.id)
-        .order('created_at', { ascending: false })
-      studentResults = data || []
+          .from('results')
+          .select('id, marks, rank, violation_count, tests(id, title, total_marks, date, batches(name))')
+          .eq('student_id', studentId)
+          .order('created_at', { ascending: false })
+        studentResults = data || []
     }
 
     return { batches, studentResults }
@@ -148,7 +150,7 @@ const ResultsPage = ({ hideHeader = false }) => {
       try {
         const { data } = await supabase
           .from('results')
-          .select('*, students(name, full_name), tests(title, total_marks)')
+          .select('*, students(name), tests(title, total_marks)')
           .eq('test_id', selectedTest)
           .order('rank', { ascending: true, nullsFirst: false })
         

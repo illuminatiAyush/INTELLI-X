@@ -39,6 +39,7 @@ const TestManagement = () => {
         return { tests: [], batches: [] }
       }
     } else if (role === 'student') {
+      // Use user.id directly — batch_students.student_id FK points to students.profile_id
       const { data: studentBatches } = await supabase.from('batch_students').select('batch_id').eq('student_id', user.id)
       const studentBatchIds = (studentBatches || []).map(b => b.batch_id)
       if (studentBatchIds.length > 0) {

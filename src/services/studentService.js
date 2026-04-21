@@ -1,5 +1,28 @@
 import { supabase } from '../lib/supabase'
 
+const studentIdCache = new Map()
+
+/**
+ * Resolves the internal student ID (integer) from a profile ID (Auth UUID).
+ * Uses in-memory caching to optimize performance.
+ */
+export const getStudentIdByProfile = async (profileId) => {
+  if (!profileId) return null
+  if (studentIdCache.has(profileId)) return studentIdCache.get(profileId)
+
+  const { data, error } = await supabase
+    .from('students')
+    .select('id')
+    .eq('profile_id', profileId)
+    .single()
+
+  if (error || !data) return null
+  
+  studentIdCache.set(profileId, data.id)
+  return data.id
+}
+
+
 export const getStudents = async () => {
   const { data, error } = await supabase
     .from('students')

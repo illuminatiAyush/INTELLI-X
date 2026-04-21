@@ -146,6 +146,7 @@ const TeacherProfileView = ({ user, profile, role }) => {
   const loading = tLoading && !teacherData
   const teacher = teacherData?.teacher || null
   const batches = teacherData?.batches || []
+  const [editOpen, setEditOpen] = useState(false)
 
   const handleSaved = () => {
     refetch()

@@ -10,16 +10,24 @@ import { CardSkeleton } from '../../components/ui/Skeletons'
 
 const LeaderboardPage = ({ hideHeader = false }) => {
   const { user, role } = useAuth()
+  const [currentStudentId, setCurrentStudentId] = useState(null)
+  
   const { data: initialData, loading: initialLoading } = useAppQuery(`leaderboard-init-${role}-${user?.id}`, async () => {
     if (!user) return { batches: [] }
-    let query = supabase.from('batches').select('id, name').order('name')
-    if (role === 'teacher') query = query.eq('teacher_id', user.id)
+    
     if (role === 'student') {
+      // Use user.id directly — batch_students.student_id FK points to students.profile_id
+      setCurrentStudentId(user.id)
+      
       const { data: batchStudents } = await supabase.from('batch_students').select('batch_id').eq('student_id', user.id)
       const batchIds = (batchStudents || []).map(bs => bs.batch_id)
-      if (batchIds.length > 0) query = query.in('id', batchIds)
-      else return { batches: [] }
+      
+      const { data: batchesData } = await supabase.from('batches').select('id, name').in('id', batchIds).order('name')
+      return { batches: batchesData || [] }
     }
+
+    let query = supabase.from('batches').select('id, name').order('name')
+    if (role === 'teacher') query = query.eq('teacher_id', user.id)
     const { data } = await query
     return { batches: data || [] }
   }, { enabled: !!user })
@@ -74,7 +82,7 @@ const LeaderboardPage = ({ hideHeader = false }) => {
         .select(`
           student_id, 
           marks, 
-          students!inner(name, full_name, email), 
+          students!inner(name, email), 
           tests!inner(total_marks)
         `)
         .eq('test_id', selectedTest)
@@ -225,7 +233,7 @@ const LeaderboardPage = ({ hideHeader = false }) => {
       ) : (
         <div className="space-y-4 max-w-4xl">
           {leaderboard.map((entry, i) => {
-            const isCurrentUser = entry.student_id === user.id
+            const isCurrentUser = role === 'student' && entry.student_id === currentStudentId
             return (
               <motion.div
                 key={entry.student_id}

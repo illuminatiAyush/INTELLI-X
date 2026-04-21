@@ -34,6 +34,7 @@ const JoinBatch = ({ hideHeader = false }) => {
     setError('')
     
     try {
+      // Use profile.id directly — batch_students.student_id FK points to students.profile_id
       const batch = await joinBatch(joinCode.trim().toUpperCase(), profile.id, profile.institute_id)
       setBatchName(batch.name)
       setSuccess(true)

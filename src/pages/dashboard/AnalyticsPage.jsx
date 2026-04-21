@@ -10,10 +10,13 @@ import { DashboardSkeleton } from '../../components/ui/Skeletons'
 
 const AnalyticsPage = () => {
   const { isDark } = useTheme()
-  const { role } = useAuth()
+  const { role, profile } = useAuth()
   const { data: analyticsData, loading: analyticsLoading } = useAppQuery('analytics-metrics' + (role === 'student' ? '-student' : ''), async () => {
-    const { profile } = useAuth()
+    if (!profile) return null
     
+    // Use profile.id directly — all FKs (batch_students, results, attendance) reference students.profile_id
+    const resolvedStudentId = profile.id;
+
     // DIFFERENT LOGIC FOR STUDENT
     if (role === 'student') {
       // 1. Fetch basic data for metrics
@@ -23,10 +26,10 @@ const AnalyticsPage = () => {
         { data: allResults },
         { data: myBatches }
       ] = await Promise.all([
-        supabase.from('attendance').select('status, batch_id').eq('student_id', profile.id),
-        supabase.from('results').select('marks, tests!inner(total_marks, batch_id, title)').eq('student_id', profile.id),
+        supabase.from('attendance').select('status, batch_id').eq('student_id', resolvedStudentId),
+        supabase.from('results').select('marks, tests!inner(total_marks, batch_id, title)').eq('student_id', resolvedStudentId),
         supabase.from('results').select('student_id, marks, tests!inner(total_marks)'),
-        supabase.from('batch_students').select('batches(id, name, subject)').eq('student_id', profile.id)
+        supabase.from('batch_students').select('batches(id, name, subject)').eq('student_id', resolvedStudentId)
       ])
 
       // 2. Process Attendance
@@ -51,7 +54,7 @@ const AnalyticsPage = () => {
         .map(([id, s]) => ({ id, avg: s.p ? (s.m / s.p) : 0 }))
         .sort((a, b) => b.avg - a.avg)
       
-      const myRank = rankings.findIndex(r => r.id === profile.id) + 1 || '-'
+      const myRank = rankings.findIndex(r => String(r.id) === String(resolvedStudentId)) + 1 || '-'
 
       // 5. Batch Performance for Student
       const processedBatches = (myBatches || []).map(b => {
@@ -106,14 +109,14 @@ const AnalyticsPage = () => {
         student_id, 
         marks, 
         tests(total_marks, batch_id),
-        students(id, name, full_name)
+        students(id, name)
       `)
     
     // Fetch all student to batch mappings
     const { data: batch_students } = await supabase.from('batch_students').select('student_id, batch_id')
     
     // Fetch students list for overall count (can be used to verify data)
-    const { data: students } = await supabase.from('students').select('id, name, full_name')
+    const { data: students } = await supabase.from('students').select('id, name')
     // Fetch test count
     const { count: testCount } = await supabase.from('tests').select('id', { count: 'exact', head: true })
 

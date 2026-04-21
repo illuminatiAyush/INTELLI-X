@@ -95,19 +95,15 @@ const BatchList = () => {
       }
       if (form.teacher_id) payload.teacher_id = form.teacher_id
 
-      // invite_expiry — only add if column exists (requires DB migration)
-      try {
-        if (form.invite_expiry_days) {
-          const d = new Date()
-          d.setDate(d.getDate() + parseInt(form.invite_expiry_days))
-          payload.invite_expiry = d.toISOString()
-        }
-        // max_uses — only add when user provides a value
-        if (form.max_uses && !isNaN(parseInt(form.max_uses))) {
-          payload.max_uses = parseInt(form.max_uses)
-        }
-      } catch {
-        // columns may not exist yet — skip silently
+      // invite_expiry — only add if column exists
+      if (form.invite_expiry_days) {
+        const d = new Date()
+        d.setDate(d.getDate() + parseInt(form.invite_expiry_days))
+        payload.invite_expiry = d.toISOString()
+      }
+      // max_uses — only add when user provides a value
+      if (form.max_uses && !isNaN(parseInt(form.max_uses))) {
+        payload.max_uses = parseInt(form.max_uses)
       }
       if (editing) {
         await updateBatch(editing.id, payload)
@@ -153,7 +149,7 @@ const BatchList = () => {
       { data: attendanceData },
       { data: resultsData }
     ] = await Promise.all([
-      supabase.from('batch_students').select('students(id, name, full_name, email)').eq('batch_id', batch.id),
+      supabase.from('batch_students').select('students(id, name, email)').eq('batch_id', batch.id),
       supabase.from('attendance').select('student_id, status').eq('batch_id', batch.id),
       supabase.from('results').select('student_id, marks, created_at, tests!inner(batch_id, total_marks)').eq('tests.batch_id', batch.id)
     ])
