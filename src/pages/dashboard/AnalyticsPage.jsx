@@ -280,7 +280,7 @@ const AnalyticsPage = () => {
             ) : (
               <div className="space-y-3">
                 {recentResults.map((r, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-emerald-500/30 transition-colors">
+                  <div key={i} className={`flex items-center justify-between px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-emerald-500/30 transition-all tint-card-${i % 6}`}>
                     <div>
                       <p className="text-sm font-semibold text-[var(--text-primary)]">{r.title}</p>
                       <p className="text-xs text-[var(--text-secondary)]">{r.marks} / {r.total} marks</p>

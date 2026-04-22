@@ -15,10 +15,10 @@ const IconWrapper = ({ icon: Icon, active, className = '', wrapperSize = 48, ico
           active 
             ? isDark 
               ? 'bg-white text-black shadow-none' 
-              : 'bg-black text-white shadow-none'
+              : 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 border border-indigo-400/20'
             : isDark
               ? 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'
-              : 'bg-black/5 text-gray-400 hover:bg-black/10 hover:text-black'
+              : 'bg-black/5 text-slate-500 hover:bg-indigo-500/10 hover:text-indigo-600'
         )
       } ${className}`}
       style={{ width: `${wrapperSize}px`, height: `${wrapperSize}px` }}

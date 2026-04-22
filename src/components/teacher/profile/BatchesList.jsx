@@ -50,10 +50,10 @@ const BatchesList = ({ batches, loading }) => {
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 + idx * 0.05 }}
-              className="flex items-center justify-between px-4 py-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] transition-all group"
+              className={`flex items-center justify-between px-4 py-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-app)] hover:border-[var(--border-strong)] transition-all group tint-card-${idx % 6}`}
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-[var(--border-subtle)] text-[var(--text-primary)] flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-[var(--border-subtle)] text-[var(--text-primary)] flex items-center justify-center flex-shrink-0 bg-white/50 dark:bg-transparent">
                   <Layers className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">

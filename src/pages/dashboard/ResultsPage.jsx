@@ -326,8 +326,8 @@ const ResultsPage = ({ hideHeader = false }) => {
               </button>
 
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white shadow-xl shadow-black/20">
-                  <Sparkles className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-xl shadow-amber-500/5">
+                  <Trophy className="w-6 h-6" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[var(--text-primary)]">AI Performance Insights</h2>

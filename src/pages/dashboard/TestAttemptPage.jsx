@@ -529,7 +529,7 @@ const TestAttemptPage = () => {
           )}
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full py-4 rounded-xl bg-white text-black font-bold shadow-xl active:scale-[0.98] transition-all"
+            className="w-full py-4 rounded-xl bg-[var(--text-primary)] text-[var(--bg-app)] font-bold shadow-xl active:scale-[0.98] transition-all"
           >
             Back to Dashboard
           </button>
@@ -557,7 +557,7 @@ const TestAttemptPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 mb-6 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-[var(--text-primary)]/5 flex items-center justify-center">
             <Clock className={`w-6 h-6 ${getTimerColor()}`} />
           </div>
           <div>
@@ -582,7 +582,7 @@ const TestAttemptPage = () => {
           <button
             onClick={() => handleSubmit(false)}
             disabled={submitting}
-            className="px-6 py-3 bg-white text-black font-bold rounded-xl shadow-xl flex items-center gap-2 hover:bg-gray-200 active:scale-[0.98] transition-all disabled:opacity-50"
+            className="px-6 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl shadow-xl flex items-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
             Finish
@@ -596,9 +596,9 @@ const TestAttemptPage = () => {
           <button
             key={item.id}
             onClick={() => setCurrentQuestion(idx)}
-            className={`w-10 h-10 rounded-xl font-bold text-xs transition-all ${ idx === currentQuestion ? 'bg-white text-black shadow-xl ring-2 ring-white/50' 
+            className={`w-10 h-10 rounded-xl font-bold text-xs transition-all ${ idx === currentQuestion ? 'bg-[var(--text-primary)] text-[var(--bg-app)] shadow-xl' 
                 : answers[item.id] 
-                  ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                  ? 'bg-green-500/20 text-green-500 border border-green-500/30' 
                   : 'bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-strong)]'
             }`}
           >
@@ -615,7 +615,7 @@ const TestAttemptPage = () => {
         className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[2.5rem] p-8 shadow-sm"
       >
         <div className="flex items-start gap-5 mb-10">
-          <span className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/70 font-black text-xl border border-white/10">
+          <span className="flex-shrink-0 w-12 h-12 rounded-2xl bg-[var(--text-primary)]/5 flex items-center justify-center text-[var(--text-primary)] font-black text-xl border border-[var(--border-subtle)]">
             {currentQuestion + 1}
           </span>
           <h2 className="text-lg md:text-xl font-semibold text-[var(--text-primary)] leading-relaxed pt-1">
@@ -631,15 +631,15 @@ const TestAttemptPage = () => {
               <button
                 key={oIdx}
                 onClick={() => handleOptionSelect(q.id, letter)}
-                className={`flex items-center gap-5 p-5 rounded-2xl border text-left transition-all ${ isSelected ? 'bg-white/10 border-white/30 shadow-white/[0.05]' 
+                className={`flex items-center gap-5 p-5 rounded-2xl border text-left transition-all ${ isSelected ? 'bg-[var(--text-primary)]/10 border-[var(--text-primary)]/30' 
                     : 'bg-[var(--bg-app)] border-[var(--border-subtle)] hover:border-[var(--border-strong)]'
                 }`}
               >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm border transition-all ${ isSelected ? 'bg-white text-black border-white' : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm border transition-all ${ isSelected ? 'bg-[var(--text-primary)] text-[var(--bg-app)] border-transparent' : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
                 }`}>
                   {letter}
                 </div>
-                <span className={`text-sm md:text-base font-medium ${isSelected ? 'text-white' : 'text-[var(--text-primary)]'}`}>
+                <span className="text-sm md:text-base font-medium text-[var(--text-primary)]">
                   {opt}
                 </span>
               </button>
@@ -663,7 +663,7 @@ const TestAttemptPage = () => {
           {currentQuestion < questions.length - 1 ? (
             <button
               onClick={goNext}
-              className="flex items-center gap-2 px-8 py-3 bg-white text-black font-bold rounded-xl shadow-xl hover:bg-gray-200 active:scale-[0.98] transition-all"
+              className="flex items-center gap-2 px-8 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl shadow-xl hover:opacity-90 active:scale-[0.98] transition-all"
             >
               Next <ChevronRight className="w-5 h-5" />
             </button>
@@ -671,7 +671,7 @@ const TestAttemptPage = () => {
             <button
               onClick={() => handleSubmit(false)}
               disabled={submitting}
-              className="flex items-center gap-2 px-8 py-3 bg-white text-black font-bold rounded-xl shadow-xl hover:bg-gray-200 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-8 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl shadow-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               <Send className="w-5 h-5" /> Submit Exam
             </button>

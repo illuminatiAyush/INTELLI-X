@@ -212,7 +212,7 @@ const TestManagement = () => {
       <div className="flex items-center gap-2">
         <span>{r.title}</span>
         {r.is_ai_generated && (
-          <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-white/10 text-white/70 border border-white/20 flex items-center gap-0.5">
+          <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-[var(--text-primary)]/10 text-[var(--text-primary)]/70 border border-[var(--border-subtle)] flex items-center gap-0.5">
             <Sparkles className="w-2.5 h-2.5" /> AI
           </span>
         )}
@@ -241,7 +241,7 @@ const TestManagement = () => {
               {canManage && (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleStartTest(row.id) }}
-                  className="px-2 py-0.5 ml-2 rounded text-[10px] font-bold bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-colors"
+                  className="px-2 py-0.5 ml-2 rounded text-[10px] font-bold bg-[var(--text-primary)]/10 text-[var(--text-primary)] border border-[var(--border-subtle)] hover:bg-[var(--text-primary)]/20 transition-colors"
                 >
                   Start Now
                 </button>
@@ -273,7 +273,7 @@ const TestManagement = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={(e) => { e.stopPropagation(); openResults(row) }}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 text-white hover:bg-white/10 transition-colors text-xs border border-white/10"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--text-primary)]/10 text-[var(--text-primary)] hover:bg-[var(--text-primary)]/20 transition-colors text-xs border border-[var(--border-subtle)]"
           >
             <ListOrdered className="w-3.5 h-3.5" /> Results
           </button>
@@ -521,7 +521,7 @@ const TestManagement = () => {
                       <tr key={i} className="hover:bg-[var(--bg-app)] transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs font-bold border border-white/10">
+                            <div className="w-8 h-8 rounded-full bg-[var(--text-primary)]/10 text-[var(--text-primary)] flex items-center justify-center text-xs font-bold border border-[var(--border-subtle)]">
                               {r.students?.name?.charAt(0).toUpperCase() || '?'}
                             </div>
                             <div>
@@ -537,7 +537,7 @@ const TestManagement = () => {
                           {pct !== null ? `${pct}%` : '-'}
                         </td>
                         <td className="px-6 py-4">
-                          <span className="px-2.5 py-1 rounded-lg bg-white/5 text-white text-xs font-bold border border-white/10">#{r.rank ?? i + 1}</span>
+                          <span className="px-2.5 py-1 rounded-lg bg-[var(--text-primary)]/10 text-[var(--text-primary)] text-xs font-bold border border-[var(--border-subtle)]">#{r.rank ?? i + 1}</span>
                         </td>
                         <td className="px-6 py-4">
                           {violations === 0 ? (
@@ -657,8 +657,8 @@ const TestManagement = () => {
                 <p>No students in this batch</p>
               </div>
             ) : (
-              testStudents.map((student) => (
-                <div key={student.id} className="flex items-center justify-between px-5 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)]/50 hover:border-white/20 transition-all">
+              testStudents.map((student, idx) => (
+                <div key={student.id} className={`flex items-center justify-between px-5 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)]/50 hover:border-black/20 dark:hover:border-white/20 transition-all tint-card-${idx % 6}`}>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-[var(--bg-app)] flex items-center justify-center text-xs font-bold text-[var(--text-primary)] border border-[var(--border-subtle)]">
                       {student.name.charAt(0).toUpperCase()}
@@ -687,7 +687,7 @@ const TestManagement = () => {
           <div className="flex justify-between items-center pt-6 border-t border-[var(--border-subtle)]">
             <button
               onClick={downloadResultsPDF}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 text-white hover:bg-white/10 border border-white/10 transition-all text-sm font-semibold active:scale-95"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--text-primary)]/5 text-[var(--text-primary)] hover:bg-[var(--text-primary)]/10 border border-[var(--border-subtle)] transition-all text-sm font-semibold active:scale-95"
             >
               <FileDown className="w-4 h-4" /> Download PDF
             </button>

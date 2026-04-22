@@ -87,7 +87,9 @@ const DashboardLayout = () => {
                 {isActive && (
                   <motion.div
                     layoutId="active-indicator"
-                    className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-6 bg-[var(--text-primary)] rounded-r-full ${isExpanded ? '-left-4' : '-left-3'}`}
+                    className={`absolute top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full ${isExpanded ? '-left-4' : '-left-3'} ${
+                      isDark ? 'bg-white' : 'bg-gradient-to-b from-indigo-500 to-purple-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]'
+                    }`}
                   />
                 )}
                 
@@ -100,7 +102,9 @@ const DashboardLayout = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -4 }}
                       className={`whitespace-nowrap font-bold text-sm transition-colors ${
-                        isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'
+                        isActive 
+                          ? isDark ? 'text-white' : 'text-indigo-600' 
+                          : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'
                       }`}
                     >
                       {item.label}

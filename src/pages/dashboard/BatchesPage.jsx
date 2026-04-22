@@ -245,7 +245,7 @@ const BatchList = () => {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white border border-white/10 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 border border-indigo-500/20 shadow-sm">
             <Users className="w-6 h-6" />
           </div>
           <div>
@@ -290,13 +290,13 @@ const BatchList = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map((batch) => (
+          {filtered.map((batch, index) => (
             <motion.div
               key={batch.id}
               whileHover={{ scale: 1.02, y: -4 }}
               transition={{ duration: 0.2 }}
               onClick={() => handleRowClick(batch)}
-              className="glass-card flex flex-col aspect-square p-5 sm:p-6 justify-between group cursor-pointer hover:border-white/30 relative overflow-hidden preserve-3d"
+              className={`glass-card tint-card-${index % 6} flex flex-col aspect-square p-5 sm:p-6 justify-between group cursor-pointer hover:border-black/10 hover:shadow-xl relative overflow-hidden preserve-3d`}
             >
 
               {/* Top: Year & Status */}
@@ -316,10 +316,10 @@ const BatchList = () => {
                   {batch.name}
                 </h2>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  <span className="px-2 py-0.5 rounded text-xs font-semibold bg-white/10 text-white/70 border-white/20 border backdrop-blur-md">
+                  <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[var(--text-primary)]/10 text-[var(--text-primary)]/80 border-[var(--border-subtle)] border backdrop-blur-md">
                     #{batch.subject || 'Core'}
                   </span>
-                  <span className="px-2 py-0.5 rounded text-xs font-semibold bg-white/5 text-white/50 border-white/10 border backdrop-blur-md">
+                  <span className="px-2 py-0.5 rounded text-xs font-semibold bg-[var(--text-primary)]/5 text-[var(--text-primary)]/60 border-[var(--border-subtle)] border backdrop-blur-md">
                     Div A
                   </span>
                 </div>
@@ -340,7 +340,7 @@ const BatchList = () => {
                   {role === 'admin' && (
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(batch); }}
-                      className="p-1.5 sm:p-2 rounded-xl bg-[var(--bg-card)] hover:bg-white/10 text-[var(--text-secondary)] hover:text-white border-transparent hover:border-white/10 transition-colors border"
+                      className="p-1.5 sm:p-2 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--text-primary)] text-[var(--text-secondary)] hover:text-[var(--bg-app)] border-transparent transition-colors border"
                       title="Edit Batch"
                     >
                       <Pencil className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -375,11 +375,8 @@ const BatchList = () => {
               <div className="flex flex-row sm:flex-col gap-2 shrink-0">
                  {expandedBatch.join_code && (
                   <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(expandedBatch.join_code);
-                      setToast({ type: 'success', message: 'Join Code copied!' });
-                    }}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs font-bold font-mono transition-colors w-full justify-center"
+                    onClick={() => { navigator.clipboard.writeText(expandedBatch.join_code); setToast({ show: true, message: 'Code Copied!', type: 'success' }); setTimeout(() => setToast(null), 3000) }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--text-primary)]/10 border-[var(--border-subtle)] text-[var(--text-primary)] hover:bg-[var(--text-primary)]/20 text-xs font-bold font-mono transition-colors w-full justify-center"
                     title="Copy Join Code"
                   >
                     <Copy className="w-3.5 h-3.5" /> {expandedBatch.join_code}
@@ -387,11 +384,8 @@ const BatchList = () => {
                  )}
                  {expandedBatch.join_link && (
                   <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(expandedBatch.join_link);
-                      setToast({ type: 'success', message: 'Invite Link copied!' });
-                    }}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs font-bold transition-colors w-full justify-center whitespace-nowrap"
+                    onClick={() => { navigator.clipboard.writeText(expandedBatch.join_link); setToast({ show: true, message: 'Link Copied!', type: 'success' }); setTimeout(() => setToast(null), 3000) }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--text-primary)]/10 border-[var(--border-subtle)] text-[var(--text-primary)] hover:bg-[var(--text-primary)]/20 text-xs font-bold transition-colors w-full justify-center whitespace-nowrap"
                     title="Copy Invite Link"
                   >
                     <LinkIcon className="w-3.5 h-3.5" /> Copy Link

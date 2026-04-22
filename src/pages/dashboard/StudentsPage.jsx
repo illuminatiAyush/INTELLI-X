@@ -203,8 +203,8 @@ const StudentsPage = ({ hideHeader = false }) => {
       {!hideHeader && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white border border-white/20 shadow-sm">
-              <Users className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-sm">
+              <GraduationCap className="w-6 h-6" />
             </div>
             <div>
               <motion.h1

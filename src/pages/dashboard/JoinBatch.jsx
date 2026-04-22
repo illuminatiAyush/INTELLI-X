@@ -68,10 +68,10 @@ const JoinBatch = ({ hideHeader = false }) => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-3xl p-8 shadow-xl relative overflow-hidden"
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-white/20" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-[var(--text-primary)]/20" />
         
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-white/10 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
+          <div className="w-16 h-16 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
             <BookOpen className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Join a Subject</h1>

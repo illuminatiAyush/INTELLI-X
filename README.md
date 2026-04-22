@@ -1,43 +1,56 @@
-IntelliX – AI-Powered Coaching Institute Operating System
+# IntelliX — AI-Powered Coaching Institute Operating System
 
-IntelliX is a next-generation AI-driven operating system built for modern coaching institutes.
-It transforms traditional institute workflows into a fully automated, data-driven, intelligent ecosystem — enabling real-time management, personalized analytics, and AI-assisted decision making.
+IntelliX is a modern operating system for coaching institutes that transforms fragmented, manual workflows into a centralized, data-driven, and scalable system.
 
-⚡ Built to scale from a single institute to a full SaaS platform.
+It enables institutes to manage students, batches, attendance, and performance — all in one place, with real-time visibility and structured insights.
 
-🧠 Vision
+---
+
+## Problem
 
 Traditional coaching systems are:
 
-fragmented ❌
-manual ❌
-inefficient ❌
+- Fragmented  
+- Manual  
+- Inefficient  
 
-IntelliX converts them into:
+---
 
-Centralized + Automated + AI-Augmented System
-⚙️ Core Capabilities
-🧑‍💼 Admin Control System
-Institute-wide analytics dashboard
-Batch-wise & student-wise drilldowns
-Attendance + test + performance insights
-Real-time monitoring
-👨‍🏫 Teacher System
-Test creation & evaluation
-Batch management
-Student performance tracking
-AI-assisted insights
-👨‍🎓 Student System
-Personalized dashboard
-Test attempts & results
-Leaderboard ranking
-AI doubt-solving assistant (WIP)
-🤖 AI Layer (Next-Gen Feature)
-AI chatbot → evolving into full Doubt Solver
-Image + text input support (OCR pipeline)
-Structured teaching responses (step-by-step)
-Future-ready for RAG (Retrieval Augmented Generation)
-🧩 System Architecture (Current)
+## Solution
+
+IntelliX digitizes the entire institute workflow into a unified platform:
+
+- Centralized data management  
+- Real-time tracking  
+- Role-based access control  
+- Performance analytics  
+- Scalable multi-institute architecture  
+
+---
+
+## Core Modules
+
+### Admin
+- Institute-wide dashboard  
+- Batch & student management  
+- Performance analytics  
+- Attendance & results tracking  
+
+### Teacher
+- Batch management  
+- Attendance marking (live sessions)  
+- Student performance tracking  
+
+### Student
+- Personalized dashboard  
+- Attendance & results view  
+- Batch access  
+
+---
+
+## System Architecture
+
+```text
                 ┌────────────────────────┐
                 │      Frontend (React)  │
                 │  UI + State + Routing  │
@@ -53,148 +66,132 @@ Future-ready for RAG (Retrieval Augmented Generation)
         ▼                  ▼                  ▼
 ┌──────────────┐  ┌────────────────┐  ┌────────────────┐
 │  Supabase    │  │   AI Layer     │  │  Realtime Sync │
-│ (PostgreSQL) │  │ (Groq / LLM)   │  │ (WebSockets)   │
+│ (PostgreSQL) │  │ (LLM / RAG)    │  │ (WebSockets)   │
 └──────────────┘  └────────────────┘  └────────────────┘
         │
         ▼
 ┌────────────────────────────┐
 │ Auth + RBAC + Storage      │
 └────────────────────────────┘
-🧠 AI Doubt Solver Flow (Upcoming Core Feature)
-User (Image / Text)
-        ↓
-Image Crop Tool (Frontend)
+```
+
+---
+
+## AI Layer (In Progress)
+
+```text
+User Input (Text / Image)
         ↓
 OCR (Text Extraction)
         ↓
-LLM (Groq / AI)
+LLM Processing
         ↓
-Structured Answer (Teacher Style)
+Structured Answer (Step-by-step)
         ↓
 Chat Interface
-🛠 Tech Stack
-🎨 Frontend
-React 19
-Vite
-Tailwind CSS
-Headless UI
-⚡ Interaction & Animations
-Framer Motion
-Intersection Observer
-React Scroll
-📊 Visualization
-Chart.js
-React-Chartjs-2
-🧠 AI / Future ML Stack
-Groq API (LLM)
-OCR (Tesseract.js – planned)
-RAG (planned: pgvector / Pinecone)
-🗄 Backend & Infra
-Supabase
-PostgreSQL
-Auth
-Realtime
-Storage
-RBAC
-📂 Project Structure
-📦 INTELLI-X
- ┣ 📂 public/
- ┣ 📂 scripts/
- ┣ 📂 src/
- ┃ ┣ 📂 animations/
- ┃ ┣ 📂 assets/
- ┃ ┣ 📂 components/
- ┃ ┃ ┣ 📂 dashboard/
- ┃ ┃ ┣ 📂 teacher/
- ┃ ┃ ┣ 📂 profile/
- ┃ ┃ ┗ 📂 ui/
- ┃ ┣ 📂 config/
- ┃ ┣ 📂 context/
- ┃ ┣ 📂 lib/
- ┃ ┣ 📂 pages/
- ┃ ┃ ┗ 📂 dashboard/
- ┃ ┣ 📂 sections/
- ┃ ┣ 📂 services/
- ┃ ┣ 📜 App.jsx
- ┃ ┣ 📜 main.jsx
- ┃ ┗ 📜 index.css
- ┣ 📂 supabase/
- ┃ ┗ 📂 migrations/
- ┣ 📜 package.json
- ┣ 📜 vite.config.js
- ┗ 📜 tailwind.config.js
-🔐 Database Architecture (Simplified)
-Users
+```
+
+---
+
+## Tech Stack
+
+### Frontend
+- React (Vite)
+- Tailwind CSS
+
+### Backend & Infra
+- Supabase (PostgreSQL)
+- Auth + Realtime + Storage
+
+### AI (Planned)
+- LLM APIs  
+- OCR pipeline  
+- RAG (vector search)
+
+---
+
+## Database Design (Simplified)
+
+```text
+Profiles (auth users)
  ├── role (admin / teacher / student)
  ├── institute_id
 
 Institutes
 Batches
+Batch_Students
 Students
 Teachers
 Tests
-Test_Attempts
+Attempts
 Attendance
 Results
-Leaderboard
 Materials
-⚡ Key Engineering Highlights
-🔒 Strict RBAC (Role-Based Access Control)
-⚡ Real-time updates using Supabase subscriptions
-🧠 Optimized batch-wise analytics (no N+1 queries)
-🛡 Crash-safe UI with null-safe rendering
-🔄 Modular service architecture
-🚀 SaaS-ready multi-institute design
-💻 Getting Started
-Prerequisites
-Node.js (v18+)
-npm
-Installation
+```
+
+---
+
+## Key Features
+
+- Role-Based Access Control (RBAC)  
+- Multi-tenant architecture (SaaS-ready)  
+- Real-time updates  
+- Optimized queries (no N+1)  
+- Modular architecture  
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- npm
+
+### Installation
+
+```bash
 git clone https://github.com/your-username/INTELLI-X-master.git
 cd INTELLI-X-master
 npm install
-Environment Setup
+```
+
+### Environment Variables
+
+```env
 VITE_SUPABASE_URL=your-url
 VITE_SUPABASE_ANON_KEY=your-key
 VITE_GROQ_API_KEY=your-ai-key
-Run Dev Server
+```
+
+### Run
+
+```bash
 npm run dev
-Build
-npm run build
-🧪 Current Status
-✔ Admin Dashboard (Functional)
-✔ Batch & Student Management
-✔ Analytics System (Drilldown Enabled)
-✔ Auth + RBAC
-✔ UI System (Refined Minimal Theme)
+```
 
-🚧 AI Doubt Solver (MVP in progress)
-🚧 Test Creation Engine (Upcoming Core)
-🚧 RAG-based Learning System
-🚀 Roadmap
-Phase 1 (Current)
-Admin + Teacher + Student system
-Analytics + dashboards
-Core UI/UX
-Phase 2
-AI doubt solver (image + text)
-Test creation engine
-Performance insights AI
-Phase 3
-RAG-based intelligent learning
-SaaS multi-institute scaling
-Advanced analytics + predictions
-🧠 Philosophy
+---
 
-“The best systems are not managed — they are engineered.”
+## Current Status
 
-IntelliX is not just software.
-It is an operating system for education.
+- Admin Dashboard  
+- Batch & Student Management  
+- Auth + RBAC  
+- Real-time system  
 
-🤝 Contributing
+**In Progress:**
+- AI Doubt Solver  
+- Test Engine  
+- RAG-based learning  
 
-Currently under active development. Contributions will be opened soon.
+---
 
-📜 License
+## Vision
 
-Private project (for now)
+We don’t change how institutes teach.  
+We give them complete control, visibility, and intelligence over their system.
+
+---
+
+## License
+
+Private (under development)

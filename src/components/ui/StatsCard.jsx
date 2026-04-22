@@ -14,7 +14,7 @@ const StatsCard = ({ title, value, icon: Icon, trend, color = 'white' }) => {
       case 'purple': return 'text-purple-500 bg-purple-500/10 border-purple-500/20';
       case 'indigo': return 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20';
       case 'cyan': return 'text-cyan-500 bg-cyan-500/10 border-cyan-500/20';
-      case 'white': return isDark ? 'text-white bg-white/10 border-white/20' : 'text-slate-800 bg-slate-100 border-slate-200';
+      case 'white': return isDark ? 'text-white bg-white/10 border-white/20' : 'text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md shadow-indigo-500/20 border-indigo-400/30';
       default: return 'text-[var(--text-primary)] bg-[var(--text-primary)]/5 border-[var(--border-subtle)]';
     }
   };

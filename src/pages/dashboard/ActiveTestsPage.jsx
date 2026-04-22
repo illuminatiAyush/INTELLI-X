@@ -233,7 +233,7 @@ const ActiveTestsPage = ({ hideHeader = false }) => {
             animate={{ opacity: 1, x: 0 }}
             className="text-3xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-3"
           >
-            <Sparkles className="w-7 h-7 text-white" />
+            <Sparkles className="w-7 h-7 text-indigo-500" />
             AI Tests
           </motion.h1>
           <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
@@ -285,11 +285,11 @@ const ActiveTestsPage = ({ hideHeader = false }) => {
       {/* 3. COMPLETED SECTION */}
       <section>
         <div className="flex items-center gap-2 mb-5 pt-4">
-          <div className="p-2 rounded-lg bg-white/10 text-white">
+          <div className="p-2 rounded-lg bg-[var(--text-primary)]/10 text-[var(--text-primary)]">
             <FileText className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-bold text-[var(--text-primary)]">Exam History</h2>
-          <span className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold border border-white/20">{completedTests.length}</span>
+          <span className="px-2 py-0.5 rounded-full bg-[var(--text-primary)]/10 text-[var(--text-primary)] text-[10px] font-bold border border-[var(--border-subtle)]">{completedTests.length}</span>
         </div>
         {completedTests.length === 0 ? (
           <div className="py-10 text-center bg-[var(--bg-surface)]/30 rounded-3xl border border-dashed border-[var(--border-subtle)]">

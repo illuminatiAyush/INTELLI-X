@@ -22,15 +22,26 @@
   }
 
   .light-mode {
-    --bg-app: #f8fafc;
+    --bg-app: #f4f7fe;
     --bg-surface: #ffffff;
-    --bg-card: #ffffff;
-    --bg-gradient: none;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-gradient: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 20%),
+                   radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 20%),
+                   radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
     --text-primary: #0f172a;
-    --text-secondary: #64748b;
-    --border-subtle: rgba(0, 0, 0, 0.08);
-    --border-strong: rgba(0, 0, 0, 0.12);
+    --text-secondary: #475569;
+    --border-subtle: rgba(15, 23, 42, 0.08);
+    --border-strong: rgba(15, 23, 42, 0.15);
+    --shadow-premium: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 0 3px rgba(15, 23, 42, 0.02);
   }
+
+  /* Vibrant Tint Cards specifically for light mode */
+  .light-mode .tint-card-0 { background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-color: #bfdbfe; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.05); }
+  .light-mode .tint-card-1 { background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%); border-color: #e9d5ff; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.05); }
+  .light-mode .tint-card-2 { background: linear-gradient(135deg, #fff1f2 0%, #ffffff 100%); border-color: #fecdd3; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.05); }
+  .light-mode .tint-card-3 { background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-color: #bbf7d0; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.05); }
+  .light-mode .tint-card-4 { background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%); border-color: #fde68a; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.05); }
+  .light-mode .tint-card-5 { background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%); border-color: #a7f3d0; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.05); }
 
   body {
     background-color: var(--bg-app);

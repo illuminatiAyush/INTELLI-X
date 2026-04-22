@@ -137,8 +137,8 @@ const TeachersPage = ({ hideHeader = false }) => {
       {!hideHeader && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-white border border-white/20 shadow-sm shadow-white/5">
-              <Users className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 border border-purple-500/20 shadow-sm shadow-purple-500/5">
+              <UserCheck className="w-6 h-6" />
             </div>
             <div>
               <motion.h1

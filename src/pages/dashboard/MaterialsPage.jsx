@@ -134,7 +134,7 @@ const MaterialsPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm"
+          className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm tint-card-0"
         >
           <div className={`flex items-center gap-3 mb-6`}>
             <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
@@ -150,7 +150,7 @@ const MaterialsPage = () => {
                 placeholder="Enter document title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-white/50 focus:bg-[var(--bg-app)] transition-all"
+                className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-indigo-400 focus:bg-[var(--bg-app)] transition-all"
               />
             </div>
             <Select
@@ -167,17 +167,17 @@ const MaterialsPage = () => {
                 ref={fileRef}
                 type="file"
                 accept=".pdf,.doc,.docx,.ppt,.pptx,.xlsx"
-                className={`w-full text-xs text-[var(--text-secondary)] file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:cursor-pointer transition-all ${isDark ? 'file:bg-white/10 file:text-white hover:file:bg-white/20' : 'file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200'}`}
+                className={`w-full text-xs text-[var(--text-secondary)] file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:cursor-pointer transition-all ${isDark ? 'file:bg-white/10 file:text-white hover:file:bg-white/20' : 'file:bg-indigo-500/10 file:text-indigo-600 hover:file:bg-indigo-500/20'}`}
               />
             </div>
             <div className="flex items-end">
               <motion.button
                 onClick={handleUpload}
                 disabled={uploading || !title || !uploadBatch || !fileRef.current?.files[0]}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-black text-sm font-bold disabled:opacity-50 shadow-xl active:scale-95 transition-all"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--text-primary)] text-[var(--bg-app)] text-sm font-bold disabled:opacity-50 shadow-xl active:scale-95 transition-all"
               >
                 {uploading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Upload className="w-5 h-5" />
                 )}
@@ -208,7 +208,7 @@ const MaterialsPage = () => {
               placeholder="Find materials by title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-white/50 focus:bg-[var(--bg-app)] transition-all"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-indigo-400 focus:bg-[var(--bg-app)] transition-all"
             />
           </div>
         </div>
@@ -232,10 +232,10 @@ const MaterialsPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="group rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 flex flex-col hover:border-white/20 hover:shadow-2xl transition-all"
+              className={`group rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 flex flex-col hover:border-black/20 dark:hover:border-white/20 hover:shadow-xl transition-all tint-card-${i % 6}`}
             >
               <div className="flex items-start gap-3 mb-4">
-                <div className="p-3 rounded-xl transition-all bg-white/10 text-white group-hover:bg-white group-hover:text-black">
+                <div className={`p-3 rounded-xl transition-all ${isDark ? 'bg-white/10 text-white group-hover:bg-white group-hover:text-black' : 'bg-black/10 text-black group-hover:bg-indigo-600 group-hover:text-white'}`}>
                   <FileText className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">

@@ -440,7 +440,7 @@ const AdminAttendanceView = ({ user, role }) => {
               )}
               <button
                 onClick={downloadPDF}
-                className="flex items-center gap-2 text-xs px-4 py-2 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all font-semibold active:scale-95"
+                className="flex items-center gap-2 text-xs px-4 py-2 rounded-xl bg-[var(--text-primary)]/5 text-[var(--text-primary)] hover:bg-[var(--text-primary)]/10 border border-[var(--border-subtle)] transition-all font-semibold active:scale-95"
               >
                 <FileDown className="w-3.5 h-3.5" />
                 Download PDF
