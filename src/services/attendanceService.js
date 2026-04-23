@@ -50,3 +50,21 @@ export const getAttendanceStats = async (batchId) => {
   const present = data.filter((r) => r.status === 'present').length
   return { total, present, absent: total - present, rate: total ? ((present / total) * 100).toFixed(1) : 0 }
 }
+
+export const getAttendanceByLecture = async (lectureId) => {
+  const { data, error } = await supabase
+    .from('attendance')
+    .select('*, students:student_id(name)')
+    .eq('lecture_id', lectureId)
+  if (error) throw error
+  return data
+}
+
+export const upsertLectureAttendance = async (records) => {
+  const { data, error } = await supabase
+    .from('attendance')
+    .upsert(records, { onConflict: 'lecture_id,student_id' })
+    .select()
+  if (error) throw error
+  return data
+}

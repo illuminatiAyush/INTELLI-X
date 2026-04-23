@@ -37,6 +37,7 @@ import ProfilePage from './pages/dashboard/ProfilePage'
 import JoinBatch from './pages/dashboard/JoinBatch'
 import ActiveTestsPage from './pages/dashboard/ActiveTestsPage'
 import TestAttemptPage from './pages/dashboard/TestAttemptPage'
+import LecturesPage from './pages/dashboard/LecturesPage'
 
 const JoinRedirect = () => {
   const { code } = useParams()
@@ -100,6 +101,7 @@ const AppContent = () => {
         <Route path="students" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><StudentsPage /></ProtectedRoute>} />
         <Route path="batches" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><BatchesPage /></ProtectedRoute>} />
         <Route path="attendance" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><AttendancePage /></ProtectedRoute>} />
+        <Route path="lectures" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><LecturesPage /></ProtectedRoute>} />
         <Route path="tests" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student']}><TestsPage /></ProtectedRoute>} />
         <Route path="results" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><ResultsPage /></ProtectedRoute>} />
         <Route path="leaderboard" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><LeaderboardPage /></ProtectedRoute>} />
