@@ -1,18 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { BookOpen, Trophy, ClipboardCheck, TrendingUp, Sparkles, Play, Clock, Activity, Plus, Bell, X, Lock } from 'lucide-react'
-import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { Link, useNavigate } from 'react-router-dom'
+import { BookOpen, Trophy, ClipboardCheck, TrendingUp, Sparkles, Play, Clock, Activity, Plus, Bell, X, Lock, FileText } from 'lucide-react'
 import StatsCard from '../../components/ui/StatsCard'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { useTheme } from '../../context/ThemeContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { DashboardSkeleton } from '../../components/ui/Skeletons'
-import IconWrapper from '../../components/ui/IconWrapper'
 
 const StudentDashboard = () => {
-  const { isDark } = useTheme()
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -56,9 +51,6 @@ const StudentDashboard = () => {
       .order('created_at', { ascending: false })
 
     const resultList = results || []
-    const totalMarks = resultList.reduce((s, r) => s + r.marks, 0)
-    const totalPossible = resultList.reduce((s, r) => s + (r.tests?.total_marks || 100), 0)
-    const avgScore = totalPossible ? ((totalMarks / totalPossible) * 100).toFixed(1) : 0
 
     // Get attendance
     const { data: attendance } = await supabase
@@ -69,7 +61,7 @@ const StudentDashboard = () => {
     const presentA = attendance?.filter((a) => a.status === 'present').length || 0
     const attendanceRate = totalA ? ((presentA / totalA) * 100).toFixed(1) : 0
 
-    // Get AI tests
+    // Get active tests
     const { data: testData } = await supabase
       .from('tests')
       .select('id, title, date, start_time, end_time, duration_minutes, batch_id, batches(name)')
@@ -85,13 +77,6 @@ const StudentDashboard = () => {
       })
       .slice(0, 4)
 
-    // Chart Data
-    const chartData = resultList.slice(0, 10).reverse().map(r => ({
-      name: r.tests?.title?.substring(0, 15) || 'Test',
-      score: Math.round((r.marks / (r.tests?.total_marks || 100)) * 100),
-      date: new Date(r.tests?.date || r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-    }))
-
     // Get notifications
     const { data: notifies } = await supabase
       .from('notifications')
@@ -105,13 +90,11 @@ const StudentDashboard = () => {
       hasBatches: true,
       stats: {
         tests: resultList.length,
-        avgScore,
         attendanceRate,
         rank: resultList[0]?.rank || '-',
       },
       recentResults: resultList.slice(0, 5),
       activeTests: activeOrUpcoming,
-      chartData,
       enrolledBatches: batchDetails || [],
       notifications: notifies || [],
       unreadCount: notifies?.filter(n => !n.read).length || 0
@@ -143,104 +126,109 @@ const StudentDashboard = () => {
     recentResults,
     activeTests,
     hasBatches,
-    chartData,
     enrolledBatches,
   } = studentData || {
     studentRecord: null,
-    stats: { tests: 0, avgScore: 0, attendanceRate: 0, rank: '-' },
+    stats: { tests: 0, attendanceRate: 0, rank: '-' },
     recentResults: [],
     activeTests: [],
     hasBatches: true,
-    chartData: [],
     enrolledBatches: [],
   }
 
   if (!studentRecord) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 bg-[var(--bg-card)] rounded-2xl flex items-center justify-center mb-4 text-[var(--text-secondary)]">
+        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 text-gray-500 border border-gray-200 shadow-sm">
           <Activity className="w-8 h-8" />
         </div>
-        <p className="text-[var(--text-primary)] font-semibold text-lg">No student profile found</p>
-        <p className="text-[var(--text-secondary)] text-sm mt-1">Please contact your admin to link your account</p>
+        <p className="text-gray-900 font-semibold text-lg">No student profile found</p>
+        <p className="text-gray-500 text-sm mt-1">Please contact your admin to link your account</p>
       </div>
     )
   }
 
   if (!hasBatches) {
     return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="min-h-[60vh] flex flex-col items-center justify-center text-center p-12 border border-[var(--border-subtle)] rounded-[2.5rem] bg-[var(--bg-card)] mt-8 relative overflow-hidden"
-      >
-
-        <IconWrapper icon={BookOpen} wrapperSize={80} iconSize={40} className="mb-8 relative z-10" />
-        <h2 className="text-4xl font-bold text-[var(--text-primary)] mb-4 relative z-10 tracking-tight">Welcome to IntelliX</h2>
-        <p className="text-[var(--text-secondary)] text-lg max-w-lg mx-auto mb-10 leading-relaxed relative z-10">
-          You are successfully registered but haven't joined any classes yet. Get your class Join Code from your teacher to begin exploring.
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-12 bg-white border border-gray-200 rounded-[16px] shadow-sm mt-8">
+        <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 mb-6">
+           <BookOpen className="w-8 h-8" />
+        </div>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2 tracking-tight">Welcome to IntelliX</h2>
+        <p className="text-gray-500 text-sm max-w-sm mx-auto mb-8 leading-relaxed">
+          You are successfully registered but haven't joined any classes yet. Get your class Join Code from your teacher to begin.
         </p>
         <button 
           onClick={() => navigate('/dashboard/join')}
-          className="px-10 py-4 rounded-2xl bg-white text-black hover:bg-gray-200 font-bold tracking-tight transition-all active:scale-95 flex items-center gap-2 relative z-10"
+          className="btn-primary"
         >
-          <Plus className="w-5 h-5"/>
+          <Plus className="w-5 h-5 mr-2"/>
           Join Your First Subject
         </button>
-      </motion.div>
+      </div>
     )
   }
 
+  const hour = new Date().getHours()
+  let greeting = 'Good Evening'
+  if (hour < 12) greeting = 'Good Morning'
+  else if (hour < 18) greeting = 'Good Afternoon'
+
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* SECTION 1: Welcome Back */}
+      <div className="bg-white rounded-[16px] border border-gray-200 p-8 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
-          <motion.h1
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-          >
-            Welcome, {studentRecord.name}
-          </motion.h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">Your academic performance and progress</p>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-tight mb-2">
+            {greeting}, {studentRecord.name}.
+          </h1>
+          <div className="flex flex-wrap items-center gap-6 text-sm mt-4">
+            <div className="flex items-center gap-2 text-gray-600">
+               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+               <span className="font-medium text-gray-900">{enrolledBatches.length}</span> Subjects
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+               <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+               <span className="font-medium text-gray-900">{activeTests.length}</span> Upcoming Tests
+            </div>
+          </div>
         </div>
+        
         <div className="flex items-center gap-3">
           <div className="relative">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="p-3 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all relative"
+              className="p-3 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors relative"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
-                <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full border-2 bg-white border-black" />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full border-2 bg-blue-500 border-gray-50" />
               )}
-            </motion.button>
+            </button>
 
             {/* Notification Popover */}
             {showNotifications && (
-              <div className="absolute right-0 mt-3 w-80 bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-2xl shadow-2xl z-50 overflow-hidden">
-                <div className="px-4 py-3 border-b border-[var(--border-subtle)] flex items-center justify-between bg-white/5">
-                  <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider">Notifications</span>
-                  <button onClick={() => setShowNotifications(false)}><X className="w-4 h-4 text-[var(--text-secondary)]" /></button>
+              <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                  <span className="text-xs font-semibold text-gray-900 uppercase tracking-wider">Notifications</span>
+                  <button onClick={() => setShowNotifications(false)}><X className="w-4 h-4 text-gray-500" /></button>
                 </div>
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-[var(--text-secondary)] text-sm">No notifications yet</div>
+                    <div className="px-4 py-8 text-center text-gray-500 text-sm">No notifications yet</div>
                   ) : (
                     notifications.map(n => (
                       <div 
                         key={n.id} 
                         onClick={() => !n.read && markAsRead(n.id)}
-                        className={`px-4 py-3 border-b border-[var(--border-subtle)] hover:bg-[var(--bg-app)] transition-colors cursor-pointer ${!n.read ? 'bg-white/5' : ''}`}
+                        className={`px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${!n.read ? 'bg-blue-50' : ''}`}
                       >
                         <div className="flex justify-between items-start gap-2">
-                          <p className="text-sm font-bold text-[var(--text-primary)]">{n.title}</p>
-                          {!n.read && <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-white" />}
+                          <p className="text-sm font-semibold text-gray-900">{n.title}</p>
+                          {!n.read && <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-blue-500" />}
                         </div>
-                        <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">{n.message}</p>
-                        <p className="text-[10px] text-[var(--text-secondary)] mt-2">{new Date(n.created_at).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-600 mt-1 leading-relaxed">{n.message}</p>
+                        <p className="text-[10px] text-gray-400 mt-2">{new Date(n.created_at).toLocaleDateString()}</p>
                       </div>
                     ))
                   )}
@@ -248,238 +236,101 @@ const StudentDashboard = () => {
               </div>
             )}
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => navigate('/dashboard/join')}
-            className="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl bg-white text-black hover:bg-gray-200 text-sm font-bold active:scale-95 transition-all"
-          >
-            <Plus className="w-5 h-5" /> Join Subject
-          </motion.button>
+          <Link to="/dashboard/join" className="btn-secondary">
+             <Plus className="w-4 h-4 mr-2" /> Join Subject
+          </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Tests Taken" value={stats.tests} icon={BookOpen} color="blue" />
-        <StatsCard title="Avg Score" value={`${stats.avgScore}%`} icon={TrendingUp} color="emerald" />
-        <StatsCard title="Attendance" value={`${stats.attendanceRate}%`} icon={ClipboardCheck} color="indigo" />
-        <StatsCard title="Last Rank" value={`#${stats.rank}`} icon={Trophy} color="amber" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsCard title="Attendance" value={`${stats.attendanceRate}%`} icon={ClipboardCheck} color="success" />
+        <StatsCard title="Enrolled Subjects" value={enrolledBatches.length} icon={BookOpen} color="warning" />
+        <StatsCard title="Tests Taken" value={stats.tests} icon={FileText} color="primary" />
+        <StatsCard title="Last Rank" value={`#${stats.rank}`} icon={Trophy} color="danger" />
       </div>
 
-      {/* My Enrolled Batches (Subjects) */}
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <IconWrapper icon={BookOpen} wrapperSize={40} iconSize={20} />
-            <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">My Subjects</h2>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {enrolledBatches.map((batch, i) => (
-            <motion.div
-              key={batch.id}
-              whileHover={{ y: -5, scale: 1.01, backgroundColor: 'rgba(255, 255, 255, 0.06)' }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.07 }}
-              className="p-8 rounded-[2rem] bg-[var(--bg-card)] border border-[var(--border-subtle)] shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all cursor-pointer group relative overflow-hidden"
-            >
-              <IconWrapper 
-                icon={BookOpen}
-                wrapperSize={56}
-                iconSize={28}
-                className="mb-6 relative z-10 group-hover:bg-white group-hover:text-black shadow-xl"
-              />
-              <h3 className="font-bold text-[var(--text-primary)] text-lg mb-1 truncate relative z-10">{batch.name}</h3>
-              <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-[0.2em] relative z-10">
-                {batch.subject || 'Subject'}
-              </p>
-            </motion.div>
-          ))}
-
-          <motion.div
-            whileHover={{ y: -5, backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
-            className="p-8 rounded-[2rem] bg-[var(--bg-card)] border border-dashed border-[var(--border-subtle)] flex flex-col items-center justify-center text-center group cursor-pointer hover:border-white transition-all gap-4"
-            onClick={() => navigate('/dashboard/join')}
-          >
-            <div className={`w-14 h-14 rounded-2xl ${isDark ? 'bg-[var(--bg-card)] group-hover:bg-white/10' : 'bg-slate-50 group-hover:bg-slate-100'} flex items-center justify-center transition-all border border-[var(--border-subtle)] shadow-inner`}>
-              <Plus className={`w-6 h-6 ${isDark ? 'text-[var(--text-secondary)] group-hover:text-white' : 'text-slate-400 group-hover:text-slate-900'}`} />
-            </div>
-            <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">Join New Subject</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Active AI Tests */}
-      {activeTests.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.05 }}
-            className={`rounded-2xl border ${isDark ? 'border-white/10 bg-white/5' : 'border-slate-100 bg-slate-50'} p-6 shadow-sm`}
-          >
-            <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <IconWrapper icon={Sparkles} wrapperSize={40} iconSize={20} />
-              <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Active AI Tests</h2>
-            </div>
-            <button
-              onClick={() => navigate('/dashboard/active-tests')}
-              className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-widest hover:text-[var(--text-primary)] transition-colors border-b border-transparent hover:border-[var(--border-subtle)] pb-1"
-            >
-              View All History
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activeTests.map((test) => {
-              const isLocked = test.start_time && new Date(test.start_time) > new Date()
-              return (
-                  <div
-                    key={test.id}
-                    className={`flex items-center justify-between px-6 py-5 rounded-[1.5rem] border transition-all group cursor-pointer relative overflow-hidden ${ isLocked ? (isDark ? 'border-white/5 bg-white/[0.01] opacity-60' : 'border-slate-100 bg-slate-50/50 opacity-60')
-                      : (isDark ? 'border-white/10 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06] shadow-lg shadow-black/20' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-md')
-                    }`}
-                    onClick={() => !isLocked && navigate(`/dashboard/test-attempt/${test.id}`)}
-                  >
-                    <div className="min-w-0 flex-1 relative z-10">
-                      <p className={`text-sm font-bold truncate ${isLocked ? (isDark ? 'text-gray-500' : 'text-slate-400') : (isDark ? 'text-white' : 'text-slate-900')} transition-colors`}>
-                        {test.title}
-                      </p>
-                      <div className="flex items-center gap-3 mt-1.5">
-                        {isLocked ? (
-                          <span className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border ${isDark ? 'text-amber-500/80 bg-amber-500/5 border-amber-500/10' : 'text-amber-600 bg-amber-50 border-amber-100'}`}>
-                            <Clock className="w-2.5 h-2.5" /> Scheduled
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">Live Now</span>
-                        )}
-                        {test.duration_minutes && (
-                          <span className="flex items-center gap-1 text-[10px] text-[var(--text-secondary)] font-medium">
-                            <Activity className="w-3 h-3" /> {test.duration_minutes}m
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className={`ml-3 p-3 rounded-2xl transition-all relative z-10 ${ isLocked ? 'bg-white/5 text-gray-600'
-                        : 'bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-white border border-white/5'
-                    }`}>
-                      {isLocked ? <Lock className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                    </div>
-                  </div>
-              )
-            })}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Performance & Recent Results Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Performance Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="rounded-[2.5rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col h-[450px] relative"
-        >
-
-          <div className="flex items-center gap-3 mb-8 relative z-10">
-            <div className={`p-2.5 rounded-2xl ${isDark ? 'bg-white/10 text-white border border-white/20 shadow-xl shadow-black/20' : 'bg-slate-100 text-slate-700 border border-slate-200 shadow-sm'}`}>
-              <Activity className="w-5 h-5" />
-            </div>
-            <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Performance Timeline</h2>
+        {/* Today's Classes & Enrolled Subjects */}
+        <div className="academic-card lg:col-span-2 flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">Today's Classes & Subjects</h2>
+            <Link to="/dashboard/batches" className="text-sm font-medium text-blue-600 hover:text-blue-700">View All</Link>
           </div>
           
-          {chartData.length < 2 ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-[var(--text-secondary)] text-sm font-bold border border-dashed border-[var(--border-subtle)] rounded-[2rem] m-2 bg-[var(--bg-card)] relative z-10 gap-3">
-              <div className="p-4 rounded-2xl bg-[var(--bg-card)]">
-                <TrendingUp className="w-8 h-8 opacity-20" />
-              </div>
-              <p className="uppercase tracking-widest text-[10px]">Insufficient performance data</p>
-            </div>
-          ) : (
-            <div className="flex-1 w-full h-full min-h-0 relative z-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={isDark ? "#ffffff" : "#4f46e5"} stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor={isDark ? "#ffffff" : "#4f46e5"} stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isDark ? '#9ca3af' : '#64748b', fontWeight: 600 }} dy={15} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: isDark ? '#9ca3af' : '#64748b', fontWeight: 600 }} domain={[0, 100]} />
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"} />
-                  <RechartsTooltip 
-                    contentStyle={{ 
-                      backgroundColor: isDark ? '#111827' : '#ffffff', 
-                      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', 
-                      borderRadius: '16px', 
-                      color: isDark ? '#fff' : '#000', 
-                      fontSize: '12px', 
-                      fontWeight: 'bold', 
-                      boxShadow: '0 10px 30px rgba(0,0,0,0.1)' 
-                    }}
-                    itemStyle={{ color: isDark ? '#ffffff' : '#4f46e5' }}
-                    cursor={{ stroke: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', strokeWidth: 2 }}
-                  />
-                  <Area type="monotone" dataKey="score" stroke={isDark ? "#ffffff" : "#4f46e5"} strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" name="Score %" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Recent Results */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.15 }}
-          className="rounded-[2.5rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.3)] flex flex-col h-[450px] relative"
-        >
-
-          <div className="flex items-center gap-3 mb-8 relative z-10">
-            <div className={`p-2.5 rounded-2xl shadow-xl ${isDark ? 'bg-white/10 text-white border border-white/20 shadow-black/20' : 'bg-slate-100 text-slate-700 border border-slate-200 shadow-sm'}`}>
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Recent Activity</h2>
-          </div>
-          {recentResults.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-[var(--text-secondary)] text-sm font-bold border border-dashed border-[var(--border-subtle)] rounded-[2rem] m-2 bg-[var(--bg-card)] relative z-10 gap-3">
-              <div className="p-4 rounded-2xl bg-[var(--bg-card)]">
-                <ClipboardCheck className="w-8 h-8 opacity-20" />
-              </div>
-              <p className="uppercase tracking-widest text-[10px]">No recent results found</p>
-            </div>
-          ) : (
-            <div className="space-y-4 relative z-10 overflow-y-auto custom-scrollbar pr-2">
-              {recentResults.map((r) => (
-                <div 
-                  key={r.id} 
-                  className="flex items-center justify-between px-6 py-5 rounded-[1.5rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] hover:bg-white/[0.05] hover:border-white/10 transition-all group cursor-pointer"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold text-[var(--text-primary)] transition-colors truncate">{r.tests?.title}</p>
-                    <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">
-                      {r.tests?.date ? new Date(r.tests.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''}
-                    </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {enrolledBatches.map((batch) => (
+              <div
+                key={batch.id}
+                className="p-5 rounded-xl border border-gray-100 hover:border-blue-100 hover:bg-blue-50 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                    <BookOpen className="w-5 h-5" />
                   </div>
-                  <div className="text-right ml-4">
-                    <p className="text-sm font-bold text-[var(--text-primary)]">
-                      {r.marks} <span className="text-gray-600 font-medium">/</span> {r.tests?.total_marks}
-                    </p>
-                    {r.rank && <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>Rank #{r.rank}</p>}
+                  <div>
+                     <h3 className="font-semibold text-gray-900 truncate">{batch.name}</h3>
+                     <p className="text-xs text-gray-500 font-medium">{batch.subject || 'Subject'}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </motion.div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Study Materials Shortcut */}
+        <div className="academic-card flex flex-col justify-center text-center">
+           <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-6 h-6" />
+           </div>
+           <h3 className="font-semibold text-gray-900 mb-2">Study Materials</h3>
+           <p className="text-sm text-gray-500 mb-6">Access your latest notes and assignments.</p>
+           <Link to="/dashboard/materials" className="btn-secondary w-full">Open Drive</Link>
+        </div>
+
       </div>
+
+      {/* Recent Results */}
+      <div className="academic-card">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">Recent Results</h2>
+          <Link to="/dashboard/results" className="text-sm font-medium text-blue-600 hover:text-blue-700">View All</Link>
+        </div>
+        {recentResults.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <ClipboardCheck className="w-6 h-6 text-gray-400 mb-2" />
+            <p className="text-sm text-gray-500">No recent results found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recentResults.map((r) => (
+              <div 
+                key={r.id} 
+                className="p-5 rounded-xl border border-gray-100 hover:border-gray-300 transition-colors"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 truncate max-w-[160px]">{r.tests?.title}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {r.tests?.date ? new Date(r.tests.date).toLocaleDateString() : ''}
+                    </p>
+                  </div>
+                  {r.rank && (
+                    <span className="px-2 py-1 bg-amber-50 text-amber-600 text-xs font-semibold rounded-md">
+                      #{r.rank}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-end gap-1">
+                   <span className="text-2xl font-bold text-gray-900 leading-none">{r.marks}</span>
+                   <span className="text-sm font-medium text-gray-500 mb-0.5">/ {r.tests?.total_marks}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
     </div>
   )
 }

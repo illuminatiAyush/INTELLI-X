@@ -1,58 +1,57 @@
 import { motion } from 'framer-motion'
-import { useTheme } from '../../context/ThemeContext'
-import IconWrapper from './IconWrapper'
 
-const StatsCard = ({ title, value, icon: Icon, trend, color = 'white' }) => {
-  const { isDark } = useTheme()
+const StatsCard = ({ title, value, icon: Icon, trend, color = 'primary' }) => {
   const getColors = (c) => {
     switch (c) {
+      case 'success':
+      case 'green':
       case 'emerald': 
-      case 'green': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
-      case 'amber': return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
-      case 'rose': return 'text-rose-500 bg-rose-500/10 border-rose-500/20';
-      case 'blue': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
-      case 'purple': return 'text-purple-500 bg-purple-500/10 border-purple-500/20';
-      case 'indigo': return 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20';
-      case 'cyan': return 'text-cyan-500 bg-cyan-500/10 border-cyan-500/20';
-      case 'white': return isDark ? 'text-white bg-white/10 border-white/20' : 'text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md shadow-indigo-500/20 border-indigo-400/30';
-      default: return 'text-[var(--text-primary)] bg-[var(--text-primary)]/5 border-[var(--border-subtle)]';
+        return 'text-green-600 bg-green-50';
+      case 'warning':
+      case 'amber': 
+        return 'text-amber-600 bg-amber-50';
+      case 'danger':
+      case 'rose': 
+      case 'red':
+        return 'text-red-600 bg-red-50';
+      case 'primary':
+      case 'blue': 
+      case 'indigo': 
+        return 'text-blue-600 bg-blue-50';
+      default: 
+        return 'text-gray-600 bg-gray-50';
     }
   };
+  
   const colorStyle = getColors(color);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      whileHover={{ scale: 1.01 }}
-      className="relative overflow-hidden rounded-[2rem] border transition-all duration-300 group bg-[var(--bg-card)] hover:bg-[var(--bg-surface)] border-[var(--border-subtle)] p-8 shadow-sm"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="academic-card hover:border-gray-300 transition-colors"
     >
-      <div className="flex items-start justify-between relative z-10">
+      <div className="flex items-start justify-between">
         <div>
-          <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--text-secondary)] mb-3">
+          <p className="text-sm font-medium text-gray-500 mb-2">
             {title}
           </p>
-          <p className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] tracking-tighter leading-none mb-4">
+          <p className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
             {value}
           </p>
           {trend !== undefined && (
-            <div className="flex items-center gap-2">
-              <span className={`flex items-center justify-center px-1.5 py-0.5 rounded-lg text-[10px] font-bold tracking-tight ${trend > 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${trend > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                 {trend > 0 ? '↑' : '↓'} {isNaN(trend) ? '0' : Math.abs(trend)}%
               </span>
-              <span className="text-[10px] font-bold text-[var(--text-secondary)] tracking-widest uppercase opacity-40">Growth</span>
+              <span className="text-xs text-gray-500 font-medium">vs last month</span>
             </div>
           )}
         </div>
         {Icon && (
-          <IconWrapper 
-            icon={Icon} 
-            colorOverride={true}
-            className={`${colorStyle} shadow-sm group-hover:scale-110 transition-transform duration-500`}
-            wrapperSize={56}
-            iconSize={24}
-          />
+          <div className={`p-3 rounded-xl ${colorStyle}`}>
+            <Icon className="w-6 h-6" />
+          </div>
         )}
       </div>
     </motion.div>

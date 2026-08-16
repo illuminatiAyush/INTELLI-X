@@ -14,7 +14,6 @@ import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
-import AITestCreatorModal from '../../components/teacher/AITestCreatorModal'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { TableSkeleton } from '../../components/ui/Skeletons'
 
@@ -77,7 +76,6 @@ const TestManagement = () => {
   const [adminResults, setAdminResults] = useState([])
   const [adminSelTest, setAdminSelTest] = useState(null)
   const [adminSelBatch, setAdminSelBatch] = useState(null)
-  const [aiModalOpen, setAiModalOpen] = useState(false)
 
   const fetchData = () => refetchTests()
 
@@ -211,11 +209,6 @@ const TestManagement = () => {
     { key: 'title', label: 'Test Title', render: (r) => (
       <div className="flex items-center gap-2">
         <span>{r.title}</span>
-        {r.is_ai_generated && (
-          <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-[var(--text-primary)]/10 text-[var(--text-primary)]/70 border border-[var(--border-subtle)] flex items-center gap-0.5">
-            <Sparkles className="w-2.5 h-2.5" /> AI
-          </span>
-        )}
       </div>
     )},
     { key: 'batch_id', label: 'Batch', render: (r) => r.batches?.name || '-' },
@@ -593,14 +586,6 @@ const TestManagement = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setAiModalOpen(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black hover:bg-gray-200 text-sm font-bold shadow-lg active:scale-95 transition-all"
-              >
-                <Brain className="w-5 h-5 font-bold" /> Create AI Test
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
                 onClick={() => setModalOpen(true)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-semibold hover:border-[var(--border-strong)] transition-all"
               >
@@ -614,14 +599,6 @@ const TestManagement = () => {
       <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
         <DataTable columns={columns} data={filtered} emptyMessage="No tests found" />
       </div>
-
-      {/* AI Test Creator Modal */}
-      <AITestCreatorModal
-        isOpen={aiModalOpen}
-        onClose={() => setAiModalOpen(false)}
-        batches={batches}
-        onTestCreated={fetchData}
-      />
 
       {/* Create Manual Test Modal */}
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Create Manual Test">

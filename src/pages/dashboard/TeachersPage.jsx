@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import { Plus, Search, Pencil, Trash2, Mail, BookOpen, Phone, Users } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { useTheme } from '../../context/ThemeContext'
+import { Plus, Search, Pencil, Trash2, Mail, BookOpen, Phone, Users, UserCheck } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { useAppQuery } from '../../hooks/useAppQuery'
-import { TableSkeleton } from '../../components/ui/Skeletons'
+import { DashboardSkeleton } from '../../components/ui/Skeletons'
 
 const TeachersPage = ({ hideHeader = false }) => {
-  const { isDark } = useTheme()
   const { user, profile } = useAuth()
   const { data: teachersData, loading: teachersLoading, refetch: refetchTeachers } = useAppQuery('teachers-list', async () => {
     // RLS will automatically restrict this to the admin's institute_id
@@ -31,8 +28,11 @@ const TeachersPage = ({ hideHeader = false }) => {
   const [showModal, setShowModal] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  const fetchTeachers = () => refetchTeachers()
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const teachersPerPage = 12
 
+  const fetchTeachers = () => refetchTeachers()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -48,16 +48,14 @@ const TeachersPage = ({ hideHeader = false }) => {
         setShowModal(false)
         setEditingTeacher(null)
         fetchTeachers()
-        alert(`Teacher "${formData.name}" updated successfully!`)
       } else {
-        // Add mode: create via Edge Function (handles auth + profile)
+        // Add mode: create via Edge Function
         if (!formData.email || !formData.password) {
           throw new Error('Email and password are required for login access.')
         }
-        // 1. Explicitly check for valid session before invocation
         const { data: { session } } = await supabase.auth.getSession()
         if (!session) {
-          throw new Error("Your session has expired. Please log out and back in to add teachers.")
+          throw new Error("Your session has expired. Please log out and back in.")
         }
 
         const { data, error: invokeError } = await supabase.functions.invoke('create-user', {
@@ -72,17 +70,12 @@ const TeachersPage = ({ hideHeader = false }) => {
           }
         })
         
-        if (invokeError) {
-          if (invokeError.message?.includes('Invalid JWT') || invokeError.message?.includes('Unauthorized')) {
-            throw new Error("Authentication failed: Your session is invalid. Please refresh the page or re-login.")
-          }
-          throw new Error(invokeError.message)
-        }
+        if (invokeError) throw new Error(invokeError.message)
         if (data?.error) throw new Error(data.error)
+        
         setShowModal(false)
         setFormData({ name: '', email: '', password: '', subject: '', phone: '' })
         fetchTeachers()
-        alert(`Teacher "${formData.name}" created successfully!`)
       }
     } catch (error) {
       console.error('Error saving teacher:', error)
@@ -92,7 +85,8 @@ const TeachersPage = ({ hideHeader = false }) => {
     }
   }
 
-  const handleOpenEdit = (teacher) => {
+  const handleOpenEdit = (teacher, e) => {
+    e.stopPropagation()
     setEditingTeacher(teacher)
     setFormData({ name: teacher.name || '', email: teacher.email || '', password: '', subject: teacher.subject || '', phone: teacher.phone || '' })
     setShowModal(true)
@@ -103,7 +97,9 @@ const TeachersPage = ({ hideHeader = false }) => {
     setFormData({ name: '', email: '', password: '', subject: '', phone: '' })
     setShowModal(true)
   }
-  const handleDelete = async (id) => {
+  
+  const handleDelete = async (id, e) => {
+    e.stopPropagation()
     if (!window.confirm('Are you sure you want to remove this teacher?')) return
     
     try {
@@ -116,225 +112,218 @@ const TeachersPage = ({ hideHeader = false }) => {
     }
   }
 
-
-
   const filteredTeachers = teachers.filter(teacher => 
     teacher.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     teacher.subject?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-24 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-subtle)] animate-pulse" />
-        <TableSkeleton rows={10} cols={5} />
-      </div>
-    )
-  }
+  // Pagination Logic
+  const indexOfLastTeacher = currentPage * teachersPerPage
+  const indexOfFirstTeacher = indexOfLastTeacher - teachersPerPage
+  const currentTeachers = filteredTeachers.slice(indexOfFirstTeacher, indexOfLastTeacher)
+  const totalPages = Math.ceil(filteredTeachers.length / teachersPerPage)
+
+  if (loading) return <DashboardSkeleton />
 
   return (
-    <div className="space-y-6">
+    <div className={hideHeader ? "space-y-6" : "space-y-8"}>
       {!hideHeader && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-surface)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+        <div className="bg-white p-8 rounded-[16px] border border-gray-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 border border-purple-500/20 shadow-sm shadow-purple-500/5">
+            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600">
               <UserCheck className="w-6 h-6" />
             </div>
             <div>
-              <motion.h1
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-              >
-                Teachers
-              </motion.h1>
-              <p className="text-[var(--text-secondary)] mt-1 font-medium">Manage and organize teaching staff</p>
+              <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Teachers</h1>
+              <p className="text-gray-500 text-sm mt-1">Manage and organize teaching staff</p>
             </div>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => { setEditingTeacher(null); setFormData({ name: '', email: '', password: '', subject: '', phone: '' }); setShowModal(true); }}
-            className="flex items-center px-5 py-2.5 bg-white text-black rounded-xl hover:bg-gray-200 transition-all font-bold shadow-lg"
+          <button
+            onClick={handleOpenAdd}
+            className="btn-primary shrink-0"
           >
             <Plus className="w-5 h-5 mr-2" /> Add Teacher
-          </motion.button>
+          </button>
         </div>
       )}
 
-      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
-        <div className="p-5 border-b border-[var(--border-subtle)] flex justify-between items-center bg-[var(--bg-app)]/50">
-          <div className="relative w-80">
-            <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-[var(--text-secondary)] w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search teachers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2.5 bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-[var(--text-secondary)] rounded-xl focus:outline-none focus:border-white/40 transition-all text-sm font-medium`}
-            />
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-[var(--bg-app)]/50 text-[var(--text-secondary)] text-xs uppercase tracking-wider">
-              <tr>
-                <th className="px-6 py-5 font-bold">Name</th>
-                <th className="px-6 py-5 font-bold">Subject</th>
-                <th className="px-6 py-5 font-bold">Phone</th>
-                <th className="px-6 py-5 font-bold">Email</th>
-                <th className="px-6 py-5 font-bold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border-subtle)]">
-              {filteredTeachers.map((teacher) => (
-                <tr key={teacher.id} className="hover:bg-[var(--bg-app)] transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="font-semibold text-[var(--text-primary)]">{teacher.name}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center text-[var(--text-primary)] font-medium">
-                      <div className={`p-1.5 rounded-lg ${isDark ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200'} text-[var(--text-primary)] border mr-2.5 shadow-sm`}>
-                        <BookOpen className="w-3.5 h-3.5" />
-                      </div>
-                      {teacher.subject || '-'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-3.5 h-3.5 text-[var(--text-secondary)] opacity-60" />
-                      {teacher.phone || '-'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-[var(--text-secondary)] font-medium">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-3.5 h-3.5 text-[var(--text-secondary)] opacity-60" />
-                      {teacher.email || '-'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right space-x-3 whitespace-nowrap">
-                    <button
-                      onClick={() => handleOpenEdit(teacher)}
-                      className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                    >
-                      <Pencil className="w-4 h-4 inline" />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(teacher.id)}
-                      className="text-red-400 hover:text-red-500 transition"
-                    >
-                      <Trash2 className="w-4 h-4 inline" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {filteredTeachers.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-[var(--text-secondary)]">
-                    No teachers found. Click 'Add Teacher' to create one.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {/* Search */}
+      <div className="bg-white p-4 rounded-[16px] border border-gray-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="relative w-full sm:w-96">
+          <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search by name or subject..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+          />
         </div>
       </div>
 
-      {showModal && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 w-screen h-screen bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className={`${isDark ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'} border p-6 rounded-xl w-full max-w-md shadow-2xl relative z-50`}>
-          <h2 className="text-xl font-bold mb-4">{editingTeacher ? 'Edit Teacher' : 'Add New Teacher'}</h2>
-            <form onSubmit={handleSubmit} className="space-y-4 max-h-[85vh] overflow-y-auto pr-2">
+      {/* Grid Layout */}
+      {filteredTeachers.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 bg-white border border-dashed border-gray-300 rounded-[16px]">
+           <UserCheck className="w-10 h-10 text-gray-300 mb-3" />
+           <p className="text-gray-500 font-medium">No teachers found.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {currentTeachers.map((teacher) => (
+            <div 
+              key={teacher.id} 
+              className="academic-card hover:border-gray-300 transition-all flex flex-col justify-between"
+            >
               <div>
-                <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Full Name</label>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-sm">
+                      {teacher.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 truncate max-w-[150px]">{teacher.name}</h3>
+                      <p className="text-xs text-gray-500 truncate max-w-[150px]">{teacher.subject || 'No subject'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span>{teacher.phone || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Mail className="w-4 h-4 text-gray-400" />
+                    <span className="truncate">{teacher.email || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end pt-4 border-t border-gray-100 gap-1">
+                <button onClick={(e) => handleOpenEdit(teacher, e)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 transition-colors">
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button onClick={(e) => handleDelete(teacher.id, e)} className="p-1.5 rounded-md hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between bg-white px-6 py-4 rounded-[16px] border border-gray-200 shadow-sm">
+          <p className="text-sm text-gray-600 font-medium">
+            Showing <span className="font-semibold text-gray-900">{indexOfFirstTeacher + 1}</span> to <span className="font-semibold text-gray-900">{Math.min(indexOfLastTeacher, filteredTeachers.length)}</span> of <span className="font-semibold text-gray-900">{filteredTeachers.length}</span> teachers
+          </p>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {showModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 w-screen h-screen bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-gray-200 text-gray-900 p-6 rounded-xl w-full max-w-md shadow-2xl relative z-50 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4">{editingTeacher ? 'Edit Teacher' : 'Add New Teacher'}</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                 <input
                   required
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                 />
               </div>
-              {/* Email — shown in edit mode for updating the teachers table record */}
-              {editingTeacher && (
+              
+              {editingTeacher ? (
                 <div>
-                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Email / Gmail</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email / Gmail</label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="teacher@gmail.com"
-                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                   />
                 </div>
-              )}
-              {/* Email & Password — only for new teacher creation */}
-              {!editingTeacher && (
+              ) : (
                 <>
                   <div>
-                    <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Email Address *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
                     <input
                       required
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                     />
                   </div>
                   <div>
-                    <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Password *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
                     <input
                       required
                       type="password"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      placeholder="Minimum 6 characters"
-                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                     />
                   </div>
                 </>
               )}
+
               <div>
-                <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Subject Expertise</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Subject Expertise</label>
                 <input
                   required
                   type="text"
-                  placeholder="e.g. Advanced Mathematics"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
-                />
-              </div>
-              {/* Phone — editable in both add and edit mode */}
-              <div>
-                <label className={`block text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Phone Number</label>
-                <input
-                  type="tel"
-                  placeholder="e.g. +91 98765 43210"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className={`w-full px-4 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white focus:border-white/50' : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-gray-400' } border rounded-lg focus:outline-none transition-all`}
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                 />
               </div>
               
-              <div className={`flex justify-end space-x-3 pt-4 border-t ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
                   disabled={submitting}
-                  className={`px-4 py-2 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800 font-medium'} transition`}
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all flex items-center gap-2 bg-white text-black hover:bg-gray-200"
+                  className="btn-primary"
                 >
-                  {submitting && <div className={`w-4 h-4 border-2 ${isDark ? 'border-black' : 'border-white'} border-t-transparent rounded-full animate-spin`} />}
                   {submitting ? 'Saving...' : editingTeacher ? 'Update Teacher' : 'Save Teacher'}
                 </button>
               </div>

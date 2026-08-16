@@ -1,20 +1,15 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Layers, FileText, Users, Brain, Sparkles, Activity, CheckCircle2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Layers, FileText, Users, Activity, CheckCircle2, ClipboardList, Plus, Video } from 'lucide-react'
 import StatsCard from '../../components/ui/StatsCard'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { useTheme } from '../../context/ThemeContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { DashboardSkeleton } from '../../components/ui/Skeletons'
-import IconWrapper from '../../components/ui/IconWrapper'
 
 const TeacherDashboard = () => {
-  const { isDark } = useTheme()
-  const { user } = useAuth()
-  const navigate = useNavigate()
-  const [liveResults, setLiveResults] = useState([])
+  const { user, profile } = useAuth()
+  const displayName = profile?.first_name || profile?.name || 'Faculty'
 
   const { data: dashboardData, loading } = useAppQuery(`teacher-dashboard-${user?.id}`, async () => {
     if (!user) return null
@@ -28,21 +23,16 @@ const TeacherDashboard = () => {
     const batchIds = batchList.map((b) => b.id).filter(Boolean)
 
     let testCount = 0
-    let aiTestCount = 0
     let activeTests = []
     let liveResults = []
 
     if (batchIds.length > 0) {
-      const [{ count }, { count: aiCount }] = await Promise.all([
-        supabase.from('tests').select('id', { count: 'exact', head: true }).in('batch_id', batchIds),
-        supabase.from('tests').select('id', { count: 'exact', head: true }).in('batch_id', batchIds).eq('is_ai_generated', true)
-      ])
+      const { count } = await supabase.from('tests').select('id', { count: 'exact', head: true }).in('batch_id', batchIds)
       testCount = count || 0
-      aiTestCount = aiCount || 0
 
       const { data: recentTests } = await supabase
         .from('tests')
-        .select('id, title, end_time, total_marks')
+        .select('id, title, end_time, total_marks, batch_id, batches(name)')
         .in('batch_id', batchIds)
         .order('created_at', { ascending: false })
         .limit(3)
@@ -62,12 +52,20 @@ const TeacherDashboard = () => {
 
     const totalStudents = batchList.reduce((sum, b) => sum + (b.students?.length || 0), 0)
 
+    const today = new Date().toISOString().split('T')[0]
+    let pendingAttendance = 0
+    if (batchIds.length > 0) {
+      const { data: attendanceData } = await supabase.from('attendance').select('batch_id').eq('date', today).in('batch_id', batchIds)
+      const takenBatches = new Set((attendanceData || []).map(a => a.batch_id))
+      pendingAttendance = Math.max(0, batchIds.length - takenBatches.size)
+    }
+
     return {
       stats: {
         batches: batchList.length,
         students: totalStudents,
         tests: testCount,
-        aiTests: aiTestCount,
+        pendingAttendance
       },
       batches: batchList,
       activeTests,
@@ -75,162 +73,171 @@ const TeacherDashboard = () => {
     }
   }, { enabled: !!user })
 
-  useEffect(() => {
-    if (dashboardData?.initialLiveResults) {
-      setLiveResults(dashboardData.initialLiveResults)
-    }
-  }, [dashboardData])
-
   if (loading && !dashboardData) return <DashboardSkeleton />
 
-  const { stats, batches, activeTests } = dashboardData || {
-    stats: { batches: 0, students: 0, tests: 0, aiTests: 0 },
+  const { stats, batches, activeTests, initialLiveResults } = dashboardData || {
+    stats: { batches: 0, students: 0, tests: 0, pendingAttendance: 0 },
     batches: [],
-    activeTests: []
+    activeTests: [],
+    initialLiveResults: []
   }
+
+  // Generate a greeting based on time of day
+  const hour = new Date().getHours()
+  let greeting = 'Good Evening'
+  if (hour < 12) greeting = 'Good Morning'
+  else if (hour < 18) greeting = 'Good Afternoon'
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      {/* SECTION 1: Welcome Back */}
+      <div className="bg-white rounded-[16px] border border-gray-200 p-8 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
-          <motion.h1
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-4xl font-bold text-[var(--text-primary)] tracking-tight"
-          >
-            Faculty Overview
-          </motion.h1>
-          <p className="text-[var(--text-secondary)] text-sm mt-1.5 font-medium">Manage institutional classes and sync student progress</p>
-        </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/dashboard/tests')}
-          className="flex items-center justify-center gap-3 px-8 py-3.5 rounded-2xl bg-white text-black shadow-sm text-sm font-bold active:scale-95 transition-all hover:bg-gray-200"
-        >
-          <Sparkles className="w-5 h-5" /> Create AI Test
-        </motion.button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="My Batches" value={stats.batches} icon={Layers} color="purple" />
-        <StatsCard title="Total Students" value={stats.students} icon={Users} color="blue" />
-        <StatsCard title="Tests Created" value={stats.tests} icon={FileText} color="emerald" />
-        <StatsCard title="AI Tests" value={stats.aiTests} icon={Sparkles} color="indigo" />
-      </div>
-
-      {/* My Batches */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.1 }}
-        className="rounded-[2.5rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.3)] relative overflow-hidden"
-      >
-
-        <div className="flex items-center justify-between mb-8 relative z-10">
-          <div className="flex items-center gap-3">
-            <IconWrapper icon={Layers} wrapperSize={40} iconSize={20} />
-            <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Active Batches</h2>
-          </div>
-          <button onClick={() => navigate('/dashboard/batches')} className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-widest hover:text-[var(--text-primary)] transition-colors border-b border-transparent hover:border-[var(--text-primary)]/20 pb-1">
-            Manage All
-          </button>
-        </div>
-        {batches.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center text-[var(--text-secondary)] bg-[var(--bg-card)] rounded-[2rem] border border-dashed border-[var(--border-subtle)] gap-3">
-             <div className="p-4 rounded-2xl bg-[var(--bg-card)]">
-                <Users className="w-8 h-8 opacity-20" />
-              </div>
-              <p className="uppercase tracking-widest text-[10px] font-bold">No institutional batches found</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
-            {batches.map((batch) => (
-              <div
-                key={batch.id}
-                className="flex items-center justify-between px-6 py-5 rounded-[1.5rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] hover:bg-white/[0.03] hover:border-white/10 transition-all group cursor-pointer"
-                onClick={() => navigate(`/dashboard/batches/${batch.id}`)}
-              >
-                <div>
-                  <p className="text-sm font-bold text-[var(--text-primary)] transition-colors">{batch.name}</p>
-                  <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-widest mt-1">{batch.subject || 'Core Subject'}</p>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-tight">
-                  <Users className="w-3.5 h-3.5 opacity-50" />
-                  <span className="text-[var(--text-primary)]">{batch.students?.length || 0} Students</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </motion.div>
-
-      {/* Live Test Analytics */}
-      {activeTests.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="rounded-[2.5rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.3)] relative overflow-hidden"
-        >
-
-          <div className="flex items-center justify-between mb-8 relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-2xl bg-green-500/10 text-green-500 border border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
-                <Activity className="w-5 h-5 animate-pulse" />
-              </div>
-              <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Real-time Analytics</h2>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-tight mb-4">
+            {greeting}, {displayName}.
+          </h1>
+          <div className="flex flex-wrap items-center gap-6 text-sm">
+            <div className="flex items-center gap-2 text-gray-600">
+               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+               <span className="font-medium text-gray-900">{stats.batches}</span> Active Batches
             </div>
-            <span className="px-4 py-1.5 rounded-full text-[10px] font-black bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-[0.1em]">
-               Link Established
-            </span>
+            <div className="flex items-center gap-2 text-gray-600">
+               <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+               <span className="font-medium text-gray-900">{stats.pendingAttendance}</span> Pending Attendance Today
+            </div>
           </div>
+        </div>
+        <Link
+          to="/dashboard/attendance"
+          className="btn-primary shrink-0"
+        >
+          Mark Attendance
+        </Link>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-            {activeTests.map((t) => {
-              const testResults = (liveResults || []).filter(r => r.test_id === t.id)
-              const attemptCount = testResults.length
-              const isEnded = (t.end_time && new Date(t.end_time) < new Date()) || false
-              const avgScore = attemptCount > 0 
-                ? (testResults.reduce((sum, r) => sum + (r.marks || 0), 0) / attemptCount).toFixed(1) 
-                : 0
+      {/* SECTION 2: Quick Actions */}
+      <div>
+        <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Link to="/dashboard/lectures" className="academic-card flex flex-col items-center justify-center py-6 text-center hover:border-blue-300 hover:bg-blue-50 group transition-all">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3 group-hover:scale-110 transition-transform">
+              <Video className="w-5 h-5" />
+            </div>
+            <span className="text-sm font-medium text-gray-900">Start Live Class</span>
+          </Link>
+          <Link to="/dashboard/attendance" className="academic-card flex flex-col items-center justify-center py-6 text-center hover:border-blue-300 hover:bg-blue-50 group transition-all">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3 group-hover:scale-110 transition-transform">
+              <ClipboardList className="w-5 h-5" />
+            </div>
+            <span className="text-sm font-medium text-gray-900">Take Attendance</span>
+          </Link>
+          <Link to="/dashboard/materials" className="academic-card flex flex-col items-center justify-center py-6 text-center hover:border-blue-300 hover:bg-blue-50 group transition-all">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3 group-hover:scale-110 transition-transform">
+              <Plus className="w-5 h-5" />
+            </div>
+            <span className="text-sm font-medium text-gray-900">Upload Material</span>
+          </Link>
+          <Link to="/dashboard/tests" className="academic-card flex flex-col items-center justify-center py-6 text-center hover:border-blue-300 hover:bg-blue-50 group transition-all">
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3 group-hover:scale-110 transition-transform">
+              <FileText className="w-5 h-5" />
+            </div>
+            <span className="text-sm font-medium text-gray-900">Create Test</span>
+          </Link>
+        </div>
+      </div>
 
-              return (
-                <div key={t.id} className="p-6 rounded-[2rem] border border-[var(--border-subtle)] bg-[var(--bg-card)] hover:bg-white/[0.05] hover:border-white/10 transition-all flex flex-col justify-between group cursor-pointer relative overflow-hidden">
-                   <div className="absolute inset-x-0 bottom-0 h-0.5 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+      {/* SECTION 3: Performance Overview */}
+      <div>
+         <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Overview</h2>
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+           <StatsCard title="My Batches" value={stats.batches} icon={Layers} color="primary" />
+           <StatsCard title="Total Students" value={stats.students} icon={Users} color="success" />
+           <StatsCard title="Tests Created" value={stats.tests} icon={FileText} color="warning" />
+         </div>
+      </div>
+
+      {/* SECTION 4: Today's Classes & Recent Results */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Today's Classes / Batches */}
+        <div className="academic-card flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">My Batches</h2>
+            <Link to="/dashboard/batches" className="text-sm font-medium text-blue-600 hover:text-blue-700">View All</Link>
+          </div>
+          
+          {batches.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center py-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+               <Users className="w-6 h-6 text-gray-400 mb-2" />
+               <p className="text-sm text-gray-500">No active batches assigned.</p>
+            </div>
+          ) : (
+            <div className="flex-1 space-y-3">
+              {batches.slice(0, 4).map((batch) => (
+                <Link
+                  key={batch.id}
+                  to={`/dashboard/batches/${batch.id}`}
+                  className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:bg-blue-50 transition-colors group"
+                >
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-bold text-[var(--text-primary)] transition-colors truncate pr-2">{t.title}</h3>
-                      {isEnded ? (
-                        <CheckCircle2 className="w-4 h-4 text-gray-600" />
-                      ) : (
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_12px_rgba(34,197,94,0.6)]" />
-                      )}
-                    </div>
-                    
-                    <div className="flex items-end gap-3 mt-6">
-                      <div className="text-4xl font-black text-[var(--text-primary)] tracking-tighter">{attemptCount}</div>
-                      <div className="text-[10px] text-[var(--text-secondary)] font-bold pb-2 uppercase tracking-widest">Submissions</div>
-                    </div>
+                    <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">{batch.name}</p>
+                    <p className="text-xs font-medium text-gray-500 mt-0.5">{batch.subject || 'Core Subject'}</p>
                   </div>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-gray-200 text-xs text-gray-600 font-medium">
+                    <Users className="w-3.5 h-3.5 text-gray-400" />
+                    <span>{batch.students?.length || 0} Students</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
 
-                  <div className="mt-8 pt-5 border-t border-[var(--border-subtle)] flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] uppercase text-[var(--text-secondary)] font-bold mb-1 tracking-widest">Global Avg</p>
-                      <p className="text-sm font-bold text-[var(--text-primary)]">{avgScore} <span className="text-[var(--text-secondary)] font-medium">/ {t.total_marks || '?'}</span></p>
-                    </div>
-                    <button onClick={() => navigate('/dashboard/results')} className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest hover:text-[var(--text-primary)] transition-all border-b border-transparent hover:border-[var(--border-subtle)]">
-                      Sync Results &rarr;
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
+        {/* Recent Results */}
+        <div className="academic-card flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">Recent Tests</h2>
+            <Link to="/dashboard/tests" className="text-sm font-medium text-blue-600 hover:text-blue-700">View All</Link>
           </div>
-        </motion.div>
-      )}
+          
+          {activeTests.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center py-8 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+               <FileText className="w-6 h-6 text-gray-400 mb-2" />
+               <p className="text-sm text-gray-500">No recent tests found.</p>
+            </div>
+          ) : (
+            <div className="flex-1 space-y-3">
+              {activeTests.slice(0, 4).map((t) => {
+                const testResults = (initialLiveResults || []).filter(r => r.test_id === t.id)
+                const attemptCount = testResults.length
+                const avgScore = attemptCount > 0 
+                  ? (testResults.reduce((sum, r) => sum + (r.marks || 0), 0) / attemptCount).toFixed(1) 
+                  : 0
+
+                return (
+                  <Link
+                    key={t.id}
+                    to="/dashboard/results"
+                    className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:bg-blue-50 transition-colors group"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 transition-colors truncate max-w-[180px]">{t.title}</p>
+                      </div>
+                      <p className="text-xs font-medium text-gray-500">{t.batches?.name}</p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-gray-900">{avgScore} <span className="text-xs font-medium text-gray-500">/ {t.total_marks || '?'} avg</span></p>
+                      <p className="text-xs font-medium text-gray-500 mt-0.5">{attemptCount} submissions</p>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

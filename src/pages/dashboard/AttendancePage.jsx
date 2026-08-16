@@ -22,21 +22,16 @@ import { TableSkeleton, CardSkeleton } from '../../components/ui/Skeletons'
 const StudentAttendanceView = ({ user }) => {
   const { data: attendanceData, loading: attendanceLoading } = useAppQuery(`student-attendance-${user?.id}`, async () => {
     if (!user) return []
-    
-    // Use user.id directly — attendance.student_id FK points to students.profile_id
     const studentId = user.id
 
-    // 1. Get enrolled batch IDs
     const { data: enrollments } = await supabase
       .from('batch_students')
       .select('batch_id')
       .eq('student_id', studentId)
 
     if (!enrollments?.length) return []
-
     const batchIds = enrollments.map(en => en.batch_id)
 
-    // 2. Fetch batches with teacher name
     const { data: batchRows } = await supabase
       .from('batches')
       .select('id, name, teachers(name)')
@@ -44,7 +39,6 @@ const StudentAttendanceView = ({ user }) => {
 
     if (!batchRows?.length) return []
 
-    // 3. For each batch fetch date-wise attendance records
     const subjectList = await Promise.all(
       batchRows.map(async (batch) => {
         const records = await getStudentAttendanceForBatch(studentId, batch.id)
@@ -67,17 +61,17 @@ const StudentAttendanceView = ({ user }) => {
   if (loading) {
     return (
       <div className="space-y-4">
-        {[...Array(6)].map((_, i) => <CardSkeleton key={i} />)}
+        {[...Array(3)].map((_, i) => <CardSkeleton key={i} />)}
       </div>
     )
   }
 
   if (!subjects.length) {
     return (
-      <div className="text-center py-16 border border-dashed border-[var(--border-strong)] rounded-2xl bg-[var(--bg-surface)]">
-        <ClipboardCheck className="w-12 h-12 mx-auto mb-3 opacity-20" />
-        <p className="text-[var(--text-secondary)] font-medium">You are not enrolled in any subjects yet.</p>
-        <p className="text-[var(--text-secondary)] text-sm mt-1 opacity-60">Ask your teacher for a join code to get started.</p>
+      <div className="text-center py-16 border border-dashed border-gray-300 rounded-[16px] bg-white">
+        <ClipboardCheck className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+        <p className="text-gray-500 font-medium">You are not enrolled in any subjects yet.</p>
+        <p className="text-gray-400 text-sm mt-1">Ask your teacher for a join code to get started.</p>
       </div>
     )
   }
@@ -87,7 +81,7 @@ const StudentAttendanceView = ({ user }) => {
   return (
     <div className="space-y-3">
       {/* Table Header */}
-      <div className="hidden sm:grid grid-cols-12 gap-4 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+      <div className="hidden sm:grid grid-cols-12 gap-4 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
         <span className="col-span-5 flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Subject</span>
         <span className="col-span-4 flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> Teacher</span>
         <span className="col-span-2 flex items-center gap-1.5"><Percent className="w-3.5 h-3.5" /> Attendance</span>
@@ -95,45 +89,42 @@ const StudentAttendanceView = ({ user }) => {
       </div>
 
       {subjects.map(({ batch, teacher, records, rate }, i) => (
-        <motion.div
+        <div
           key={batch.id}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.05 }}
-          className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden shadow-sm"
+          className="rounded-[16px] border border-gray-200 bg-white overflow-hidden shadow-sm"
         >
           {/* Subject Row */}
           <button
             onClick={() => toggle(batch.id)}
-            className="w-full grid grid-cols-12 gap-4 items-center px-5 py-4 hover:bg-[var(--bg-card)] transition-colors text-left"
+            className="w-full grid grid-cols-12 gap-4 items-center px-5 py-4 hover:bg-gray-50 transition-colors text-left"
           >
             {/* Subject name */}
             <div className="col-span-5 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[var(--border-subtle)] text-[var(--text-primary)] flex items-center justify-center font-bold text-sm flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-gray-100 text-gray-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
                 {batch.name.charAt(0).toUpperCase()}
               </div>
-              <span className="font-semibold text-[var(--text-primary)] text-sm truncate">{batch.name}</span>
+              <span className="font-semibold text-gray-900 text-sm truncate">{batch.name}</span>
             </div>
 
             {/* Teacher */}
             <div className="col-span-4 flex items-center gap-2">
-              <User className="w-3.5 h-3.5 text-[var(--text-secondary)] flex-shrink-0" />
-              <span className="text-sm text-[var(--text-secondary)] truncate">{teacher}</span>
+              <User className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+              <span className="text-sm text-gray-600 truncate">{teacher}</span>
             </div>
 
             {/* Attendance % */}
             <div className="col-span-2">
               {rate === null ? (
-                <span className="text-xs text-[var(--text-secondary)] opacity-50">No data</span>
+                <span className="text-xs text-gray-400">No data</span>
               ) : (
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 rounded-full bg-[var(--border-subtle)] overflow-hidden max-w-[60px]">
+                  <div className="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden max-w-[60px]">
                     <div
-                      className={`h-full rounded-full transition-all ${rate >= 75 ? 'bg-emerald-500' : rate >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                      className={`h-full rounded-full transition-all ${rate >= 75 ? 'bg-green-500' : rate >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
                       style={{ width: `${rate}%` }}
                     />
                   </div>
-                  <span className={`text-xs font-bold ${rate >= 75 ? 'text-emerald-500' : rate >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                  <span className={`text-xs font-bold ${rate >= 75 ? 'text-green-600' : rate >= 50 ? 'text-amber-600' : 'text-red-600'}`}>
                     {rate}%
                   </span>
                 </div>
@@ -143,8 +134,8 @@ const StudentAttendanceView = ({ user }) => {
             {/* Expand icon */}
             <div className="col-span-1 flex justify-end">
               {expanded === batch.id
-                ? <ChevronUp className="w-4 h-4 text-[var(--text-secondary)]" />
-                : <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />
+                ? <ChevronUp className="w-4 h-4 text-gray-400" />
+                : <ChevronDown className="w-4 h-4 text-gray-400" />
               }
             </div>
           </button>
@@ -157,25 +148,25 @@ const StudentAttendanceView = ({ user }) => {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="overflow-hidden border-t border-[var(--border-subtle)]"
+                className="overflow-hidden border-t border-gray-100"
               >
-                <div className="px-5 py-4 bg-[var(--bg-app)]/40">
+                <div className="px-5 py-4 bg-gray-50/50">
                   {records.length === 0 ? (
-                    <p className="text-sm text-[var(--text-secondary)] text-center py-4 opacity-60">
+                    <p className="text-sm text-gray-500 text-center py-4">
                       No attendance recorded yet for this subject.
                     </p>
                   ) : (
                     <>
                       {/* Summary pills */}
                       <div className="flex items-center gap-3 mb-4 flex-wrap">
-                        <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Summary</span>
-                        <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold">
+                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Summary</span>
+                        <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">
                           Present: {records.filter(r => r.status === 'present').length}
                         </span>
-                        <span className="px-3 py-1 rounded-full bg-red-500/10 text-red-500 text-xs font-bold">
+                        <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">
                           Absent: {records.filter(r => r.status === 'absent').length}
                         </span>
-                        <span className="px-3 py-1 rounded-full bg-[var(--border-subtle)] text-[var(--text-secondary)] text-xs font-bold">
+                        <span className="px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-bold">
                           Total: {records.length}
                         </span>
                       </div>
@@ -186,21 +177,21 @@ const StudentAttendanceView = ({ user }) => {
                           <div
                             key={rec.date}
                             className={`flex items-center justify-between px-4 py-2.5 rounded-xl border text-sm transition-all ${ rec.status === 'present'
-                                ? 'bg-emerald-500/5 border-emerald-500/20'
-                                : 'bg-red-500/5 border-red-500/20'
+                                ? 'bg-green-50 border-green-200'
+                                : 'bg-red-50 border-red-200'
                             }`}
                           >
-                            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                            <div className="flex items-center gap-2 text-gray-600">
                               <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                              <span className="font-medium">
+                              <span className="font-medium text-gray-800">
                                 {new Date(rec.date).toLocaleDateString('en-IN', {
                                   weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
                                 })}
                               </span>
                             </div>
-                            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${ rec.status === 'present'
-                                ? 'bg-emerald-500/15 text-emerald-500'
-                                : 'bg-red-500/15 text-red-500'
+                            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold ${ rec.status === 'present'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-red-100 text-red-700'
                             }`}>
                               {rec.status === 'present'
                                 ? <><Check className="w-3 h-3" /> Present</>
@@ -216,7 +207,7 @@ const StudentAttendanceView = ({ user }) => {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
       ))}
     </div>
   )
@@ -249,7 +240,6 @@ const AdminAttendanceView = ({ user, role }) => {
   const batches = initialData?.batches || []
   const isInitialLoading = initialLoading && !initialData
 
-
   useEffect(() => {
     if (!selectedBatch) return
     const fetchStudentsAndAttendance = async () => {
@@ -263,7 +253,7 @@ const AdminAttendanceView = ({ user, role }) => {
         const map = {}
         attendanceList.forEach((a) => { map[a.student_id] = a.status })
         studentList.forEach((s) => { 
-          const sid = s.profile_id || s.id // Prefer profile_id (User UUID)
+          const sid = s.profile_id || s.id
           if (!map[sid]) map[sid] = 'present' 
         })
         setAttendance(map)
@@ -299,7 +289,7 @@ const AdminAttendanceView = ({ user, role }) => {
     setSaving(true)
     try {
       const records = students.map((s) => ({
-        student_id: s.profile_id || s.id, // Use profile_id (User UUID) for storage
+        student_id: s.profile_id || s.id, 
         batch_id: selectedBatch,
         date: selectedDate,
         status: attendance[s.profile_id || s.id] || 'present',
@@ -321,7 +311,6 @@ const AdminAttendanceView = ({ user, role }) => {
     const batchName = batches.find(b => b.id === selectedBatch)?.name || 'Batch'
     const doc = new jsPDF()
 
-    // Header
     doc.setFillColor(0, 0, 0)
     doc.rect(0, 0, 220, 28, 'F')
     doc.setTextColor(255, 255, 255)
@@ -329,14 +318,12 @@ const AdminAttendanceView = ({ user, role }) => {
     doc.setFont('helvetica', 'bold')
     doc.text('Attendance Report', 14, 18)
 
-    // Meta info
     doc.setTextColor(40, 40, 40)
     doc.setFontSize(11)
     doc.setFont('helvetica', 'normal')
     doc.text(`Batch: ${batchName}`, 14, 38)
     doc.text(`Date: ${selectedDate}`, 14, 46)
 
-    // Summary pills
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.setFillColor(16, 185, 129)
@@ -352,7 +339,6 @@ const AdminAttendanceView = ({ user, role }) => {
     doc.roundedRect(94, 52, 30, 9, 2, 2, 'F')
     doc.text(`Total: ${students.length}`, 96, 58.5)
 
-    // Table
     autoTable(doc, {
       startY: 68,
       head: [['#', 'Student Name', 'Email', 'Status']],
@@ -374,7 +360,6 @@ const AdminAttendanceView = ({ user, role }) => {
       },
     })
 
-    // Footer
     const pageCount = doc.internal.getNumberOfPages()
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i)
@@ -389,7 +374,7 @@ const AdminAttendanceView = ({ user, role }) => {
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[var(--bg-card)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-[16px] border border-gray-200 shadow-sm">
         <div className="flex-1">
           <Select
             label="Select Subject"
@@ -399,12 +384,12 @@ const AdminAttendanceView = ({ user, role }) => {
           />
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">Date</label>
+          <label className="block text-sm font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">Date</label>
           <input
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm outline-none focus:border-white focus:bg-[var(--bg-surface)] transition-all"
+            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-sm outline-none focus:border-blue-500 focus:bg-white transition-all"
           />
         </div>
       </div>
@@ -412,114 +397,109 @@ const AdminAttendanceView = ({ user, role }) => {
       {isInitialLoading || loading ? (
         <TableSkeleton rows={10} cols={3} />
       ) : students.length === 0 ? (
-        <div className="text-center py-12 text-[var(--text-secondary)]">
+        <div className="text-center py-12 text-gray-400 bg-white border border-dashed border-gray-200 rounded-[16px]">
           <ClipboardCheck className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p>No students in this subject</p>
         </div>
       ) : (
-        <>
+        <div className="bg-white rounded-[16px] border border-gray-200 shadow-sm overflow-hidden">
           {/* Summary Bar */}
-          <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-[var(--bg-app)]/50 border border-[var(--border-subtle)] shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200 gap-4">
             <div className="flex items-center gap-6 text-sm">
-              <span className="text-[var(--text-secondary)] font-medium uppercase tracking-wider text-xs">Overview</span>
-              <div className="h-4 w-px bg-[var(--border-subtle)]" />
-              <span className="text-[var(--text-secondary)]">Total: <span className="text-[var(--text-primary)] font-bold">{students.length}</span></span>
-              <span className="text-emerald-500">Present: <span className="font-bold">{presentCount}</span></span>
-              <span className="text-red-500">Absent: <span className="font-bold">{absentCount}</span></span>
+              <span className="text-gray-500 font-medium uppercase tracking-wider text-xs">Overview</span>
+              <div className="h-4 w-px bg-gray-300" />
+              <span className="text-gray-500">Total: <span className="text-gray-900 font-bold">{students.length}</span></span>
+              <span className="text-green-600">Present: <span className="font-bold">{presentCount}</span></span>
+              <span className="text-red-600">Absent: <span className="font-bold">{absentCount}</span></span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {(role === 'teacher' || role === 'admin' || role === 'master_admin') && (
                 <>
-                  <button onClick={() => markAll('present')} className="text-xs px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-all font-semibold active:scale-95">
+                  <button onClick={() => markAll('present')} className="text-xs px-3 py-1.5 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-all font-semibold">
                     Mark All Present
                   </button>
-                  <button onClick={() => markAll('absent')} className="text-xs px-4 py-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all font-semibold active:scale-95">
+                  <button onClick={() => markAll('absent')} className="text-xs px-3 py-1.5 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-all font-semibold">
                     Mark All Absent
                   </button>
                 </>
               )}
               <button
                 onClick={downloadPDF}
-                className="flex items-center gap-2 text-xs px-4 py-2 rounded-xl bg-[var(--text-primary)]/5 text-[var(--text-primary)] hover:bg-[var(--text-primary)]/10 border border-[var(--border-subtle)] transition-all font-semibold active:scale-95"
+                className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all font-semibold"
               >
                 <FileDown className="w-3.5 h-3.5" />
-                Download PDF
+                PDF
               </button>
             </div>
           </div>
 
           {/* Student List */}
-          <div className="space-y-3">
+          <div className="p-4 space-y-2">
             {students.map((student, i) => {
               const sid = student.profile_id || student.id
               const isPresent = attendance[sid] === 'present'
               
               return (
-                <motion.div
+                <div
                   key={sid}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.02 }}
-                  className={`flex items-center justify-between px-6 py-4 rounded-2xl border transition-all ${ isPresent ? 'bg-emerald-500/5 border-emerald-500/20 shadow-sm shadow-emerald-500/5'
-                      : 'bg-red-500/5 border-red-500/20 shadow-sm shadow-red-500/5'
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${ isPresent ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
                   }`}
                 >
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-inner ${ isPresent ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${ isPresent ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
                   }`}>
                     {student.name.charAt(0).toUpperCase()}
                   </div>
                    <div>
-                    <p className="text-base font-bold text-[var(--text-primary)]">{student.full_name || student.name || "Unknown"}</p>
-                    <p className="text-xs text-[var(--text-secondary)] font-medium">{student.email || 'No email provided'}</p>
+                    <p className="text-sm font-bold text-gray-900">{student.full_name || student.name || "Unknown"}</p>
+                    <p className="text-xs text-gray-500 font-medium">{student.email || 'No email provided'}</p>
                   </div>
                 </div>
                 {(role === 'teacher' || role === 'admin' || role === 'master_admin') ? (
                   <button
                     onClick={() => toggleStatus(sid)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${ isPresent ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                        : 'bg-red-500 text-white shadow-lg shadow-red-500/20'
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${ isPresent ? 'bg-green-500 text-white hover:bg-green-600'
+                        : 'bg-red-500 text-white hover:bg-red-600'
                     }`}
                   >
                     {isPresent ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
                     {isPresent ? 'Present' : 'Absent'}
                   </button>
                 ) : (
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold ${ isPresent ? 'bg-emerald-500/15 text-emerald-500'
-                      : 'bg-red-500/15 text-red-500'
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold ${ isPresent ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
                   }`}>
                     {isPresent ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
                     {isPresent ? 'Present' : 'Absent'}
                   </div>
                 )}
-              </motion.div>
+              </div>
             )})}
           </div>
 
-          {/* Save Button — teachers/admins */}
+          {/* Save Button */}
           {(role === 'teacher' || role === 'admin' || role === 'master_admin') && (
-            <div className="flex justify-end pt-2">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+            <div className="flex justify-end p-4 border-t border-gray-100 bg-gray-50 rounded-b-[16px]">
+              <button
                 onClick={handleSave}
                 disabled={saving}
-                className={`flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-bold shadow-xl transition-all ${ saved ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30'
-                    : 'bg-white text-black shadow-white/10'
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${ saved ? 'bg-green-100 text-green-700 border border-green-300'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
                 {saving ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : saved ? (
-                  <Check className="w-5 h-5" />
+                  <Check className="w-4 h-4" />
                 ) : (
-                  <Save className="w-5 h-5" />
+                  <Save className="w-4 h-4" />
                 )}
                 {saving ? 'Saving...' : saved ? 'Attendance Saved' : 'Save Attendance'}
-              </motion.button>
+              </button>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   )
@@ -530,21 +510,15 @@ const AttendancePage = ({ hideHeader = false }) => {
   const { user, role } = useAuth()
 
   return (
-    <div className="space-y-8">
+    <div className={hideHeader ? "space-y-6" : "space-y-8"}>
       {!hideHeader && (
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-sm shadow-emerald-500/5">
+        <div className="flex items-center gap-4 bg-white p-6 rounded-[16px] border border-gray-200 shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600">
             <ClipboardCheck className="w-6 h-6" />
           </div>
           <div>
-            <motion.h1
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-            >
-              Attendance
-            </motion.h1>
-            <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
+            <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Attendance</h1>
+            <p className="text-gray-500 text-sm mt-1">
               {role === 'student'
                 ? 'Your attendance across all enrolled subjects'
                 : role === 'admin' || role === 'master_admin'

@@ -4,9 +4,8 @@ import { BarChart3 } from 'lucide-react'
 import DataTable from '../../components/ui/DataTable'
 import { Select } from '../../components/ui/FormField'
 import { useAuth } from '../../context/AuthContext'
-import { useTheme } from '../../context/ThemeContext'
 import { supabase } from '../../lib/supabase'
-import { Sparkles, Download, X, AlertTriangle } from 'lucide-react'
+import { Sparkles, Download, X, AlertTriangle, Trophy } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
 import jsPDF from 'jspdf'
 import toast from 'react-hot-toast'
@@ -15,7 +14,6 @@ import { TableSkeleton } from '../../components/ui/Skeletons'
 
 const ResultsPage = ({ hideHeader = false }) => {
   const { user, role } = useAuth()
-  const { isDark } = useTheme()
   const [selectedBatch, setSelectedBatch] = useState('')
   const [selectedTest, setSelectedTest] = useState('')
   const [aiModalOpen, setAiModalOpen] = useState(false)
@@ -35,7 +33,6 @@ const ResultsPage = ({ hideHeader = false }) => {
 
     let studentResults = []
     if (role === 'student') {
-      // Use user.id directly — results.student_id FK points to students.profile_id
       const studentId = user.id
       const { data } = await supabase
           .from('results')
@@ -66,7 +63,6 @@ const ResultsPage = ({ hideHeader = false }) => {
       doc.setFontSize(12)
       doc.setTextColor('#000000')
       
-      // DATA MAPPING FIX: Prioritize full_name
       const studentName = role === 'student' 
         ? user?.user_metadata?.full_name 
         : (r.students?.full_name || r.students?.name || "Unknown");
@@ -85,38 +81,6 @@ const ResultsPage = ({ hideHeader = false }) => {
         doc.setTextColor('#ef4444')
         doc.text(`⚠️ Tab Switch Violations: ${r.violation_count}`, 14, 90)
         doc.setTextColor('#000000')
-      }
-
-      if (r.ai_feedback) {
-         doc.setFontSize(16)
-         doc.setTextColor('#000000')
-         doc.text('AI Feedback & Insights', 14, 100)
-         
-         doc.setFontSize(11)
-         doc.setTextColor('#333333')
-         let yPos = 110
-         
-         if (r.ai_feedback.overall_summary) {
-           doc.text(`Summary: ${r.ai_feedback.overall_summary}`, 14, yPos, { maxWidth: 180 })
-           yPos += 12
-         }
-         if (r.ai_feedback.strengths?.length) {
-           doc.setFontSize(12); doc.setTextColor('#22c55e')
-           doc.text('Strengths:', 14, yPos); yPos += 6; doc.setFontSize(11); doc.setTextColor('#333')
-           r.ai_feedback.strengths.forEach(s => { doc.text(`• ${s}`, 18, yPos, { maxWidth: 170 }); yPos += 6 })
-           yPos += 4
-         }
-         if (r.ai_feedback.weak_topics?.length) {
-           doc.setFontSize(12); doc.setTextColor('#ef4444')
-           doc.text('Areas for Improvement:', 14, yPos); yPos += 6; doc.setFontSize(11); doc.setTextColor('#333')
-           r.ai_feedback.weak_topics.forEach(s => { doc.text(`• ${s}`, 18, yPos, { maxWidth: 170 }); yPos += 6 })
-           yPos += 4
-         }
-         if (r.ai_feedback.improvement_suggestions?.length) {
-           doc.setFontSize(12); doc.setTextColor('#4b5563')
-           doc.text('Suggestions:', 14, yPos); yPos += 6; doc.setFontSize(11); doc.setTextColor('#333')
-           r.ai_feedback.improvement_suggestions.forEach(s => { doc.text(`• ${s}`, 18, yPos, { maxWidth: 170 }); yPos += 6 })
-         }
       }
 
       const fileName = `InteliX_${(studentName || 'Student').replace(/\s+/g, '_')}_${(r.tests?.title || 'Report').replace(/\s+/g, '_')}.pdf`
@@ -150,14 +114,10 @@ const ResultsPage = ({ hideHeader = false }) => {
       try {
         const { data } = await supabase
           .from('results')
-          .select('*, students(name), tests(title, total_marks)')
+          .select('*, students(name, full_name), tests(title, total_marks)')
           .eq('test_id', selectedTest)
           .order('rank', { ascending: true, nullsFirst: false })
         
-        // DEBUG SAFETY
-        if (data && data.length > 0) console.log('Results Sample:', data[0]);
-
-        // violation_count is auto-included with '*'
         setResults(data || [])
       } catch (err) {
         console.error(err)
@@ -168,23 +128,11 @@ const ResultsPage = ({ hideHeader = false }) => {
     fetchResults()
   }, [selectedTest])
 
-  // Student auto-fetch is handled by useAppQuery init
-
-
   const renderActions = (r) => (
     <div className="flex items-center justify-end gap-2">
-      {r.ai_feedback && Object.keys(r.ai_feedback).length > 0 && (
-        <button
-          onClick={() => { setSelectedResult(r); setAiModalOpen(true); }}
-          className={`p-1.5 rounded-lg hover:scale-105 transition-all shadow-sm ${isDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'}`}
-          title="View AI Insights"
-        >
-          <Sparkles className="w-4 h-4" />
-        </button>
-      )}
       <button
         onClick={() => handleGeneratePDF(r)}
-        className={`p-1.5 rounded-lg hover:scale-105 transition-all shadow-sm ${isDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'}`}
+        className="p-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent hover:border-gray-300 transition-all shadow-sm"
         title="Download Report (PDF)"
       >
         <Download className="w-4 h-4" />
@@ -194,17 +142,20 @@ const ResultsPage = ({ hideHeader = false }) => {
 
   const columns = role === 'student'
     ? [
-        { key: 'test', label: 'Test', render: (r) => r.tests?.title || '-' },
-        { key: 'batch', label: 'Batch', render: (r) => r.tests?.batches?.name || '-' },
-        { key: 'date', label: 'Date', render: (r) => r.tests?.date ? new Date(r.tests.date).toLocaleDateString() : '-' },
-        { key: 'marks', label: 'Marks', render: (r) => <span className="font-bold text-[var(--text-primary)]">{r.marks}</span> },
-        { key: 'percentage', label: '%', render: (r) => r.tests?.total_marks ? `${((r.marks / r.tests.total_marks) * 100).toFixed(1)}%` : '-' },
+        { key: 'test', label: 'Test', render: (r) => <span className="font-medium text-gray-900">{r.tests?.title || '-'}</span> },
+        { key: 'batch', label: 'Batch', render: (r) => <span className="text-gray-600">{r.tests?.batches?.name || '-'}</span> },
+        { key: 'date', label: 'Date', render: (r) => <span className="text-gray-500">{r.tests?.date ? new Date(r.tests.date).toLocaleDateString() : '-'}</span> },
+        { key: 'marks', label: 'Marks', render: (r) => <span className="font-bold text-gray-900">{r.marks}</span> },
+        { key: 'percentage', label: '%', render: (r) => r.tests?.total_marks ? <span className="font-semibold text-blue-600">{((r.marks / r.tests.total_marks) * 100).toFixed(1)}%</span> : '-' },
         {
           key: 'rank',
           label: 'Rank',
           render: (r) => r.rank ? (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium shadow-sm ${
-              r.rank === 1 ? 'bg-white text-black' : 'bg-white/10 text-white/70 border border-white/5'
+            <span className={`px-2 py-1 rounded-md text-xs font-bold ${
+              r.rank === 1 ? 'bg-amber-100 text-amber-700' : 
+              r.rank === 2 ? 'bg-gray-200 text-gray-700' :
+              r.rank === 3 ? 'bg-orange-100 text-orange-700' :
+              'bg-blue-50 text-blue-600'
             }`}>
               #{r.rank}
             </span>
@@ -218,17 +169,20 @@ const ResultsPage = ({ hideHeader = false }) => {
           label: 'Student', 
           render: (r) => {
             const studentName = r.students?.full_name || r.students?.name || 'Unknown';
-            return <span className="font-medium text-[var(--text-primary)]">{studentName}</span>
+            return <span className="font-semibold text-gray-900">{studentName}</span>
           } 
         },
-        { key: 'marks', label: 'Marks', render: (r) => <span className="font-bold text-[var(--text-primary)]">{r.marks}</span> },
-        { key: 'percentage', label: '%', render: (r) => r.tests?.total_marks ? `${((r.marks / r.tests.total_marks) * 100).toFixed(1)}%` : '-' },
+        { key: 'marks', label: 'Marks', render: (r) => <span className="font-bold text-gray-900">{r.marks}</span> },
+        { key: 'percentage', label: '%', render: (r) => r.tests?.total_marks ? <span className="font-semibold text-blue-600">{((r.marks / r.tests.total_marks) * 100).toFixed(1)}%</span> : '-' },
         {
           key: 'rank',
           label: 'Rank',
           render: (r) => r.rank ? (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium shadow-sm ${
-              r.rank === 1 ? 'bg-white text-black' : 'bg-white/10 text-white/70 border border-white/5'
+            <span className={`px-2 py-1 rounded-md text-xs font-bold ${
+              r.rank === 1 ? 'bg-amber-100 text-amber-700' : 
+              r.rank === 2 ? 'bg-gray-200 text-gray-700' :
+              r.rank === 3 ? 'bg-orange-100 text-orange-700' :
+              'bg-blue-50 text-blue-600'
             }`}>
               #{r.rank}
             </span>
@@ -240,10 +194,10 @@ const ResultsPage = ({ hideHeader = false }) => {
           render: (r) => {
             const count = r.violation_count || 0
             if (count === 0) return (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20">Clean</span>
+              <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-green-100 text-green-700">Clean</span>
             )
             return (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-1 w-fit">
+              <span className="px-2 py-1 rounded-md text-[10px] font-bold bg-red-100 text-red-700 flex items-center gap-1 w-fit">
                 <AlertTriangle className="w-3 h-3" /> {count}
               </span>
             )
@@ -256,21 +210,15 @@ const ResultsPage = ({ hideHeader = false }) => {
   const testOptions = tests.map((t) => ({ value: t.id, label: `${t.title} (${new Date(t.date).toLocaleDateString()})` }))
 
   return (
-    <div className="space-y-8">
+    <div className={hideHeader ? "space-y-6" : "space-y-8"}>
       {!hideHeader && (
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20 shadow-sm shadow-amber-500/5">
+        <div className="flex items-center gap-4 bg-white p-6 rounded-[16px] border border-gray-200 shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
-            <motion.h1 
-              initial={{ opacity: 0, x: -10 }} 
-              animate={{ opacity: 1, x: 0 }} 
-              className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-            >
-              Results & Insights
-            </motion.h1>
-            <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
+            <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Results & Insights</h1>
+            <p className="text-gray-500 text-sm mt-1">
               {role === 'student' ? 'Your test scores and rankings' : 'View and manage test results across your batches'}
             </p>
           </div>
@@ -278,7 +226,7 @@ const ResultsPage = ({ hideHeader = false }) => {
       )}
 
       {role !== 'student' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[var(--bg-card)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-[16px] border border-gray-200 shadow-sm">
           <div className="flex-1">
             <Select 
               label="Batch" 
@@ -295,6 +243,7 @@ const ResultsPage = ({ hideHeader = false }) => {
               options={testOptions} 
               value={selectedTest} 
               onChange={(e) => setSelectedTest(e.target.value)} 
+              disabled={testOptions.length === 0}
             />
           </div>
         </div>
@@ -303,90 +252,10 @@ const ResultsPage = ({ hideHeader = false }) => {
       {(isInitialLoading || loading) ? (
         <TableSkeleton rows={8} cols={6} />
       ) : (
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-[16px] overflow-hidden shadow-sm">
           <DataTable columns={columns} data={results} emptyMessage={role === 'student' ? 'No results found for your account' : 'Select a batch and test to view results'} />
         </div>
       )}
-
-      {/* AI Feedback Modal */}
-      <AnimatePresence>
-        {aiModalOpen && selectedResult?.ai_feedback && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl overflow-hidden relative max-h-[90vh] overflow-y-auto custom-scrollbar"
-            >
-              <button
-                onClick={() => setAiModalOpen(false)}
-                className="absolute top-6 right-6 p-2 rounded-full bg-[var(--bg-app)] text-[var(--text-secondary)] hover:text-red-400 hover:bg-red-500/10 transition-all"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-xl shadow-amber-500/5">
-                  <Trophy className="w-6 h-6" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-[var(--text-primary)]">AI Performance Insights</h2>
-                  <p className="text-sm font-medium text-[var(--text-secondary)]">{selectedResult.tests?.title}</p>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                {selectedResult.ai_feedback.overall_summary && (
-                  <div className="p-4 rounded-2xl bg-[var(--bg-app)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm font-medium leading-relaxed">
-                    "{selectedResult.ai_feedback.overall_summary}"
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedResult.ai_feedback.strengths?.length > 0 && (
-                    <div className="p-5 rounded-2xl border border-green-500/20 bg-green-500/5">
-                      <h3 className="text-sm font-bold text-green-400 mb-3 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-green-400"></span> Strengths
-                      </h3>
-                      <ul className="space-y-2">
-                        {selectedResult.ai_feedback.strengths.map((s, i) => (
-                          <li key={i} className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{s}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {selectedResult.ai_feedback.weak_topics?.length > 0 && (
-                    <div className="p-5 rounded-2xl border border-red-500/20 bg-red-500/5">
-                      <h3 className="text-sm font-bold text-red-400 mb-3 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-red-400"></span> Areas to Improve
-                      </h3>
-                      <ul className="space-y-2">
-                        {selectedResult.ai_feedback.weak_topics.map((s, i) => (
-                          <li key={i} className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{s}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-
-                {selectedResult.ai_feedback.improvement_suggestions?.length > 0 && (
-                  <div className="p-5 rounded-2xl border border-white/20 bg-white/5">
-                    <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-white"></span> Action Plan
-                    </h3>
-                    <ul className="space-y-2">
-                      {selectedResult.ai_feedback.improvement_suggestions.map((s, i) => (
-                        <li key={i} className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{s}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

@@ -4,14 +4,12 @@ import { Upload, FileText, Trash2, Download, Search } from 'lucide-react'
 import { Select } from '../../components/ui/FormField'
 import { getMaterials, uploadMaterial, deleteMaterial } from '../../services/materialService'
 import { useAuth } from '../../context/AuthContext'
-import { useTheme } from '../../context/ThemeContext'
 import { supabase } from '../../lib/supabase'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { CardSkeleton } from '../../components/ui/Skeletons'
 
 const MaterialsPage = () => {
   const { user, role } = useAuth()
-  const { isDark } = useTheme()
   const { data: initialData, loading: initialLoading, refetch: refetchInitial } = useAppQuery(`materials-init-${role}-${user?.id}`, async () => {
     if (!user) return { batches: [], materials: [] }
     
@@ -116,41 +114,36 @@ const MaterialsPage = () => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <motion.h1 
-          initial={{ opacity: 0, x: -10 }} 
-          animate={{ opacity: 1, x: 0 }} 
-          className="text-3xl font-bold text-[var(--text-primary)] tracking-tight"
-        >
-          Study Materials
-        </motion.h1>
-        <p className="text-[var(--text-secondary)] text-sm mt-1 font-medium">
-          {canUpload ? 'Upload and manage study materials for your batches' : 'Access your shared study materials and resources'}
-        </p>
+      <div className="flex items-center gap-4 bg-white p-6 rounded-[16px] border border-gray-200 shadow-sm">
+        <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
+          <FileText className="w-6 h-6" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Study Materials</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {canUpload ? 'Upload and manage study materials for your batches' : 'Access your shared study materials and resources'}
+          </p>
+        </div>
       </div>
 
       {/* Upload Section */}
       {canUpload && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-sm tint-card-0"
-        >
-          <div className={`flex items-center gap-3 mb-6`}>
-            <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
+        <div className="rounded-[16px] border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
               <Upload className="w-5 h-5" />
             </div>
-            <h2 className="text-lg font-bold text-[var(--text-primary)]">Upload Material</h2>
+            <h2 className="text-lg font-bold text-gray-900">Upload Material</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">Title</label>
+              <label className="block text-sm font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">Title</label>
               <input
                 type="text"
                 placeholder="Enter document title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-indigo-400 focus:bg-[var(--bg-app)] transition-all"
+                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-blue-500 focus:bg-white transition-all"
               />
             </div>
             <Select
@@ -162,34 +155,34 @@ const MaterialsPage = () => {
               disabled={batchOptions.length === 0}
             />
             <div>
-              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">File (PDF/DOC)</label>
+              <label className="block text-sm font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">File (PDF/DOC)</label>
               <input
                 ref={fileRef}
                 type="file"
                 accept=".pdf,.doc,.docx,.ppt,.pptx,.xlsx"
-                className={`w-full text-xs text-[var(--text-secondary)] file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:cursor-pointer transition-all ${isDark ? 'file:bg-white/10 file:text-white hover:file:bg-white/20' : 'file:bg-indigo-500/10 file:text-indigo-600 hover:file:bg-indigo-500/20'}`}
+                className="w-full text-xs text-gray-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:cursor-pointer transition-all file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
             </div>
             <div className="flex items-end">
-              <motion.button
+              <button
                 onClick={handleUpload}
                 disabled={uploading || !title || !uploadBatch || !fileRef.current?.files[0]}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--text-primary)] text-[var(--bg-app)] text-sm font-bold disabled:opacity-50 shadow-xl active:scale-95 transition-all"
+                className="btn-primary w-full h-[42px] justify-center"
               >
                 {uploading ? (
-                  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <Upload className="w-5 h-5" />
+                  <Upload className="w-4 h-4 mr-2" />
                 )}
                 {uploading ? 'Uploading...' : 'Publish Material'}
-              </motion.button>
+              </button>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {/* Filters */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[var(--bg-card)] p-6 rounded-2xl border border-[var(--border-subtle)] shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-[16px] border border-gray-200 shadow-sm">
         <div className="flex-1">
           <Select
             label="Filter by Batch"
@@ -200,15 +193,15 @@ const MaterialsPage = () => {
           />
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5 uppercase tracking-wider">Quick Search</label>
+          <label className="block text-sm font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">Quick Search</label>
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Find materials by title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-sm placeholder-[var(--text-secondary)]/50 outline-none focus:border-indigo-400 focus:bg-[var(--bg-app)] transition-all"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-blue-500 focus:bg-white transition-all"
             />
           </div>
         </div>
@@ -220,55 +213,52 @@ const MaterialsPage = () => {
           {[...Array(8)].map((_, i) => <CardSkeleton key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-20 bg-[var(--bg-surface)]/50 rounded-3xl border border-dashed border-[var(--border-subtle)]">
-          <FileText className="w-16 h-16 mx-auto mb-4 text-[var(--text-secondary)] opacity-20" />
-          <p className="text-[var(--text-secondary)] font-medium text-lg">No materials found matching your criteria</p>
+        <div className="text-center py-20 bg-white rounded-[16px] border border-dashed border-gray-300">
+          <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <p className="text-gray-500 font-medium">No materials found matching your criteria</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map((mat, i) => (
-            <motion.div
+          {filtered.map((mat) => (
+            <div
               key={mat.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className={`group rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 flex flex-col hover:border-black/20 dark:hover:border-white/20 hover:shadow-xl transition-all tint-card-${i % 6}`}
+              className="academic-card flex flex-col hover:border-blue-300 hover:bg-blue-50 transition-all group"
             >
               <div className="flex items-start gap-3 mb-4">
-                <div className={`p-3 rounded-xl transition-all ${isDark ? 'bg-white/10 text-white group-hover:bg-white group-hover:text-black' : 'bg-black/10 text-black group-hover:bg-indigo-600 group-hover:text-white'}`}>
+                <div className="p-3 rounded-xl bg-gray-100 text-gray-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                   <FileText className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-[var(--text-primary)] truncate transition-colors">{mat.title}</h3>
-                  <p className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mt-1">{mat.batches?.name || 'PUBLIC'}</p>
+                  <h3 className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-700 transition-colors">{mat.title}</h3>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-1">{mat.batches?.name || 'PUBLIC'}</p>
                 </div>
               </div>
+              
               <div className="mb-6 flex-1">
-                 <p className="text-xs text-[var(--text-secondary)] font-medium flex items-center gap-1.5 flex-wrap leading-relaxed">
-                   <span className="w-1 h-1 rounded-full bg-[var(--border-subtle)]" />
+                 <p className="text-xs text-gray-500 font-medium">
                    Published {mat.profiles?.first_name ? `by ${mat.profiles.first_name} ${mat.profiles.last_name || ''} ` : ''}on {new Date(mat.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              
+              <div className="flex items-center gap-2 mt-auto pt-4 border-t border-gray-100">
                 <a
                   href={mat.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs font-bold transition-all hover:bg-white hover:text-black hover:border-transparent"
-
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold transition-all hover:bg-white hover:border-gray-300 group-hover:bg-white group-hover:border-blue-200"
                 >
                   <Download className="w-3.5 h-3.5" /> Get File
                 </a>
                 {canUpload && (
                   <button
                     onClick={() => handleDelete(mat)}
-                    className="p-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-all active:scale-90"
+                    className="p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-gray-400 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       )}

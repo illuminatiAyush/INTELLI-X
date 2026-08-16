@@ -10,7 +10,6 @@ import Statistics from './sections/Statistics'
 import Pricing from './sections/Pricing'
 import CTA from './components/CTA'
 import FAQ from './sections/FAQ'
-import AIChatbot from './components/AIChatbot'
 import Footer from './components/Footer'
 import AuthPage from './pages/AuthPage'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -71,7 +70,6 @@ const HomePage = () => (
       <CTA />
     </main>
     <Footer />
-    <AIChatbot />
   </>
 )
 

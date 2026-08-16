@@ -1,15 +1,14 @@
-# IntelliX — AI-Powered Coaching Institute Operating System
+# IntelliX — Modern Coaching Institute Management Platform
 
 IntelliX is a modern operating system for coaching institutes that transforms fragmented, manual workflows into a centralized, data-driven, and scalable system.
 
-It enables institutes to manage students, batches, attendance, and performance — all in one place, with real-time visibility and structured insights.
+It enables institutes to manage students, batches, attendance, fees, and performance — all in one place, with real-time visibility and structured insights.
 
 ---
 
 ## Problem
 
 Traditional coaching systems are:
-
 - Fragmented  
 - Manual  
 - Inefficient  
@@ -19,7 +18,6 @@ Traditional coaching systems are:
 ## Solution
 
 IntelliX digitizes the entire institute workflow into a unified platform:
-
 - Centralized data management  
 - Real-time tracking  
 - Role-based access control  
@@ -34,17 +32,22 @@ IntelliX digitizes the entire institute workflow into a unified platform:
 - Institute-wide dashboard  
 - Batch & student management  
 - Performance analytics  
-- Attendance & results tracking  
+- Attendance & results tracking
+- Fee management
+- Notifications
 
 ### Teacher
 - Batch management  
 - Attendance marking (live sessions)  
 - Student performance tracking  
+- Test administration
 
 ### Student
 - Personalized dashboard  
 - Attendance & results view  
 - Batch access  
+- Test attempts
+- Fee tracking
 
 ---
 
@@ -63,32 +66,16 @@ IntelliX digitizes the entire institute workflow into a unified platform:
                 └──────────┬─────────────┘
                            │
         ┌──────────────────┼──────────────────┐
-        ▼                  ▼                  ▼
-┌──────────────┐  ┌────────────────┐  ┌────────────────┐
-│  Supabase    │  │   AI Layer     │  │  Realtime Sync │
-│ (PostgreSQL) │  │ (LLM / RAG)    │  │ (WebSockets)   │
-└──────────────┘  └────────────────┘  └────────────────┘
+        ▼                                     ▼
+┌──────────────┐                      ┌────────────────┐
+│  Supabase    │                      │  Realtime Sync │
+│ (PostgreSQL) │                      │ (WebSockets)   │
+└──────────────┘                      └────────────────┘
         │
         ▼
 ┌────────────────────────────┐
 │ Auth + RBAC + Storage      │
 └────────────────────────────┘
-```
-
----
-
-## AI Layer (In Progress)
-
-```text
-User Input (Text / Image)
-        ↓
-OCR (Text Extraction)
-        ↓
-LLM Processing
-        ↓
-Structured Answer (Step-by-step)
-        ↓
-Chat Interface
 ```
 
 ---
@@ -102,11 +89,7 @@ Chat Interface
 ### Backend & Infra
 - Supabase (PostgreSQL)
 - Auth + Realtime + Storage
-
-### AI (Planned)
-- LLM APIs  
-- OCR pipeline  
-- RAG (vector search)
+- FastAPI (Future)
 
 ---
 
@@ -160,7 +143,6 @@ npm install
 ```env
 VITE_SUPABASE_URL=your-url
 VITE_SUPABASE_ANON_KEY=your-key
-VITE_GROQ_API_KEY=your-ai-key
 ```
 
 ### Run
@@ -176,18 +158,14 @@ npm run dev
 - Admin Dashboard  
 - Batch & Student Management  
 - Auth + RBAC  
-- Real-time system  
-
-**In Progress:**
-- AI Doubt Solver  
-- Test Engine  
-- RAG-based learning  
+- Real-time system
+- Test Engine
 
 ---
 
 ## Vision
 
-We don’t change how institutes teach.  
+We don't change how institutes teach.  
 We give them complete control, visibility, and intelligence over their system.
 
 ---

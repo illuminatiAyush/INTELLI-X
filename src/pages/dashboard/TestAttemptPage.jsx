@@ -5,7 +5,6 @@ import { Clock, ChevronLeft, ChevronRight, AlertTriangle, CheckCircle2, Send, Sh
 import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
-import { generateAIFeedback } from '../../services/aiTestService'
 import { TestAttemptSkeleton } from '../../components/ui/Skeletons'
 
 const TestAttemptPage = () => {
@@ -176,14 +175,6 @@ const TestAttemptPage = () => {
 
       if (resultData) {
         setResult(resultData)
-        // Background: Generate AI Feedback
-        generateAIFeedback(resultData, currentT, qList)
-          .then(async (feedback) => {
-            if (feedback) {
-              await supabase.from('results').update({ ai_feedback: feedback }).eq('id', resultData.id)
-            }
-          })
-          .catch(err => console.error("AI feedback gen failed:", err))
       }
 
       submittedRef.current = true
