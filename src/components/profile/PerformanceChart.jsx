@@ -1,0 +1,127 @@
+import { useMemo } from 'react'
+import { motion } from 'framer-motion'
+import { Line } from 'react-chartjs-2'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { TrendingUp } from 'lucide-react'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
+
+const Skeleton = () => (
+  <div className="rounded-2xl border border-gray-200 bg-white p-6 animate-pulse">
+    <div className="h-5 w-48 rounded bg-[var(--border-subtle)] mb-6" />
+    <div className="h-52 w-full rounded-xl bg-[var(--border-subtle)]" />
+  </div>
+)
+
+const PerformanceChart = ({ testScores, loading }) => {
+  const chartData = useMemo(() => {
+    if (!testScores) return null
+    return {
+      labels: testScores.labels,
+      datasets: [
+        {
+          label: 'Score',
+          data: testScores.scores,
+          borderColor: '#ffffff',
+          backgroundColor: (ctx) => {
+            const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height)
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)')
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)')
+            return gradient
+          },
+          borderWidth: 3,
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: '#0a0a0a',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.4,
+          fill: true,
+        },
+      ],
+    }
+  }, [testScores])
+
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          titleColor: '#fff',
+          bodyColor: '#d4d4d8',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          cornerRadius: 12,
+          padding: 12,
+          callbacks: {
+            label: (ctx) => `Score: ${ctx.parsed.y}%`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#a1a1aa', font: { size: 12, weight: 500 } },
+          border: { display: false },
+        },
+        y: {
+          min: 0,
+          max: 100,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: {
+            color: '#a1a1aa',
+            font: { size: 12, weight: 500 },
+            callback: (v) => `${v}%`,
+            stepSize: 20,
+          },
+          border: { display: false },
+        },
+      },
+      interaction: { intersect: false, mode: 'index' },
+    }),
+    []
+  )
+
+  if (loading) return <Skeleton />
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 }}
+      className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+    >
+      <div className="flex items-center gap-2 mb-6">
+        <div className="p-2 rounded-lg bg-white/10 text-white border border-white/10">
+          <TrendingUp className="w-5 h-5" />
+        </div>
+        <h3 className="text-lg font-bold text-gray-900">Performance Trend</h3>
+      </div>
+      <div className="h-56 relative">
+        {chartData ? (
+          <Line data={chartData} options={options} />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 border border-dashed border-gray-200 rounded-xl">
+             <TrendingUp className="w-8 h-8 text-gray-600 mb-3 opacity-30" />
+             <p className="text-sm font-bold text-gray-900">Score Trend Pending</p>
+             <p className="text-gray-600 text-[10px] uppercase tracking-widest font-bold mt-1">First test results will appear here</p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+export default PerformanceChart
