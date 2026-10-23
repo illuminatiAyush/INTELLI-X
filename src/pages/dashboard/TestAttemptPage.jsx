@@ -497,7 +497,7 @@ const TestAttemptPage = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-lg mx-auto py-12"
       >
-        <div className="bg-white border border-gray-200 rounded-3xl p-8 text-center shadow-xl">
+        <div className="bg-white border border-gray-200 rounded-3xl p-8 text-center">
           <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center ${ pct >= 70 ? 'bg-green-500/10' : pct >= 40 ? 'bg-amber-500/10' : 'bg-red-500/10'
           }`}>
             <CheckCircle2 className={`w-10 h-10 ${ pct >= 70 ? 'text-green-400' : pct >= 40 ? 'text-amber-400' : 'text-red-400'
@@ -529,7 +529,7 @@ const TestAttemptPage = () => {
           )}
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full py-4 rounded-xl bg-[var(--text-primary)] text-[var(--bg-app)] font-bold shadow-xl active:scale-[0.98] transition-all"
+            className="w-full py-4 rounded-xl bg-[var(--text-primary)] text-[var(--bg-app)] font-bold active:scale-[0.98] transition-all"
           >
             Back to Dashboard
           </button>
@@ -555,7 +555,7 @@ const TestAttemptPage = () => {
   return (
     <div className="max-w-4xl mx-auto pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 mb-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 mb-6 bg-white border border-gray-200 rounded-2xl">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center">
             <Clock className={`w-6 h-6 ${getTimerColor()}`} />
@@ -575,14 +575,14 @@ const TestAttemptPage = () => {
               {violationCount} Violation{violationCount > 1 ? 's' : ''}
             </div>
           )}
-          <div className={`px-5 py-3 rounded-xl border font-mono text-xl font-black ${ timeLeft <= 60 ? 'bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-gray-50 border-gray-200 text-gray-900'
+          <div className={`px-5 py-3 rounded-xl border font-mono text-xl font-black ${ timeLeft <= 60 ? 'bg-red-500/10 border-red-500/20 text-red-400$1' : 'bg-gray-50 border-gray-200 text-gray-900'
           }`}>
             {formatTime(timeLeft)}
           </div>
           <button
             onClick={() => handleSubmit(false)}
             disabled={submitting}
-            className="px-6 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl shadow-xl flex items-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
+            className="px-6 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl flex items-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
             Finish
@@ -612,7 +612,7 @@ const TestAttemptPage = () => {
         key={currentQuestion}
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="bg-white border border-gray-200 rounded-[2.5rem] p-8 shadow-sm"
+        className="bg-white border border-gray-200 rounded-[2.5rem] p-8"
       >
         <div className="flex items-start gap-5 mb-10">
           <span className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-900 font-black text-xl border border-gray-200">
@@ -663,7 +663,7 @@ const TestAttemptPage = () => {
           {currentQuestion < questions.length - 1 ? (
             <button
               onClick={goNext}
-              className="flex items-center gap-2 px-8 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl shadow-xl hover:opacity-90 active:scale-[0.98] transition-all"
+              className="flex items-center gap-2 px-8 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all"
             >
               Next <ChevronRight className="w-5 h-5" />
             </button>
@@ -671,7 +671,7 @@ const TestAttemptPage = () => {
             <button
               onClick={() => handleSubmit(false)}
               disabled={submitting}
-              className="flex items-center gap-2 px-8 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl shadow-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-8 py-3 bg-[var(--text-primary)] text-[var(--bg-app)] font-bold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               <Send className="w-5 h-5" /> Submit Exam
             </button>
@@ -691,3 +691,5 @@ const TestAttemptPage = () => {
 }
 
 export default TestAttemptPage
+
+

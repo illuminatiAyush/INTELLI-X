@@ -18,7 +18,7 @@ const Toggle = ({ enabled, onToggle }) => (
     }`}
   >
     <span
-      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out ${ enabled ? 'translate-x-5' : 'translate-x-0'
+      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white ring-0 transition-transform duration-200 ease-in-out ${ enabled ? 'translate-x-5' : 'translate-x-0'
       }`}
     />
   </button>
@@ -38,7 +38,7 @@ const Notifications = () => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.25 }}
-      className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      className="rounded-2xl border border-gray-200 bg-white p-6"
     >
       <div className="flex items-center gap-2 mb-5">
         <div className="p-2 rounded-lg bg-white/10 text-white border border-white/10">
@@ -69,3 +69,4 @@ const Notifications = () => {
 }
 
 export default Notifications
+

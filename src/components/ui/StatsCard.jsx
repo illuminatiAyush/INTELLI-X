@@ -24,7 +24,7 @@ const StatsCard = ({ title, value, icon: Icon, trend, color = 'white' }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="relative bg-white rounded-xl border border-gray-200 p-5 flex flex-col justify-between shadow-sm"
+      className="relative bg-white rounded-xl border border-gray-200 p-5 flex flex-col justify-between"
       style={{ minHeight: 110 }}
     >
       {/* top row: label + icon */}
@@ -68,3 +68,4 @@ const StatsCard = ({ title, value, icon: Icon, trend, color = 'white' }) => {
 }
 
 export default StatsCard
+

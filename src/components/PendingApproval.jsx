@@ -10,7 +10,7 @@ export default function PendingApproval() {
       <motion.div 
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="max-w-md w-full bg-[var(--bg-surface)] backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-8 z-10 shadow-2xl shadow-black/50"
+        className="max-w-md w-full bg-[var(--bg-surface)] backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-8 z-10 shadow-black/50"
       >
         <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 text-amber-500">
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -35,3 +35,4 @@ export default function PendingApproval() {
     </div>
   )
 }
+

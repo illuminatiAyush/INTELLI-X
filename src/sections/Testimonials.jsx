@@ -86,8 +86,8 @@ const Testimonials = () => {
           } : {}}
           className={`relative w-full flex flex-col items-center rounded-[32px] border p-8 sm:p-12 md:p-16 ${
             isDark 
-              ? 'bg-black/40 border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.4)]' 
-              : 'bg-black/[0.01] border-black/[0.05] shadow-[0_20px_60px_rgba(0,0,0,0.05)]'
+              ? 'bg-black/40 border-white/10$1' 
+              : 'bg-black/[0.01] border-black/[0.05]$1'
           }`}
         >
           {/* Fixed Height Variable Container to trap crossfades */}
@@ -136,3 +136,4 @@ const Testimonials = () => {
 }
 
 export default Testimonials
+

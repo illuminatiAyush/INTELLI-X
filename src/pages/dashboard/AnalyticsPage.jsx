@@ -371,7 +371,7 @@ const AnalyticsPage = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-2xl border border-gray-200 bg-white p-6"
         >
           <div className="flex items-center gap-2 mb-6">
             <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-700'}`}>
@@ -427,7 +427,7 @@ const AnalyticsPage = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+            className="rounded-2xl border border-gray-200 bg-white p-6"
           >
             <div className="flex items-center gap-2 mb-6">
               <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
@@ -462,7 +462,7 @@ const AnalyticsPage = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm"
+            className="rounded-2xl border border-blue-200 bg-blue-50 p-6"
           >
             <div className="flex items-center gap-2 mb-4">
               <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
@@ -525,7 +525,7 @@ const AnalyticsPage = () => {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-2xl border border-gray-200 bg-white p-6"
       >
         <div className="flex items-center gap-2 mb-6">
           <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-slate-100 text-slate-700 border border-slate-200'} shadow-sm`}>
@@ -578,7 +578,7 @@ const AnalyticsPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-2xl border border-gray-200 bg-white p-6"
         >
           <div className="flex items-center gap-2 mb-6">
             <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
@@ -619,7 +619,7 @@ const AnalyticsPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-2xl border border-gray-200 bg-white p-6"
         >
           <div className="flex items-center gap-2 mb-6">
             <div className="p-2 rounded-lg bg-red-500/10 text-red-500">
@@ -649,3 +649,4 @@ const AnalyticsPage = () => {
 }
 
 export default AnalyticsPage
+

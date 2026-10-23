@@ -199,7 +199,7 @@ const ActiveTestsPage = ({ hideHeader = false }) => {
           {status.canAttempt ? (
             <button
               onClick={() => handleStartTest(test)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold shadow-xl active:scale-95 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-bold active:scale-95 transition-all"
             >
               <Play className="w-3.5 h-3.5" /> Start Test
             </button>
@@ -306,3 +306,4 @@ const ActiveTestsPage = ({ hideHeader = false }) => {
 }
 
 export default ActiveTestsPage
+

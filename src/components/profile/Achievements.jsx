@@ -61,7 +61,7 @@ const Achievements = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.25 + idx * 0.08 }}
-            className={`relative overflow-hidden rounded-2xl border ${badge.color.border} ${badge.color.bg} p-5 shadow-lg ${badge.color.glow} hover:scale-[1.02] transition-transform`}
+            className={`relative overflow-hidden rounded-2xl border ${badge.color.border} ${badge.color.bg} p-5 ${badge.color.glow} hover:scale-[1.02] transition-transform`}
           >
             <div className={`inline-flex p-3 rounded-xl ${badge.color.bg} ${badge.color.text} mb-3`}>
               <badge.icon className="w-6 h-6" />
@@ -79,3 +79,4 @@ const Achievements = () => {
 }
 
 export default Achievements
+

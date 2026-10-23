@@ -162,7 +162,7 @@ const AIChatbot = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => { setIsOpen(true); setIsMinimized(false); }}
-        className={`fixed bottom-6 right-6 w-16 h-16 rounded-full bg-[var(--text-primary)] text-[var(--bg-app)] shadow-2xl z-50 flex items-center justify-center border-2 ${isDark ? 'border-white/20' : 'border-black/10'} transition-all ${isOpen ? 'scale-0 opacity-0 pointer-events-none' : ''}`}
+        className={`fixed bottom-6 right-6 w-16 h-16 rounded-full bg-[var(--text-primary)] text-[var(--bg-app)] z-50 flex items-center justify-center border-2 ${isDark ? 'border-white/20' : 'border-black/10'} transition-all ${isOpen ? 'scale-0 opacity-0 pointer-events-none' : ''}`}
       >
         <Sparkles className="w-8 h-8" />
         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 border-2 border-[var(--bg-app)] rounded-full" />
@@ -182,7 +182,7 @@ const AIChatbot = () => {
               width: isMinimized ? '300px' : '400px'
             }}
             exit={{ opacity: 0, y: 100, scale: 0.9 }}
-            className="fixed bottom-6 right-6 border rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-[60] flex flex-col overflow-hidden backdrop-blur-xl transition-all duration-300"
+            className="fixed bottom-6 right-6 border rounded-[2.5rem]$1 z-[60] flex flex-col overflow-hidden backdrop-blur-xl transition-all duration-300"
             style={{
               background: 'var(--bg-surface)',
               borderColor: 'var(--border-subtle)'
@@ -195,7 +195,7 @@ const AIChatbot = () => {
                    borderColor: 'var(--border-subtle)'
                  }}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-white text-black flex items-center justify-center shadow-xl">
+                <div className="w-10 h-10 rounded-2xl bg-white text-black flex items-center justify-center">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
@@ -417,7 +417,7 @@ const AIChatbot = () => {
                     <button
                       type="submit"
                       disabled={!input.trim() || loading}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200 active:scale-95 transition-all shadow-xl"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200 active:scale-95 transition-all"
                     >
                       <Send className="w-4 h-4" />
                     </button>
@@ -437,3 +437,4 @@ const AIChatbot = () => {
 }
 
 export default AIChatbot
+

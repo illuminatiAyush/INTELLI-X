@@ -286,7 +286,7 @@ const LecturesPage = ({ hideHeader = false }) => {
           {(role === 'admin' || role === 'teacher') && (
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xl transition-all active:scale-95"
+              className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all active:scale-95"
             >
               <Plus className="w-5 h-5" /> Schedule Lecture
             </button>
@@ -361,7 +361,7 @@ const LecturesPage = ({ hideHeader = false }) => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white border border-gray-200 p-6 rounded-3xl w-full max-w-md shadow-2xl relative"
+            className="bg-white border border-gray-200 p-6 rounded-3xl w-full max-w-md relative"
           >
             <h3 className="text-xl font-bold text-gray-900 mb-6">Schedule Lecture</h3>
             <form onSubmit={handleCreateLecture} className="space-y-4">
@@ -484,3 +484,4 @@ const LecturesPage = ({ hideHeader = false }) => {
 }
 
 export default LecturesPage
+

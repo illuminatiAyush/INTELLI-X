@@ -148,7 +148,7 @@ const DashboardPreview = () => {
     }
   }
 
-  const panelBg = isDark ? 'bg-[#000000] border-white/10 shadow-[0_0_0_1px_rgba(255,255,255,0.05)]' : 'bg-white border-gray-200 shadow-sm'
+  const panelBg = isDark ? 'bg-[#000000] border-white/10$1' : 'bg-white border-gray-200 shadow-sm'
   const labelColor = isDark ? 'text-gray-400' : 'text-gray-500'
   const headingColor = isDark ? 'text-white' : 'text-gray-900'
 
@@ -175,7 +175,7 @@ const DashboardPreview = () => {
 
         {/* Dashboard UI Frame */}
         <motion.div
-          className={`rounded-[2rem] border overflow-hidden ${isDark ? 'bg-[#000000] border-white/10 shadow-2xl shadow-black/50' : 'bg-white border-gray-200 shadow-2xl'}`}
+          className={`rounded-[2rem] border overflow-hidden ${isDark ? 'bg-[#000000] border-white/10 shadow-black/50' : 'bg-white border-gray-200 shadow-2xl'}`}
         >
           {/* Window chrome */}
           <div className={`flex items-center justify-between px-6 py-4 border-b ${isDark ? 'border-white/10 bg-white/5' : 'border-gray-100 bg-gray-50'}`}>
@@ -261,3 +261,5 @@ const DashboardPreview = () => {
 }
 
 export default DashboardPreview
+
+

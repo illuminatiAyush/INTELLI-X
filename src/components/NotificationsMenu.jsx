@@ -43,7 +43,7 @@ const NotificationsMenu = () => {
           
           toast.custom((t) => (
             <div
-              className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full border shadow-xl rounded-2xl pointer-events-auto flex`}
+              className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full border rounded-2xl pointer-events-auto flex`}
               style={{ 
                 background: 'var(--bg-surface)',
                 borderColor: 'var(--border-subtle)'
@@ -100,7 +100,7 @@ const NotificationsMenu = () => {
           
           toast.custom((t) => (
             <div
-              className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full border shadow-xl rounded-2xl pointer-events-auto flex`}
+              className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full border rounded-2xl pointer-events-auto flex`}
               style={{ 
                 background: 'var(--bg-surface)',
                 borderColor: 'var(--border-subtle)'
@@ -224,7 +224,7 @@ const NotificationsMenu = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2 w-80 sm:w-96 border rounded-2xl shadow-xl z-50 overflow-hidden flex flex-col"
+            className="absolute right-0 mt-2 w-80 sm:w-96 border rounded-2xl z-50 overflow-hidden flex flex-col"
             style={{ 
               maxHeight: '450px',
               background: 'var(--bg-surface)',
@@ -315,3 +315,4 @@ const NotificationsMenu = () => {
 }
 
 export default NotificationsMenu
+

@@ -75,7 +75,7 @@ const Navbar = () => {
       }}
       className={`fixed max-w-[1240px] px-6 transition-all duration-240 ease-out flex items-center justify-between ${
         scrolled
-          ? `rounded-[14px] py-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border ${
+          ? `rounded-[14px] py-3.5$1 border ${
               isDark 
                 ? 'bg-[#000000]/80 border-white/[0.08] backdrop-blur-[12px]' 
                 : 'bg-white/80 border-black/[0.08] backdrop-blur-[12px]'
@@ -143,7 +143,7 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className={`absolute top-full left-0 right-0 mt-3 p-6 rounded-[20px] border shadow-2xl ${ isDark ? 'bg-black/95 border-white/[0.08] backdrop-blur-2xl' : 'bg-white/98 border-black/[0.08] backdrop-blur-2xl'
+            className={`absolute top-full left-0 right-0 mt-3 p-6 rounded-[20px] border ${ isDark ? 'bg-black/95 border-white/[0.08] backdrop-blur-2xl' : 'bg-white/98 border-black/[0.08] backdrop-blur-2xl'
             }`}
           >
             <div className="flex flex-col gap-6">
@@ -174,3 +174,4 @@ const Navbar = () => {
 }
 
 export default Navbar
+

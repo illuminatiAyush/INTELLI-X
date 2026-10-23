@@ -173,7 +173,7 @@ const LeaderboardPage = ({ hideHeader = false }) => {
       {!hideHeader && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20 shadow-sm shadow-gold-500/5">
+            <div className="w-12 h-12 rounded-2xl bg-gold-500/10 flex items-center justify-center text-gold-500 border border-gold-500/20 shadow-gold-500/5">
               <Trophy className="w-6 h-6" />
             </div>
             <div>
@@ -190,7 +190,7 @@ const LeaderboardPage = ({ hideHeader = false }) => {
           <button
             onClick={fetchLeaderboard}
             disabled={refreshing || !selectedTest}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 text-sm font-medium transition-all shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 hover:text-gray-900 text-sm font-medium transition-all"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
@@ -199,10 +199,10 @@ const LeaderboardPage = ({ hideHeader = false }) => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="bg-white p-4 rounded-2xl border border-gray-200">
           <Select label="Select Batch" options={batchOptions} value={selectedBatch} onChange={(e) => setSelectedBatch(e.target.value)} />
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="bg-white p-4 rounded-2xl border border-gray-200">
           <Select 
             label="Select Test" 
             options={testOptions} 
@@ -272,3 +272,4 @@ const LeaderboardPage = ({ hideHeader = false }) => {
 }
 
 export default LeaderboardPage
+

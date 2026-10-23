@@ -51,7 +51,7 @@ const SubscriptionsPage = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-2xl border border-gray-200 bg-white p-6"
       >
         <div className="flex items-center gap-2 mb-6">
           <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
@@ -110,3 +110,4 @@ const SubscriptionsPage = () => {
 }
 
 export default SubscriptionsPage
+

@@ -44,7 +44,7 @@ const FAQItem = ({ question, answer, isOpen, onClick, color }) => {
     <div 
       className={`rounded-2xl transition-all duration-500 overflow-hidden ${
         isDark ? 'bg-white/[0.05] border border-white/[0.12]' : 'bg-white border border-gray-200 shadow-sm'
-      } ${isOpen ? (isDark ? `border-${color}-500/50 bg-${color}-500/[0.08] shadow-[0_0_30px_-10px_rgba(var(--${color}-rgb),0.2)]` : `border-${color}-500/30 bg-${color}-50/50 shadow-md`) : (isDark ? 'hover:border-white/20' : 'hover:border-gray-300')}`}
+      } ${isOpen ? (isDark ? `border-${color}-500/50 bg-${color}-500/[0.08]$1` : `border-${color}-500/30 bg-${color}-50/50 shadow-md`) : (isDark ? 'hover:border-white/20' : 'hover:border-gray-300')}`}
     >
       <button
         onClick={onClick}
@@ -153,3 +153,5 @@ const FAQ = () => {
 }
 
 export default FAQ
+
+

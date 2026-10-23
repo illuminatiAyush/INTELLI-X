@@ -259,7 +259,7 @@ const BatchList = () => {
 
       {/* Grid Layout replacing DataTable */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 bg-white border border-gray-200 rounded-2xl shadow-sm">
+        <div className="flex flex-col items-center justify-center h-64 bg-white border border-gray-200 rounded-2xl">
           <p className="text-gray-600 font-medium">No batches found</p>
         </div>
       ) : (
@@ -386,7 +386,7 @@ const BatchList = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                  <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 shadow-sm">
+                  <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200">
                     <p className="text-[10px] sm:text-xs text-gray-600 font-bold uppercase tracking-widest mb-3">Attendance details</p>
                     <div className="flex justify-between items-center text-sm py-1.5 border-b border-gray-200">
                       <span className="text-gray-600 font-medium">Total Classes</span>
@@ -402,7 +402,7 @@ const BatchList = () => {
                     </div>
                   </div>
                   
-                  <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 shadow-sm">
+                  <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200">
                     <p className="text-[10px] sm:text-xs text-gray-600 font-bold uppercase tracking-widest mb-3">Performance details</p>
                     <div className="flex justify-between items-center text-sm py-1.5 border-b border-gray-200">
                       <span className="text-gray-600 font-medium">Latest Score</span>
@@ -935,3 +935,4 @@ const BatchesPage = () => {
 }
 
 export default BatchesPage
+

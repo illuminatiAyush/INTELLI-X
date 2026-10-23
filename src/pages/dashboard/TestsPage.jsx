@@ -445,7 +445,7 @@ const TestManagement = () => {
         </div>
 
         {/* Selectors card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-gray-200">
           <div>
             <label className={labelCls}>Batch</label>
             <select
@@ -477,7 +477,7 @@ const TestManagement = () => {
         </div>
 
         {/* Results table */}
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           {adminSelTest && adminResults.length > 0 && (
             <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
               <div>
@@ -563,7 +563,7 @@ const TestManagement = () => {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 border border-rose-500/20 shadow-sm shadow-rose-500/5">
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 border border-rose-500/20 shadow-rose-500/5">
             <FileText className="w-6 h-6" />
           </div>
           <div>
@@ -594,7 +594,7 @@ const TestManagement = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setAiModalOpen(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black hover:bg-gray-200 text-sm font-bold shadow-lg active:scale-95 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black hover:bg-gray-200 text-sm font-bold active:scale-95 transition-all"
               >
                 <Brain className="w-5 h-5 font-bold" /> Create AI Test
               </motion.button>
@@ -611,7 +611,7 @@ const TestManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <DataTable columns={columns} data={filtered} emptyMessage="No tests found" />
       </div>
 
@@ -637,7 +637,7 @@ const TestManagement = () => {
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-xl text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors">Cancel</button>
-            <button onClick={handleCreateTest} disabled={saving || !form.title.trim() || !form.batch_id} className="px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 shadow-lg transition-all bg-white text-black hover:bg-gray-200">
+            <button onClick={handleCreateTest} disabled={saving || !form.title.trim() || !form.batch_id} className="px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 transition-all bg-white text-black hover:bg-gray-200">
               {saving ? 'Creating...' : 'Create Test'}
             </button>
           </div>
@@ -702,7 +702,7 @@ const TestManagement = () => {
                 <button
                   onClick={handleSaveResults}
                   disabled={saving}
-                  className="px-8 py-2.5 rounded-xl bg-white text-black text-sm font-bold shadow-xl active:scale-95 disabled:opacity-50 transition-all"
+                  className="px-8 py-2.5 rounded-xl bg-white text-black text-sm font-bold active:scale-95 disabled:opacity-50 transition-all"
                 >
                   {saving ? 'Saving Results...' : 'Save All Results'}
                 </button>
@@ -764,3 +764,4 @@ const TestsPage = () => {
 }
 
 export default TestsPage
+

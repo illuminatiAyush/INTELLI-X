@@ -73,7 +73,7 @@ const LoginPage = () => {
       <div className="fixed top-4 right-4 z-50">
         <button
           onClick={toggleTheme}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-300 bg-white shadow-sm text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-300 bg-white text-xs font-bold uppercase tracking-wider text-gray-700 hover:bg-gray-50 transition-colors"
         >
           {isDark ? (
             <><Sun size={13} /> Light</>
@@ -96,7 +96,7 @@ const LoginPage = () => {
           className="flex flex-col items-center gap-5"
         >
           <div
-            className="w-40 h-40 rounded-[28px] flex items-center justify-center shadow-2xl"
+            className="w-40 h-40 rounded-[28px] flex items-center justify-center"
             style={{ background: '#111111' }}
           >
             <span className="text-white font-black text-5xl tracking-tighter">iX</span>
@@ -139,7 +139,7 @@ const LoginPage = () => {
           className="w-full max-w-[380px]"
         >
           {/* Card */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8">
+          <div className="bg-white rounded-2xl border border-gray-200 p-8">
 
             {/* Heading with left blue accent bar */}
             <div className="flex items-start gap-3 mb-6">
@@ -293,3 +293,4 @@ const LoginPage = () => {
 }
 
 export default LoginPage
+

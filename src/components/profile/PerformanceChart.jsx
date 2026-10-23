@@ -101,7 +101,7 @@ const PerformanceChart = ({ testScores, loading }) => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      className="rounded-2xl border border-gray-200 bg-white p-6"
     >
       <div className="flex items-center gap-2 mb-6">
         <div className="p-2 rounded-lg bg-white/10 text-white border border-white/10">
@@ -125,3 +125,4 @@ const PerformanceChart = ({ testScores, loading }) => {
 }
 
 export default PerformanceChart
+

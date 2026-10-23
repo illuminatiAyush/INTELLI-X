@@ -117,7 +117,7 @@ const FeatureCard = ({ feature, index, tabColor }) => {
       <div className="flex flex-col h-full">
         {/* Icon */}
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-all duration-500 ${
-          isDark ? `bg-${tabColor}-500/10 text-${tabColor}-400 border border-${tabColor}-500/20 shadow-[0_0_20px_-5px_rgba(var(--${tabColor}-rgb),0.3)]` : `bg-${tabColor}-50 text-${tabColor}-600 border border-${tabColor}-100`
+          isDark ? `bg-${tabColor}-500/10 text-${tabColor}-400 border border-${tabColor}-500/20$1` : `bg-${tabColor}-50 text-${tabColor}-600 border border-${tabColor}-100`
         }`}>
           <Icon size={24} strokeWidth={1.5} />
         </div>
@@ -212,7 +212,7 @@ const Features = () => {
                 {activeTab === tab.label && (
                   <motion.div
                     layoutId="activeFeatureTab"
-                    className={`absolute inset-0 rounded-full shadow-lg ${isDark ? `bg-${tab.color}-500/10 border border-${tab.color}-500/20` : 'bg-white shadow-sm border border-gray-200'}`}
+                    className={`absolute inset-0 rounded-full ${isDark ? `bg-${tab.color}-500/10 border border-${tab.color}-500/20` : 'bg-white border border-gray-200'}`}
                     transition={{ type: 'spring', bounce: 0.15, duration: 0.6 }}
                   />
                 )}
@@ -239,3 +239,5 @@ const Features = () => {
 }
 
 export default Features
+
+

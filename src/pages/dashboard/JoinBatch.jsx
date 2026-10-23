@@ -66,7 +66,7 @@ const JoinBatch = ({ hideHeader = false }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white border border-gray-200 rounded-3xl p-8 shadow-xl relative overflow-hidden"
+        className="bg-white border border-gray-200 rounded-3xl p-8 relative overflow-hidden"
       >
         <div className="absolute top-0 left-0 w-full h-1 bg-gray-200" />
         
@@ -134,7 +134,7 @@ const JoinBatch = ({ hideHeader = false }) => {
               disabled={loading || !joinCode}
               whileHover={!loading && joinCode ? { scale: 1.02 } : {}}
               whileTap={!loading && joinCode ? { scale: 0.98 } : {}}
-              className="w-full h-12 flex items-center justify-center gap-2 bg-white text-black rounded-xl font-bold border border-white/10 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full h-12 flex items-center justify-center gap-2 bg-white text-black rounded-xl font-bold border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
@@ -153,3 +153,4 @@ const JoinBatch = ({ hideHeader = false }) => {
 }
 
 export default JoinBatch
+

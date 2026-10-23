@@ -204,12 +204,11 @@ input:-webkit-autofill:active {
   font-weight: 700;
   letter-spacing: 0.02em;
   cursor: pointer;
-  box-shadow: var(--accent-glow);
   transition: opacity 150ms ease, transform 120ms ease;
 }
 .btn-primary:hover  { opacity: 0.88; }
 .btn-primary:active { transform: scale(0.98); }
-.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .btn-ghost {
   display: inline-flex;
@@ -255,7 +254,6 @@ input:-webkit-autofill:active {
 .shadow-button {
   background: var(--accent);
   color: #fff;
-  box-shadow: var(--accent-glow);
   transition: all 0.3s ease;
 }
 .shadow-button:hover {
@@ -418,7 +416,6 @@ input:-webkit-autofill:active {
 .typing-cursor { animation: blink 1s ease-in-out infinite; }
 
 .chatbot-container {
-  box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 1px rgba(179,156,208,0.30);
 }
 
 
@@ -432,12 +429,11 @@ input:-webkit-autofill:active {
   border: 1px solid #E5E7EB;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
 }
 
 .dashboard-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
 }
 
 /* Dashboard input styles */
@@ -589,9 +585,10 @@ input:-webkit-autofill:active {
   justify-content: center;
   font-weight: 600;
   font-size: 0.875rem;
-  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
-  color: #FFFFFF;
+  background: #E5E7EB;
+  color: #374151;
   text-transform: uppercase;
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* Quick action cards */
@@ -722,7 +719,7 @@ input:-webkit-autofill:active {
   color: #D97706;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&family=Outfit:wght@100;200;300;400;500&display=swap');
-.premium-font { font-family: 'Inter', 'Outfit', sans-serif !important; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&family=Outfit:wght@100;200;300;400;500&family=Montserrat:wght@400;500;600;700&display=swap');
+.premium-font { font-family: 'Montserrat', 'Inter', 'Outfit', sans-serif !important; }
 @media (pointer: fine) { .premium-font { cursor: none; } .premium-font * { cursor: none; } }
 html { scroll-behavior: smooth; }

@@ -74,3 +74,4 @@ const BatchesList = ({ batches, loading }) => {
 }
 
 export default BatchesList
+

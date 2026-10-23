@@ -75,7 +75,7 @@ const LogsPage = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-2xl border border-gray-200 bg-white p-6"
       >
         {logs.length === 0 ? (
           <p className="text-gray-600 text-sm py-8 text-center">No activity recorded yet</p>
@@ -116,3 +116,4 @@ const LogsPage = () => {
 }
 
 export default LogsPage
+

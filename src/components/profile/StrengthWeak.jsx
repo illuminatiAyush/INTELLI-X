@@ -8,7 +8,7 @@ const SubjectCard = ({ label, subject, isStrength }) => {
   const Icon = isStrength ? ArrowUp : ArrowDown
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:border-gray-300 transition-all">
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 hover:border-gray-300 transition-all">
       <div className="flex items-center gap-2 mb-4">
         <div className={`p-2 rounded-lg ${accent.iconBg} ${accent.text}`}>
           <Icon className="w-4 h-4" />
@@ -53,7 +53,7 @@ const StrengthWeak = ({ subjects, loading }) => {
 
   if (!subjects || (!subjects.strong && !subjects.weak)) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
         <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500/10 to-teal-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-4">
           <ArrowUp className="w-6 h-6" />
         </div>
@@ -94,3 +94,4 @@ const StrengthWeak = ({ subjects, loading }) => {
 }
 
 export default StrengthWeak
+

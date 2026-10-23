@@ -111,7 +111,7 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         <div className="text-lg font-bold text-black tracking-tight hover-target flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-orange-500 text-white flex items-center justify-center text-xs font-bold shadow-sm">I</div>
+          <div className="w-6 h-6 rounded-md bg-orange-500 text-white flex items-center justify-center text-xs font-bold">I</div>
           INTELLI-X
         </div>
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
@@ -126,7 +126,7 @@ const Navbar = () => {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-5 py-2 rounded-full bg-[#111] text-white text-sm font-medium hover:bg-black transition-colors shadow-sm"
+              className="px-5 py-2 rounded-full bg-[#111] text-white text-sm font-medium hover:bg-black transition-colors"
             >
               Start for free
             </motion.button>
@@ -155,7 +155,7 @@ const Hero = () => {
         initial={{ opacity: 0, x: 100, y: 50, rotate: 5 }}
         animate={{ opacity: 1, x: 0, y: 0, rotate: -3 }}
         transition={{ duration: 1.2, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute top-[15%] left-[50%] md:left-[45%] w-[900px] h-[700px] bg-white rounded-[2rem] border border-gray-100 shadow-2xl shadow-purple-900/5 z-10 overflow-hidden flex flex-col hidden sm:flex"
+        className="absolute top-[15%] left-[50%] md:left-[45%] w-[900px] h-[700px] bg-white rounded-[2rem] border border-gray-100 shadow-purple-900/5 z-10 overflow-hidden flex flex-col hidden sm:flex"
       >
         {/* Mockup Header */}
         <div className="w-full h-12 border-b border-gray-100 flex items-center px-6 gap-2 bg-gray-50/80 shrink-0 backdrop-blur-sm">
@@ -173,7 +173,7 @@ const Hero = () => {
            </div>
            <div className="col-span-9 space-y-6">
               {/* Purple Accent Card */}
-              <div className="w-full h-40 bg-orange-50 border border-orange-100/50 rounded-2xl p-6 flex gap-6 items-center shadow-sm">
+              <div className="w-full h-40 bg-orange-50 border border-orange-100/50 rounded-2xl p-6 flex gap-6 items-center">
                  <div className="w-20 h-20 rounded-full bg-orange-200/50 flex items-center justify-center text-orange-600"><Users className="w-8 h-8"/></div>
                  <div className="flex-1 space-y-3">
                     <div className="w-1/3 h-4 bg-orange-200 rounded" />
@@ -182,14 +182,14 @@ const Hero = () => {
               </div>
               <div className="flex gap-6">
                  {/* Orange Accent Card */}
-                 <div className="flex-1 h-56 bg-white border border-orange-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4 relative overflow-hidden">
+                 <div className="flex-1 h-56 bg-white border border-orange-100 rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-bl-full pointer-events-none" />
                     <div className="w-10 h-10 rounded-full bg-orange-100 z-10" />
                     <div className="w-full h-2 bg-gray-100 rounded mt-auto z-10" />
                     <div className="w-3/4 h-2 bg-gray-100 rounded z-10" />
                  </div>
                  {/* Cyan Accent Card */}
-                 <div className="flex-1 h-56 bg-white border border-cyan-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4 relative overflow-hidden">
+                 <div className="flex-1 h-56 bg-white border border-cyan-100 rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-50 rounded-bl-full pointer-events-none" />
                     <div className="w-10 h-10 rounded-full bg-cyan-100 z-10" />
                     <div className="w-full h-2 bg-gray-100 rounded mt-auto z-10" />
@@ -205,7 +205,7 @@ const Hero = () => {
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute bottom-[10%] right-[-5%] w-[350px] h-[250px] bg-white/80 backdrop-blur-xl rounded-3xl border border-white/50 shadow-[0_20px_40px_-15px_rgba(255,100,150,0.15)] z-20 p-6 flex-col gap-4 hidden lg:flex"
+        className="absolute bottom-[10%] right-[-5%] w-[350px] h-[250px] bg-white/80 backdrop-blur-xl rounded-3xl border border-white/50$1 z-20 p-6 flex-col gap-4 hidden lg:flex"
       >
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-600"><CheckCircle2 className="w-6 h-6"/></div>
@@ -226,7 +226,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200/50 bg-white/60 backdrop-blur-md shadow-sm mb-8"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200/50 bg-white/60 backdrop-blur-md mb-8"
           >
             <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
             <span className="text-xs font-medium text-gray-700">INTELLI-X 2.0 is live</span>
@@ -275,7 +275,7 @@ const Hero = () => {
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 w-full rounded-full bg-[#111] text-white text-sm font-medium hover:bg-black shadow-[0_8px_20px_rgb(0,0,0,0.15)] flex items-center justify-center gap-2 group"
+                className="px-8 py-3 w-full rounded-full bg-[#111] text-white text-sm font-medium hover:bg-black$1 flex items-center justify-center gap-2 group"
               >
                 Start your free trial
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -356,7 +356,7 @@ const ValueClarity = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className={`p-6 rounded-2xl border ${item.bg} hover:shadow-md hover:-translate-y-1 transition-all duration-300`}
             >
-              <div className="mb-4 bg-white w-12 h-12 rounded-xl shadow-sm flex items-center justify-center">
+              <div className="mb-4 bg-white w-12 h-12 rounded-xl flex items-center justify-center">
                 {item.icon}
               </div>
               <h3 className="text-xl font-semibold text-black mb-2">{item.title}</h3>
@@ -402,7 +402,7 @@ const Features = () => {
             className="col-span-1 md:col-span-8 p-8 min-h-[300px] flex flex-col justify-between rounded-2xl bg-blue-50 border border-blue-100 overflow-hidden relative"
           >
             <div className="z-10 max-w-sm">
-              <div className="w-10 h-10 rounded-lg bg-white text-blue-600 shadow-sm flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-white text-blue-600 flex items-center justify-center mb-4">
                 <Users className="w-5 h-5" />
               </div>
               <h3 className="text-2xl font-bold text-blue-950 mb-2">Batch & Student Management</h3>
@@ -417,7 +417,7 @@ const Features = () => {
             className="col-span-1 md:col-span-4 p-8 min-h-[300px] flex flex-col justify-between rounded-2xl bg-yellow-50 border border-yellow-100 relative overflow-hidden"
           >
              <div className="z-10">
-              <div className="w-10 h-10 rounded-lg bg-white text-yellow-600 shadow-sm flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-white text-yellow-600 flex items-center justify-center mb-4">
                 <BookOpen className="w-5 h-5" />
               </div>
               <h3 className="text-2xl font-bold text-yellow-950 mb-2">Exam Engine</h3>
@@ -432,7 +432,7 @@ const Features = () => {
             className="col-span-1 md:col-span-4 p-8 min-h-[300px] flex flex-col justify-between rounded-2xl bg-green-50 border border-green-100 relative overflow-hidden"
           >
              <div className="z-10">
-              <div className="w-10 h-10 rounded-lg bg-white text-green-600 shadow-sm flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-white text-green-600 flex items-center justify-center mb-4">
                 <Award className="w-5 h-5" />
               </div>
               <h3 className="text-2xl font-bold text-green-950 mb-2">Leaderboards</h3>
@@ -447,7 +447,7 @@ const Features = () => {
             className="col-span-1 md:col-span-8 p-8 min-h-[300px] flex flex-col justify-between rounded-2xl bg-purple-50 border border-purple-100 relative overflow-hidden"
           >
             <div className="z-10 max-w-sm">
-              <div className="w-10 h-10 rounded-lg bg-white text-purple-600 shadow-sm flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-white text-purple-600 flex items-center justify-center mb-4">
                 <BarChart3 className="w-5 h-5" />
               </div>
               <h3 className="text-2xl font-bold text-purple-950 mb-2">Advanced Analytics</h3>
@@ -457,7 +457,7 @@ const Features = () => {
                <motion.button 
                  whileHover={{ scale: 1.05 }}
                  whileTap={{ scale: 0.95 }}
-                 className="px-5 py-2.5 rounded-full bg-purple-600 text-white font-medium text-sm shadow-md hover:bg-purple-700"
+                 className="px-5 py-2.5 rounded-full bg-purple-600 text-white font-medium text-sm hover:bg-purple-700"
                >
                   View full feature list
                </motion.button>
@@ -541,7 +541,7 @@ const Testimonials = () => {
               </div>
               <p className="text-gray-700 text-sm md:text-base mb-6 font-medium italic">"{rev.text}"</p>
               <div className="flex items-center gap-3 mt-auto pt-4 border-t border-gray-50">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm ${getColorClasses(rev.color)}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${getColorClasses(rev.color)}`}>
                   {rev.name.charAt(0)}
                 </div>
                 <div>
@@ -595,7 +595,7 @@ const CTA = () => {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 rounded-full bg-white text-black text-base font-bold flex items-center gap-2 hover:bg-gray-100 shadow-xl shadow-white/10 transition-colors"
+              className="px-8 py-4 rounded-full bg-white text-black text-base font-bold flex items-center gap-2 hover:bg-gray-100 shadow-white/10 transition-colors"
             >
               Start Your Free Trial
               <ArrowRight className="w-5 h-5" />
@@ -730,3 +730,5 @@ export default function LandingPage() {
     </div>
   );
 }
+
+

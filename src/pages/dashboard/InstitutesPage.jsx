@@ -103,7 +103,7 @@ const InstitutesPage = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed bottom-6 right-6 z-[60] flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border text-sm font-medium ${toast.type === 'success'
+            className={`fixed bottom-6 right-6 z-[60] flex items-center gap-3 px-5 py-3 rounded-xl border text-sm font-medium ${toast.type === 'success'
                 ? 'bg-green-50 border-green-200 text-green-700'
                 : toast.type === 'warning'
                   ? 'bg-amber-50 border-amber-200 text-amber-700'
@@ -117,7 +117,7 @@ const InstitutesPage = () => {
       </AnimatePresence>
 
       {/* Header */}
-      <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+      <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-gray-200">
         <div>
           <motion.h1
             initial={{ opacity: 0, x: -10 }}
@@ -130,7 +130,7 @@ const InstitutesPage = () => {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center px-5 py-2.5 rounded-xl transition-all font-semibold shadow-xl active:scale-95 bg-white text-black hover:bg-gray-200"
+          className="flex items-center px-5 py-2.5 rounded-xl transition-all font-semibold active:scale-95 bg-white text-black hover:bg-gray-200"
         >
           <Plus className="w-5 h-5 mr-2" />
           Add Institute
@@ -138,7 +138,7 @@ const InstitutesPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
           <div className="relative w-80">
             <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-600 w-4 h-4" />
@@ -205,7 +205,7 @@ const InstitutesPage = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`${isDark ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'} border p-6 rounded-2xl w-full max-w-lg shadow-2xl relative z-50`}
+            className={`${isDark ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-gray-200 text-gray-900'} border p-6 rounded-2xl w-full max-w-lg relative z-50`}
           >
             <h2 className="text-xl font-bold mb-1">Add New Institute</h2>
             <p className={`text-sm mb-5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Create an institute and its admin account</p>
@@ -315,7 +315,7 @@ const InstitutesPage = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all font-semibold disabled:opacity-50 shadow-xl bg-white text-black hover:bg-gray-200"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all font-semibold disabled:opacity-50 bg-white text-black hover:bg-gray-200"
                 >
                   {submitting ? (
                     <>
@@ -340,3 +340,4 @@ const InstitutesPage = () => {
 }
 
 export default InstitutesPage
+

@@ -244,7 +244,7 @@ const TeachersPage = ({ hideHeader = false }) => {
 
       {showModal && typeof document !== 'undefined' && createPortal(
         <div className="fixed inset-0 w-screen h-screen bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="dashboard-card w-full max-w-md shadow-2xl relative z-50">
+          <div className="dashboard-card w-full max-w-md relative z-50">
             <h2 className="text-xl font-semibold mb-6 text-gray-900">
               {editingTeacher ? 'Edit Teacher' : 'Add New Teacher'}
             </h2>
@@ -364,3 +364,4 @@ const TeachersPage = ({ hideHeader = false }) => {
 }
 
 export default TeachersPage
+

@@ -176,7 +176,7 @@ const ResultsPage = ({ hideHeader = false }) => {
       {r.ai_feedback && Object.keys(r.ai_feedback).length > 0 && (
         <button
           onClick={() => { setSelectedResult(r); setAiModalOpen(true); }}
-          className={`p-1.5 rounded-lg hover:scale-105 transition-all shadow-sm ${isDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'}`}
+          className={`p-1.5 rounded-lg hover:scale-105 transition-all ${isDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'}`}
           title="View AI Insights"
         >
           <Sparkles className="w-4 h-4" />
@@ -184,7 +184,7 @@ const ResultsPage = ({ hideHeader = false }) => {
       )}
       <button
         onClick={() => handleGeneratePDF(r)}
-        className={`p-1.5 rounded-lg hover:scale-105 transition-all shadow-sm ${isDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'}`}
+        className={`p-1.5 rounded-lg hover:scale-105 transition-all ${isDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'}`}
         title="Download Report (PDF)"
       >
         <Download className="w-4 h-4" />
@@ -203,7 +203,7 @@ const ResultsPage = ({ hideHeader = false }) => {
           key: 'rank',
           label: 'Rank',
           render: (r) => r.rank ? (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium shadow-sm ${
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
               r.rank === 1 ? 'bg-white text-black' : 'bg-white/10 text-white/70 border border-white/5'
             }`}>
               #{r.rank}
@@ -227,7 +227,7 @@ const ResultsPage = ({ hideHeader = false }) => {
           key: 'rank',
           label: 'Rank',
           render: (r) => r.rank ? (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium shadow-sm ${
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
               r.rank === 1 ? 'bg-white text-black' : 'bg-white/10 text-white/70 border border-white/5'
             }`}>
               #{r.rank}
@@ -259,7 +259,7 @@ const ResultsPage = ({ hideHeader = false }) => {
     <div className="space-y-8">
       {!hideHeader && (
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20 shadow-sm shadow-amber-500/5">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20 shadow-amber-500/5">
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
@@ -278,7 +278,7 @@ const ResultsPage = ({ hideHeader = false }) => {
       )}
 
       {role !== 'student' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-gray-200">
           <div className="flex-1">
             <Select 
               label="Batch" 
@@ -303,7 +303,7 @@ const ResultsPage = ({ hideHeader = false }) => {
       {(isInitialLoading || loading) ? (
         <TableSkeleton rows={8} cols={6} />
       ) : (
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           <DataTable columns={columns} data={results} emptyMessage={role === 'student' ? 'No results found for your account' : 'Select a batch and test to view results'} />
         </div>
       )}
@@ -316,7 +316,7 @@ const ResultsPage = ({ hideHeader = false }) => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white border border-gray-300 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl overflow-hidden relative max-h-[90vh] overflow-y-auto custom-scrollbar"
+              className="bg-white border border-gray-300 rounded-3xl p-6 md:p-8 max-w-2xl w-full overflow-hidden relative max-h-[90vh] overflow-y-auto custom-scrollbar"
             >
               <button
                 onClick={() => setAiModalOpen(false)}
@@ -326,7 +326,7 @@ const ResultsPage = ({ hideHeader = false }) => {
               </button>
 
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-xl shadow-amber-500/5">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-amber-500/5">
                   <Trophy className="w-6 h-6" />
                 </div>
                 <div>
@@ -392,3 +392,4 @@ const ResultsPage = ({ hideHeader = false }) => {
 }
 
 export default ResultsPage
+

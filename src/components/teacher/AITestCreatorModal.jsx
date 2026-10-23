@@ -280,7 +280,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 30 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-4xl max-h-[90vh] bg-white border border-gray-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+          className="relative w-full max-w-4xl max-h-[90vh] bg-white border border-gray-200 rounded-3xl overflow-hidden flex flex-col"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white/5">
@@ -484,7 +484,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                   <button
                     onClick={handleGenerate}
                     disabled={!prompt.trim() || !selectedBatch || !testTitle.trim()}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white text-black text-sm font-bold shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white text-black text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
                   >
                     <Sparkles className="w-4 h-4" />
                     Generate Questions
@@ -634,7 +634,7 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
                   <button
                     onClick={handleSaveTest}
                     disabled={saving || questions.length === 0}
-                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-white text-black text-sm font-bold shadow-xl disabled:opacity-50 transition-all active:scale-95"
+                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-white text-black text-sm font-bold disabled:opacity-50 transition-all active:scale-95"
                   >
                     <Send className="w-4 h-4" />
                     Publish Test ({questions.length} Qs)
@@ -663,3 +663,4 @@ const AITestCreatorModal = ({ isOpen, onClose, batches = [], onTestCreated }) =>
 }
 
 export default AITestCreatorModal
+

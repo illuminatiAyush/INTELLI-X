@@ -29,7 +29,7 @@ class ErrorBoundary extends React.Component {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-white text-black font-bold rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="px-6 py-3 bg-white text-black font-bold rounded-xl$1 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             Refresh IntelliX
           </button>
@@ -47,3 +47,4 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary
+

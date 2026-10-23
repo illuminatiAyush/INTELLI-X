@@ -121,7 +121,7 @@ const ChangePassword = () => {
         <button
           type="submit"
           disabled={submitting}
-          className="px-6 py-3 rounded-xl bg-white hover:bg-gray-200 text-black text-sm font-bold shadow-[0_8px_30px_rgba(0,0,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+          className="px-6 py-3 rounded-xl bg-white hover:bg-gray-200 text-black text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
         >
           {submitting ? (
             <span className="flex items-center gap-2">

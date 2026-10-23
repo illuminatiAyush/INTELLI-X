@@ -100,7 +100,7 @@ const StudentAttendanceView = ({ user }) => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
-          className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm"
+          className="rounded-2xl border border-gray-200 bg-white overflow-hidden"
         >
           {/* Subject Row */}
           <button
@@ -389,7 +389,7 @@ const AdminAttendanceView = ({ user, role }) => {
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-gray-200">
         <div className="flex-1">
           <Select
             label="Select Subject"
@@ -419,7 +419,7 @@ const AdminAttendanceView = ({ user, role }) => {
       ) : (
         <>
           {/* Summary Bar */}
-          <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-gray-50/50 border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-gray-50/50 border border-gray-200">
             <div className="flex items-center gap-6 text-sm">
               <span className="text-gray-600 font-medium uppercase tracking-wider text-xs">Overview</span>
               <div className="h-4 w-px bg-[var(--border-subtle)]" />
@@ -460,8 +460,8 @@ const AdminAttendanceView = ({ user, role }) => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.02 }}
-                  className={`flex items-center justify-between px-6 py-4 rounded-2xl border transition-all ${ isPresent ? 'bg-emerald-500/5 border-emerald-500/20 shadow-sm shadow-emerald-500/5'
-                      : 'bg-red-500/5 border-red-500/20 shadow-sm shadow-red-500/5'
+                  className={`flex items-center justify-between px-6 py-4 rounded-2xl border transition-all ${ isPresent ? 'bg-emerald-500/5 border-emerald-500/20 shadow-emerald-500/5'
+                      : 'bg-red-500/5 border-red-500/20 shadow-red-500/5'
                   }`}
                 >
                 <div className="flex items-center gap-4">
@@ -477,8 +477,8 @@ const AdminAttendanceView = ({ user, role }) => {
                 {(role === 'teacher' || role === 'admin' || role === 'master_admin') ? (
                   <button
                     onClick={() => toggleStatus(sid)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${ isPresent ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                        : 'bg-red-500 text-white shadow-lg shadow-red-500/20'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${ isPresent ? 'bg-emerald-500 text-white shadow-emerald-500/20'
+                        : 'bg-red-500 text-white shadow-red-500/20'
                     }`}
                   >
                     {isPresent ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
@@ -504,7 +504,7 @@ const AdminAttendanceView = ({ user, role }) => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSave}
                 disabled={saving}
-                className={`flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-bold shadow-xl transition-all ${
+                className={`flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-bold transition-all ${
                   saving 
                     ? 'bg-blue-400 text-white shadow-blue-400/30' 
                     : saved 
@@ -537,7 +537,7 @@ const AttendancePage = ({ hideHeader = false }) => {
     <div className="space-y-8">
       {!hideHeader && (
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-sm shadow-emerald-500/5">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-emerald-500/5">
             <ClipboardCheck className="w-6 h-6" />
           </div>
           <div>
@@ -568,3 +568,4 @@ const AttendancePage = ({ hideHeader = false }) => {
 }
 
 export default AttendancePage
+

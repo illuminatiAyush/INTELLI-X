@@ -74,7 +74,7 @@ const PhotoStack = () => {
                 className="absolute inset-0 cursor-pointer"
               >
                 <div 
-                  className={`w-full h-full rounded-2xl overflow-hidden shadow-2xl relative border ${
+                  className={`w-full h-full rounded-2xl overflow-hidden relative border ${
                     isDark ? 'border-white/10' : 'border-black/5'
                   }`}
                   style={{
@@ -196,3 +196,4 @@ const ValueClarity = () => {
 }
 
 export default ValueClarity
+

@@ -37,10 +37,10 @@ const StudentProfileView = ({ user, profile, role }) => {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6"
       >
         <div className="flex items-center gap-5">
-          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold flex-shrink-0 shadow-xl ${isDark ? 'bg-white/10 text-white shadow-black/20' : 'bg-slate-800 text-white shadow-slate-300'}`}>
+          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold flex-shrink-0 ${isDark ? 'bg-white/10 text-white shadow-black/20' : 'bg-slate-800 text-white shadow-slate-300'}`}>
             {displayName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
@@ -86,7 +86,7 @@ const StudentProfileView = ({ user, profile, role }) => {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm"
+        className="relative overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 p-6"
       >
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
@@ -190,3 +190,4 @@ const ProfilePage = () => {
 }
 
 export default ProfilePage
+

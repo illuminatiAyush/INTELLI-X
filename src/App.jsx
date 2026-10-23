@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { ThemeProvider } from './context/ThemeContext'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Agentation } from 'agentation'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import ValueClarity from './sections/ValueClarity'
@@ -225,6 +226,7 @@ function App() {
           <ThemeProvider>
             <Toast />
             <AppContent />
+            {process.env.NODE_ENV === 'development' && <Agentation />}
           </ThemeProvider>
         </BrowserRouter>
       </AuthProvider>
