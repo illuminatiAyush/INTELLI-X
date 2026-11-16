@@ -4,64 +4,6 @@ import { ArrowRight, Sparkles, Layers, Zap, Globe, Github, Twitter, Linkedin, Ch
 import './LandingPage.css';
 import { Link } from 'react-router-dom';
 
-// --- Custom Cursor ---
-const CustomCursor = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
-
-  useEffect(() => {
-    const updateMousePosition = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleMouseOver = (e) => {
-      if (
-        e.target.tagName.toLowerCase() === 'button' || 
-        e.target.tagName.toLowerCase() === 'a' || 
-        e.target.closest('button') || 
-        e.target.closest('a') ||
-        e.target.classList.contains('hover-target')
-      ) {
-        setIsHovering(true);
-      } else {
-        setIsHovering(false);
-      }
-    };
-
-    window.addEventListener('mousemove', updateMousePosition);
-    window.addEventListener('mouseover', handleMouseOver);
-
-    return () => {
-      window.removeEventListener('mousemove', updateMousePosition);
-      window.removeEventListener('mouseover', handleMouseOver);
-    };
-  }, []);
-
-  return (
-    <div className="hidden md:block">
-      <motion.div
-        className="fixed top-0 left-0 w-2.5 h-2.5 bg-black rounded-full pointer-events-none z-[9999]"
-        animate={{
-          x: mousePosition.x - 5,
-          y: mousePosition.y - 5,
-          scale: isHovering ? 0 : 1,
-        }}
-        transition={{ type: 'tween', ease: 'backOut', duration: 0.1 }}
-      />
-      <motion.div
-        className="fixed top-0 left-0 w-10 h-10 border-2 border-black/20 rounded-full pointer-events-none z-[9998] flex items-center justify-center backdrop-invert"
-        animate={{
-          x: mousePosition.x - 20,
-          y: mousePosition.y - 20,
-          scale: isHovering ? 1.5 : 1,
-          backgroundColor: isHovering ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0)',
-        }}
-        transition={{ type: 'spring', stiffness: 150, damping: 15, mass: 0.2 }}
-      />
-    </div>
-  );
-};
-
 // --- Preloader ---
 const Preloader = ({ onComplete }) => {
   useEffect(() => {
@@ -222,16 +164,6 @@ const Hero = () => {
       {/* Text Content (Bottom Left) */}
       <div className="absolute inset-0 container mx-auto px-6 pointer-events-none">
         <div className="absolute bottom-[12%] left-6 z-30 pointer-events-auto max-w-2xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200/50 bg-white/60 backdrop-blur-md mb-8"
-          >
-            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-            <span className="text-xs font-medium text-gray-700">INTELLI-X 2.0 is live</span>
-          </motion.div>
-
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight text-black leading-[1.1] mb-6 text-left">
             <motion.span 
               initial={{ opacity: 0, y: 30 }} 
@@ -292,9 +224,6 @@ const Hero = () => {
 const LogoCloud = () => {
   return (
     <section className="py-8 bg-white border-y border-gray-100 overflow-hidden">
-      <div className="container mx-auto px-6 text-center mb-6">
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Trusted by 500+ innovative institutes</p>
-      </div>
       <div className="flex whitespace-nowrap">
          <motion.div 
            className="flex gap-12 items-center"
@@ -557,15 +486,10 @@ const Testimonials = () => {
   )
 }
 
-// --- Mixed Gradient CTA Section ---
+// --- CTA Section ---
 const CTA = () => {
   return (
     <section className="py-24 bg-black relative overflow-hidden flex flex-col items-center">
-      {/* Decorative mixed background patterns */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/40 rounded-full blur-[120px]" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-600/40 rounded-full blur-[120px]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-pink-600/30 rounded-full blur-[100px]" />
-      
       <div className="container mx-auto px-6 relative z-10 text-center flex flex-col items-center">
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
@@ -711,8 +635,6 @@ export default function LandingPage() {
       <AnimatePresence mode="wait">
         {loading && <Preloader onComplete={() => setLoading(false)} />}
       </AnimatePresence>
-      
-      {!loading && <CustomCursor />}
       
       <div className={loading ? 'opacity-0' : 'opacity-100 transition-opacity duration-1000'}>
         <Navbar />

@@ -68,45 +68,6 @@ const Preloader = ({ onComplete }) => {
   );
 };
 
-const CustomCursor = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
-
-  useEffect(() => {
-    const updateMousePosition = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    const handleMouseOver = (e) => {
-      if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a' || e.target.closest('button') || e.target.closest('a')) {
-        setIsHovering(true);
-      } else {
-        setIsHovering(false);
-      }
-    };
-    window.addEventListener('mousemove', updateMousePosition);
-    window.addEventListener('mouseover', handleMouseOver);
-    return () => {
-      window.removeEventListener('mousemove', updateMousePosition);
-      window.removeEventListener('mouseover', handleMouseOver);
-    };
-  }, []);
-
-  return (
-    <div className="hidden md:block pointer-events-none z-[9999]">
-      <motion.div
-        className="fixed top-0 left-0 w-3 h-3 bg-black rounded-full mix-blend-difference"
-        animate={{ x: mousePosition.x - 6, y: mousePosition.y - 6, scale: isHovering ? 2 : 1 }}
-        transition={{ type: 'tween', ease: 'backOut', duration: 0.15 }}
-      />
-      <motion.div
-        className="fixed top-0 left-0 w-8 h-8 border border-black/30 rounded-full"
-        animate={{ x: mousePosition.x - 16, y: mousePosition.y - 16, scale: isHovering ? 1.5 : 1 }}
-        transition={{ type: 'tween', ease: 'easeOut', duration: 0.3 }}
-      />
-    </div>
-  );
-};
-
 const JoinRedirect = () => {
   const { code } = useParams()
   useEffect(() => {
@@ -148,8 +109,6 @@ const HomePageWrapper = () => {
       <AnimatePresence mode="wait">
         {loading && <Preloader onComplete={() => setLoading(false)} />}
       </AnimatePresence>
-      
-      {!loading && <CustomCursor />}
       
       <div className={loading ? 'opacity-0' : 'opacity-100 transition-opacity duration-1000'}>
         <Navbar />
@@ -226,7 +185,7 @@ function App() {
           <ThemeProvider>
             <Toast />
             <AppContent />
-            {process.env.NODE_ENV === 'development' && <Agentation />}
+            {import.meta.env.DEV && <Agentation />}
           </ThemeProvider>
         </BrowserRouter>
       </AuthProvider>
