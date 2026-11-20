@@ -1692,8 +1692,7 @@ const AlternatingFeaturesSection = () => {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-5xl font-normal text-[var(--wl-fg)] leading-tight">
-            Batches tracked,<br />
-            fees collected,<br />
+            Batches tracked, fees collected,<br />
             <span className="text-[var(--wl-muted)]">and an institute that scales.</span>
           </h2>
         </div>
