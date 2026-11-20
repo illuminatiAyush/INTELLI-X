@@ -452,6 +452,8 @@ function DotWordmark({ text = "INTELLI-X" }) {
 const Navbar = ({ isDark, setIsDark }) => {
   const [langOpen, setLangOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState('EN');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const langRef = useRef(null);
 
   const languages = [
@@ -468,48 +470,50 @@ const Navbar = ({ isDark, setIsDark }) => {
         setLangOpen(false);
       }
     };
+    const onScroll = () => {
+      setScrolled(window.scrollY > 15);
+    };
     document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--wl-bg)]/85 backdrop-blur-md border-b border-[var(--wl-line)] transition-colors duration-200">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-200 ${
+        scrolled
+          ? 'bg-[var(--wl-bg)]/85 backdrop-blur-md border-b border-[var(--wl-line)] shadow-xs'
+          : 'bg-transparent border-b border-transparent'
+      }`}
+    >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 flex h-16 items-center justify-between gap-4">
         {/* Brand */}
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="flex items-center gap-1.5 font-bold tracking-tight text-[17px] text-[var(--wl-fg)]">
-            <svg viewBox="0 0 32 20" fill="none" className="w-6 h-4 text-blue-500">
-              <path
-                d="M3 14C6 4 10 4 13 14C16 4 20 4 23 14C26 6 29 6 31 10"
-                stroke="currentColor"
-                strokeWidth="3.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span>INTELLI<span className="font-editorial-italic font-normal text-blue-500">-X</span></span>
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center shrink-0 shadow-xs">
+            <img src="/intellix-icon.svg" alt="Intelli-X" className="w-full h-full object-contain" />
           </div>
+          <span className="font-bold tracking-tight text-[17px] text-[var(--wl-fg)]">
+            INTELLI<span className="text-blue-500">-X</span>
+          </span>
         </Link>
 
-        {/* Center Pill Menu (Rounded full pill with backdrop) */}
-        <nav className="hidden lg:flex items-center gap-1 rounded-full bg-[var(--wl-surface)] border border-[var(--wl-line)] p-1 shadow-sm">
+        {/* Center Pill Menu (Exact Worklist 5-Item Pill) */}
+        <nav className="hidden md:flex items-center gap-1 rounded-full bg-[var(--wl-surface-2)]/90 border border-[var(--wl-line)] p-1 shadow-xs backdrop-blur-xs">
           <a href="#search-dir" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
-            Batches
-          </a>
-          <a href="#kanban" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
-            Admissions CRM
+            How it works
           </a>
           <a href="#proof-demo" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
-            Student Proof
-          </a>
-          <a href="#batches" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
-            Transform
-          </a>
-          <a href="#small-tools" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
-            Tools
+            Live demo
           </a>
           <a href="#pricing" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
             Pricing
+          </a>
+          <a href="#batches" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
+            Batches
           </a>
           <a href="#faq" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
             FAQ
@@ -577,14 +581,74 @@ const Navbar = ({ isDark, setIsDark }) => {
           <Link to="/register">
             <button
               type="button"
-              className="wl-btn wl-btn-primary h-9 rounded-[10px] px-4 text-[13px]"
+              className="wl-btn wl-btn-primary h-9 rounded-[10px] px-4 text-[13px] inline-flex items-center gap-1.5"
             >
               <span>Get started</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </Link>
+
+          {/* Mobile hamburger menu toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden grid size-8 place-items-center rounded-lg text-[var(--wl-muted)] hover:bg-[var(--wl-surface-2)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Drawer Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-b border-[var(--wl-line)] bg-[var(--wl-bg)] px-4 py-3 space-y-2">
+          <a
+            href="#search-dir"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 text-sm text-[var(--wl-fg)] hover:bg-[var(--wl-surface-2)] rounded-lg"
+          >
+            How it works
+          </a>
+          <a
+            href="#proof-demo"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 text-sm text-[var(--wl-fg)] hover:bg-[var(--wl-surface-2)] rounded-lg"
+          >
+            Live demo
+          </a>
+          <a
+            href="#pricing"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 text-sm text-[var(--wl-fg)] hover:bg-[var(--wl-surface-2)] rounded-lg"
+          >
+            Pricing
+          </a>
+          <a
+            href="#batches"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 text-sm text-[var(--wl-fg)] hover:bg-[var(--wl-surface-2)] rounded-lg"
+          >
+            Batches
+          </a>
+          <a
+            href="#faq"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 text-sm text-[var(--wl-fg)] hover:bg-[var(--wl-surface-2)] rounded-lg"
+          >
+            FAQ
+          </a>
+          <div className="pt-2 border-t border-[var(--wl-line)] flex items-center justify-between">
+            <Link to="/login" className="text-sm font-medium text-[var(--wl-muted)]">
+              Sign in
+            </Link>
+            <Link to="/register">
+              <button className="wl-btn wl-btn-primary h-8 px-3 text-xs rounded-lg">
+                Get started →
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
