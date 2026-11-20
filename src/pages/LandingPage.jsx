@@ -35,6 +35,7 @@ import {
   Globe
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import './LandingPage.css';
 
 // ── EXACT WORKLIST INTERACTIVE ASCII PIXEL FIELD ──
@@ -108,7 +109,14 @@ function AsciiField({ hollow = 0.2, opacity = 1 }) {
             const hoverAlpha = 0.58 * mouseInfluence;
             const alpha = Math.min(0.98, baseAlpha + hoverAlpha);
 
-            ctx.fillStyle = getColor(alpha);
+            if (mouseInfluence > 0.05) {
+              const root = canvas.closest('.landing-page-root') || document.documentElement;
+              const isLight = root.classList.contains('light');
+              const hue = Math.round(210 + mouseInfluence * 70 + (x / width) * 40) % 360;
+              ctx.fillStyle = `hsl(${hue}, 90%, ${isLight ? 42 : 68}%)`;
+            } else {
+              ctx.fillStyle = getColor(alpha);
+            }
 
             // Subtle dynamic push/displacement when mouse is near
             let posX = x;
@@ -260,6 +268,9 @@ function DitherWord({ children }) {
         }
       }
       el.style.backgroundImage = `url(${canvas.toDataURL()})`;
+      el.style.webkitBackgroundClip = "text";
+      el.style.backgroundClip = "text";
+      el.style.webkitTextFillColor = "transparent";
       el.style.color = "transparent";
     };
 
@@ -390,7 +401,8 @@ function DotWordmark({ text = "INTELLI-X" }) {
         const mouseDist = pointer ? Math.max(0, 1 - Math.hypot(p.x - pointer.x, p.y - pointer.y) / 160) : 0;
 
         if (mouseDist > 0 && p.b < 1.3 * mouseDist) {
-          ctx.fillStyle = inkColor;
+          const hue = Math.round((p.x / width) * 280 + (pointer ? (pointer.x + pointer.y) * 0.35 : 0)) % 360;
+          ctx.fillStyle = `hsl(${hue}, 95%, 62%)`;
           ctx.fillRect(p.x, p.y, 4, 4);
         } else if (p.b < threshold) {
           ctx.fillStyle = baseColor;
@@ -449,12 +461,14 @@ function DotWordmark({ text = "INTELLI-X" }) {
 }
 
 // ── FLOATING NAVBAR WITH DARK/LIGHT TOGGLE & LANGUAGE DROPDOWN ──
-const Navbar = ({ isDark, setIsDark }) => {
+const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
   const [langOpen, setLangOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState('EN');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef(null);
+
+  const handleToggle = toggleTheme || (() => setIsDark && setIsDark(!isDark));
 
   const languages = [
     { code: 'EN', label: 'English' },
@@ -559,7 +573,7 @@ const Navbar = ({ isDark, setIsDark }) => {
 
           {/* ☀️ / 🌙 THEME TOGGLE (Exact Worklist Button Spec) */}
           <button
-            onClick={() => setIsDark(!isDark)}
+            onClick={handleToggle}
             aria-label="Switch between light and dark theme"
             className="grid size-8 place-items-center rounded-lg text-[var(--wl-muted)] transition-colors hover:bg-[var(--wl-surface-2)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]"
             title={isDark ? "Switch to light mode" : "Switch to dark mode"}
@@ -638,14 +652,23 @@ const Navbar = ({ isDark, setIsDark }) => {
             FAQ
           </a>
           <div className="pt-2 border-t border-[var(--wl-line)] flex items-center justify-between">
-            <Link to="/login" className="text-sm font-medium text-[var(--wl-muted)]">
-              Sign in
-            </Link>
-            <Link to="/register">
-              <button className="wl-btn wl-btn-primary h-8 px-3 text-xs rounded-lg">
-                Get started →
-              </button>
-            </Link>
+            <button
+              onClick={handleToggle}
+              className="flex items-center gap-2 text-xs text-[var(--wl-muted)] hover:text-[var(--wl-fg)] px-2.5 py-1.5 rounded-lg border border-[var(--wl-line)] bg-[var(--wl-surface)]"
+            >
+              {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-700" />}
+              <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <Link to="/login" className="text-sm font-medium text-[var(--wl-muted)] px-2">
+                Sign in
+              </Link>
+              <Link to="/register">
+                <button className="wl-btn wl-btn-primary h-8 px-3 text-xs rounded-lg">
+                  Get started →
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       )}
@@ -2349,10 +2372,11 @@ const BatchesSection = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-[var(--wl-line)] flex items-baseline justify-between">
+              <div className="pt-4 border-t border-[var(--wl-line)] flex items-center justify-between">
                 <span className="text-xs text-[var(--wl-muted)] font-medium">Estimated administrative loss:</span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-rose-500 font-geist price-tag">
-                  ₹15,000+<span className="text-xs text-[var(--wl-muted)] font-normal ml-1">/mo overhead</span>
+                <div className="flex items-baseline gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/25">
+                  <span className="text-rose-500 font-black text-xl sm:text-2xl font-geist">₹15,000+</span>
+                  <span className="text-xs text-[var(--wl-muted)] font-medium">/mo overhead</span>
                 </div>
               </div>
             </div>
@@ -2360,8 +2384,9 @@ const BatchesSection = () => {
             {/* Card 2: The Solution (Intelli-X Automation Engine) */}
             <div className="p-6 sm:p-8 rounded-3xl border border-blue-500/50 bg-[var(--wl-surface)] flex flex-col justify-between space-y-6 shadow-xl ring-1 ring-blue-500/30">
               <div className="space-y-4">
-                <span className="rounded-full bg-blue-500/15 border border-blue-500/30 px-3 py-1 text-[11px] font-semibold text-blue-500">
-                  ⚡ Intelli-X Automated Batch Engine
+                <span className="rounded-full bg-blue-500/15 border border-blue-500/30 px-3 py-1 text-[11px] font-semibold text-blue-500 inline-flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                  Intelli-X Automated Batch Engine
                 </span>
                 <h3 className="text-lg sm:text-xl font-semibold font-geist text-[var(--wl-fg)]">
                   Automated Batches & Real-Time Portals
@@ -2391,12 +2416,12 @@ const BatchesSection = () => {
               </div>
 
               {/* High Contrast Ultra-Readable Price */}
-              <div className="pt-4 border-t border-[var(--wl-line)] flex items-baseline justify-between">
+              <div className="pt-4 border-t border-[var(--wl-line)] flex items-center justify-between">
                 <span className="text-xs font-semibold text-[var(--wl-fg)]">Complete institute tier:</span>
-                <div className="text-3xl sm:text-4xl font-extrabold text-[var(--wl-fg)] font-geist price-tag flex items-baseline gap-1">
-                  <span className="text-blue-500 font-bold text-2xl">₹</span>
-                  <span className="price-value text-3xl sm:text-4xl font-black text-[var(--wl-fg)] tracking-tight">4,999</span>
-                  <span className="text-xs text-[var(--wl-muted)] font-normal ml-1">/month</span>
+                <div className="flex items-baseline gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/30 shadow-xs">
+                  <span className="text-blue-500 font-bold text-xl sm:text-2xl font-geist">₹</span>
+                  <span className="text-2xl sm:text-3xl font-black text-[var(--wl-fg)] tracking-tight font-geist">4,999</span>
+                  <span className="text-xs text-[var(--wl-muted)] font-medium">/month</span>
                 </div>
               </div>
             </div>
@@ -2519,8 +2544,8 @@ const PricingSection = () => {
                 <h3 className="text-xl font-bold font-geist text-[var(--wl-fg)]">{p.name}</h3>
                 <p className="mt-2 text-xs text-[var(--wl-muted)] leading-relaxed font-light">{p.desc}</p>
 
-                <div className="mt-6 flex items-baseline gap-1">
-                  <span className="price-tag price-value text-3xl sm:text-4xl font-black text-[var(--wl-fg)] tracking-tight">
+                <div className="mt-6 flex items-baseline gap-1.5 px-3.5 py-2 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] w-fit shadow-xs">
+                  <span className="text-3xl sm:text-4xl font-black text-blue-500 tracking-tight font-geist">
                     {billingAnnual ? p.priceAnnual : p.priceMonthly}
                   </span>
                   <span className="text-xs text-[var(--wl-muted)] font-medium">/{p.period}</span>
@@ -2750,11 +2775,20 @@ const InteractiveFooter = ({ isDark }) => {
 
 // ── MAIN LANDING PAGE CONTAINER ──
 export default function LandingPage() {
-  const [isDark, setIsDark] = useState(true);
+  let themeContext = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    themeContext = useTheme();
+  } catch (e) {
+    themeContext = null;
+  }
+  const [localDark, setLocalDark] = useState(true);
+  const isDark = themeContext ? themeContext.isDark : localDark;
+  const toggleTheme = themeContext ? themeContext.toggleTheme : () => setLocalDark((p) => !p);
 
   return (
     <div className={`landing-page-root ${isDark ? 'dark' : 'light'} min-h-screen bg-[var(--wl-bg)] text-[var(--wl-fg)]`}>
-      <Navbar isDark={isDark} setIsDark={setIsDark} />
+      <Navbar isDark={isDark} toggleTheme={toggleTheme} />
       <main>
         <Hero />
         <SearchDirectorySection />
