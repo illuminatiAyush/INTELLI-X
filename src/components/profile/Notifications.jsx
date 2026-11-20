@@ -38,10 +38,10 @@ const Notifications = () => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.25 }}
-      className="rounded-2xl border border-gray-200 bg-white p-6"
+      className="rounded-2xl border border-sky-200/60 dark:border-sky-900/40 bg-gradient-to-br from-white via-white to-sky-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-sky-950/20 p-6 shadow-xs"
     >
       <div className="flex items-center gap-2 mb-5">
-        <div className="p-2 rounded-lg bg-white/10 text-white border border-white/10">
+        <div className="p-2 rounded-lg bg-sky-500/10 text-sky-500 border border-sky-500/20">
           <Bell className="w-5 h-5" />
         </div>
         <h3 className="text-lg font-bold text-gray-900">Notification Preferences</h3>
@@ -51,10 +51,10 @@ const Notifications = () => {
         {prefs.map((pref) => (
           <div
             key={pref.id}
-            className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 hover:border-gray-300 transition-all"
+            className="flex items-center justify-between px-4 py-3 rounded-xl border border-sky-200/50 dark:border-sky-900/30 bg-sky-50/30 dark:bg-sky-950/20 hover:border-sky-300 dark:hover:border-sky-700 transition-all"
           >
             <div className="flex items-center gap-3">
-              <pref.icon className="w-4 h-4 text-gray-600" />
+              <pref.icon className="w-4 h-4 text-sky-600 dark:text-sky-400" />
               <div>
                 <p className="text-sm font-semibold text-gray-900">{pref.label}</p>
                 <p className="text-xs text-gray-600">{pref.description}</p>

@@ -56,7 +56,7 @@ const DashboardLayout = () => {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 overflow-y-auto">
+      <nav className="flex-1 py-4 overflow-y-auto overflow-x-hidden">
         <div className="space-y-1">
           {navItems.map((item) => {
             const isActive =
@@ -72,9 +72,9 @@ const DashboardLayout = () => {
                 onClick={() => setMobileOpen(false)}
                 title={collapsed && isDesktop ? item.label : ''}
               >
-                <div className={`dashboard-nav-item ${isActive ? 'active' : ''} ${collapsed && isDesktop ? 'justify-center' : ''}`}>
-                  <Icon size={18} strokeWidth={2} />
-                  {!collapsed && <span>{item.label}</span>}
+                <div className={`dashboard-nav-item ${isActive ? 'active' : ''} ${collapsed && isDesktop ? 'justify-center !mx-2 !px-2' : ''}`}>
+                  <Icon size={18} strokeWidth={2} className="shrink-0" />
+                  {!collapsed && <span className="truncate">{item.label}</span>}
                 </div>
               </NavLink>
             )
@@ -135,31 +135,20 @@ const DashboardLayout = () => {
         onMouseEnter={() => setSidebarHovered(true)}
         onMouseLeave={() => {
           setSidebarHovered(false)
-          setSidebarOpen(false) // Close on mouse leave unless clicked
+          setSidebarOpen(false)
         }}
+        initial={false}
         animate={{
-          width: sidebarOpen || sidebarHovered ? 240 : 60,
+          width: sidebarOpen || sidebarHovered ? 240 : 64,
         }}
-        transition={{ type: 'spring', damping: 30, stiffness: 200 }}
-        className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white border-r border-dashboard-border overflow-hidden"
+        transition={{ 
+          type: 'tween', 
+          ease: [0.25, 1, 0.5, 1], 
+          duration: 0.35 
+        }}
+        className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white border-r border-dashboard-border overflow-hidden shadow-xs will-change-[width]"
       >
-        {/* Toggle Button */}
-        {!(sidebarOpen || sidebarHovered) && (
-          <div className="flex items-center justify-center p-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 text-dashboard-text-secondary hover:text-dashboard-text rounded-lg hover:bg-dashboard-border-light transition-colors"
-              title="Open sidebar"
-            >
-              <Menu size={20} />
-            </button>
-          </div>
-        )}
-
-        {/* Full Sidebar Content - only visible when open/hovered */}
-        {(sidebarOpen || sidebarHovered) && (
-          <SidebarContent collapsed={false} isDesktop={true} />
-        )}
+        <SidebarContent collapsed={!(sidebarOpen || sidebarHovered)} isDesktop={true} />
       </motion.aside>
 
       {/* ── Mobile Sidebar ── */}
@@ -190,9 +179,13 @@ const DashboardLayout = () => {
       {/* ── Main Content Area ── */}
       <motion.div
         animate={{
-          marginLeft: sidebarOpen || sidebarHovered ? 240 : 60,
+          marginLeft: sidebarOpen || sidebarHovered ? 240 : 64,
         }}
-        transition={{ type: 'spring', damping: 30, stiffness: 200 }}
+        transition={{ 
+          type: 'tween', 
+          ease: [0.25, 1, 0.5, 1], 
+          duration: 0.35 
+        }}
         className="flex-1 flex flex-col hidden lg:flex"
       >
         {/* Top Header */}

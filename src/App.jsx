@@ -40,6 +40,7 @@ import JoinBatch from './pages/dashboard/JoinBatch'
 import ActiveTestsPage from './pages/dashboard/ActiveTestsPage'
 import TestAttemptPage from './pages/dashboard/TestAttemptPage'
 import LecturesPage from './pages/dashboard/LecturesPage'
+import IntelliXDemo from './demo/IntelliXDemo'
 
 const Preloader = ({ onComplete }) => {
   useEffect(() => {
@@ -133,6 +134,7 @@ const AppContent = () => {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/demo" element={<IntelliXDemo />} />
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<AuthPage />} />
       <Route

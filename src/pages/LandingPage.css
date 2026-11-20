@@ -1,20 +1,262 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700;800&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap');
 
-body {
-  margin: 0;
+/* ═══════════════════════════════════════════════════════════════
+   Intelli-X Landing Page — Scoped Theme Tokens & Animations
+   Supports seamless Dark / Light Mode toggling + Geist Font
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Default / Dark Theme */
+:root {
+  --ascii: 255 255 255;
+}
+:root.light,
+html.light {
+  --ascii: 30 30 35;
+}
+
+.landing-page-root,
+.landing-page-root.dark {
+  --wl-bg: #09090b;
+  --wl-surface: #121215;
+  --wl-surface-2: #1c1c21;
+  --wl-surface-3: #27272a;
+  --wl-line: #27272a;
+  --wl-line-light: rgba(255, 255, 255, 0.08);
+  --wl-fg: #fafafa;
+  --wl-muted: #a1a1aa;
+  --wl-faint: #71717a;
+  --wl-accent: #3b82f6;
+
+  /* ASCII Field Color (White/light in dark mode) */
+  --ascii: 255 255 255;
+
+  /* Watermark Colors */
+  --wm-base: #27272a;
+  --wm-ink: #60a5fa;
+
+  /* Button Tokens */
+  --btn-from: #3b82f6;
+  --btn-to: #1d4ed8;
+  --btn-rim: #2563eb;
+  --btn2-from: #27272a;
+  --btn2-to: #18181b;
+  --btn2-rim: #3f3f46;
+
+  background-color: var(--wl-bg);
+  color: var(--wl-fg);
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
-.font-sans {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+/* Light Theme Override */
+.landing-page-root.light {
+  --wl-bg: #fafafa;
+  --wl-surface: #ffffff;
+  --wl-surface-2: #f4f4f5;
+  --wl-surface-3: #e4e4e7;
+  --wl-line: #e4e4e7;
+  --wl-line-light: rgba(0, 0, 0, 0.06);
+  --wl-fg: #09090b;
+  --wl-muted: #52525b;
+  --wl-faint: #71717a;
+  --wl-accent: #2563eb;
+
+  /* ASCII Field Color (Dark in light mode) */
+  --ascii: 30 30 35;
+
+  /* Watermark Colors */
+  --wm-base: #e7e5e4;
+  --wm-ink: #2563eb;
+
+  /* Button Tokens */
+  --btn-from: #3b82f6;
+  --btn-to: #1d4ed8;
+  --btn-rim: #1d4ed8;
+  --btn2-from: #ffffff;
+  --btn2-to: #f4f4f5;
+  --btn2-rim: #d4d4d8;
 }
 
-.font-arial {
-  font-family: 'Arial', sans-serif;
+/* Upright Display Headings - Cormorant 400 */
+.landing-page-root h1,
+.landing-page-root h1 span:not(.font-editorial-italic):not(.font-newsreader-italic),
+.landing-page-root h2,
+.landing-page-root h2 span:not(.font-editorial-italic):not(.font-newsreader-italic),
+.landing-page-root .landing-display-heading,
+.landing-page-root .font-heading {
+  font-family: 'Cormorant', 'Cormorant Garamond', Garamond, Georgia, serif !important;
+  font-style: normal;
+  letter-spacing: -0.02em;
 }
 
-html {
-  scroll-behavior: smooth;
-  background-color: #100904;
+/* Newsreader in true italic for intentional accent words */
+.landing-page-root .font-editorial-italic,
+.landing-page-root .font-newsreader-italic {
+  font-family: 'Newsreader', Garamond, Georgia, serif !important;
+  font-style: italic;
+  font-optical-sizing: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GEIST FONT FOR H3 HEADINGS AND CARD TITLES
+   ═══════════════════════════════════════════════════════════════ */
+.landing-page-root h3,
+.landing-page-root h4,
+.landing-page-root .font-geist {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  letter-spacing: -0.02em;
+}
+
+/* Functional UI text in Montserrat */
+.landing-page-root .font-sans,
+.landing-page-root button,
+.landing-page-root input,
+.landing-page-root a,
+.landing-page-root span:not(.font-editorial-italic):not(.font-newsreader-italic):not(.font-heading):not(h1 *):not(h2 *):not(.font-geist),
+.landing-page-root table {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Light Montserrat subtext everywhere */
+.landing-page-root p,
+.landing-page-root .subtext,
+.landing-page-root .landing-subtext {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 300 !important;
+  letter-spacing: 0.015em;
+}
+
+/* Geist Mono for monospaced figures and badges */
+.landing-page-root .font-mono,
+.landing-page-root .font-mono-num {
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ULTRA-READABLE HIGH CONTRAST PRICE TAGS
+   ═══════════════════════════════════════════════════════════════ */
+.landing-page-root .price-tag,
+.landing-page-root .price-value {
+  color: var(--wl-fg) !important;
+  font-family: 'Geist', 'Geist Mono', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em;
+  line-height: 1 !important;
+}
+
+.landing-page-root.dark .price-tag,
+.landing-page-root.dark .price-value {
+  color: #ffffff !important;
+}
+
+.landing-page-root.light .price-tag,
+.landing-page-root.light .price-value {
+  color: #09090b !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Button Hover & Press Animations
+   ═══════════════════════════════════════════════════════════════ */
+
+.landing-page-root .wl-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-weight: 500;
+  user-select: none;
+  cursor: pointer;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 11px;
+  transform: translate3d(0, 0, 0);
+  transition-property: transform, box-shadow, filter, background, border-color, color;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform, box-shadow;
+  outline: none;
+}
+
+.landing-page-root .wl-btn:focus-visible {
+  outline: 2px solid var(--wl-accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.35);
+}
+
+/* Blue Primary Button */
+.landing-page-root .wl-btn-primary {
+  color: #ffffff !important;
+  border-color: var(--btn-rim);
+  background: linear-gradient(180deg, var(--btn-from) 0%, var(--btn-to) 100%);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.15),
+    0 4px 16px -2px rgba(59, 130, 246, 0.45);
+}
+
+/* Secondary Surface Button */
+.landing-page-root .wl-btn-secondary {
+  color: var(--wl-fg);
+  border-color: var(--btn2-rim);
+  background: linear-gradient(180deg, var(--btn2-from) 0%, var(--btn2-to) 100%);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .landing-page-root .wl-btn-primary:hover {
+    transform: translate3d(0, -1.5px, 0);
+    filter: brightness(1.08);
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 4px 12px rgba(0, 0, 0, 0.25),
+      0 8px 24px -2px rgba(59, 130, 246, 0.6);
+  }
+
+  .landing-page-root .wl-btn-secondary:hover {
+    transform: translate3d(0, -1.5px, 0);
+    filter: brightness(1.05);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.landing-page-root .wl-btn:active {
+  transform: translate3d(0, 0, 0) scale(0.985);
+  transition-duration: 90ms;
+}
+
+/* Speech bubble tooltip arrow */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--wl-surface);
+}
+
+/* Hide scrollbars for ticker */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page-root .wl-btn {
+    transition: none !important;
+    transform: none !important;
+  }
 }

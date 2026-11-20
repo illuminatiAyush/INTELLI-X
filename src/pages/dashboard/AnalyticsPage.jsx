@@ -371,7 +371,7 @@ const AnalyticsPage = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-2xl border border-gray-200 bg-white p-6"
+          className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/40 bg-gradient-to-br from-white via-white to-indigo-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-indigo-950/20 p-6 shadow-xs"
         >
           <div className="flex items-center gap-2 mb-6">
             <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-700'}`}>
@@ -427,7 +427,7 @@ const AnalyticsPage = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl border border-gray-200 bg-white p-6"
+            className="rounded-2xl border border-emerald-200/60 dark:border-emerald-900/40 bg-gradient-to-br from-white via-white to-emerald-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-emerald-950/20 p-6 shadow-xs"
           >
             <div className="flex items-center gap-2 mb-6">
               <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
@@ -440,12 +440,12 @@ const AnalyticsPage = () => {
             ) : (
               <div className="space-y-3">
                 {recentResults.map((r, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 bg-white hover:border-emerald-300 transition-all">
+                  <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl border border-emerald-200/50 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/20 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all">
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{r.title}</p>
                       <p className="text-xs text-gray-600">{r.marks} / {r.total} marks</p>
                     </div>
-                    <span className="text-sm font-bold text-emerald-600">{r.percent}%</span>
+                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{r.percent}%</span>
                   </div>
                 ))}
               </div>
@@ -462,30 +462,30 @@ const AnalyticsPage = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl border border-blue-200 bg-blue-50 p-6"
+            className="rounded-2xl border border-blue-200/60 dark:border-blue-900/40 bg-gradient-to-br from-white via-white to-blue-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/20 p-6 shadow-xs"
           >
             <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
                 <BarChart3 className="w-5 h-5" />
               </div>
-              <h2 className="text-lg font-bold text-blue-900">Analytics Summary</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Analytics Summary</h2>
             </div>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">Overall Performance:</span>
-                <span className="font-bold text-blue-900">{overallStats.avgScore}%</span>
+              <div className="flex justify-between items-center py-1.5 px-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+                <span className="text-gray-600 dark:text-gray-300 font-medium">Overall Performance:</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400">{overallStats.avgScore}%</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">Attendance Rate:</span>
-                <span className="font-bold text-blue-900">{overallStats.avgAttendance}%</span>
+              <div className="flex justify-between items-center py-1.5 px-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+                <span className="text-gray-600 dark:text-gray-300 font-medium">Attendance Rate:</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400">{overallStats.avgAttendance}%</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">Tests Completed:</span>
-                <span className="font-bold text-blue-900">{overallStats.totalTests}</span>
+              <div className="flex justify-between items-center py-1.5 px-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+                <span className="text-gray-600 dark:text-gray-300 font-medium">Tests Completed:</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400">{overallStats.totalTests}</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">Current Rank:</span>
-                <span className="font-bold text-blue-900">{overallStats.rank === '-' ? 'Not Available' : `#${overallStats.rank}`}</span>
+              <div className="flex justify-between items-center py-1.5 px-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+                <span className="text-gray-600 dark:text-gray-300 font-medium">Current Rank:</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400">{overallStats.rank === '-' ? 'Not Available' : `#${overallStats.rank}`}</span>
               </div>
             </div>
           </motion.div>
@@ -514,10 +514,10 @@ const AnalyticsPage = () => {
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard title="Total Students" value={overallStats.totalStudents} icon={Users} color="neutral" />
-        <StatsCard title="Avg Attendance" value={`${overallStats.avgAttendance}%`} icon={ClipboardCheck} color="green" />
-        <StatsCard title="Tests Conducted" value={overallStats.totalTests} icon={BarChart3} color="neutral" />
-        <StatsCard title="Avg Score" value={`${overallStats.avgScore}%`} icon={TrendingUp} color="neutral" />
+        <StatsCard title="Total Students" value={overallStats.totalStudents} icon={Users} color="blue" />
+        <StatsCard title="Avg Attendance" value={`${overallStats.avgAttendance}%`} icon={ClipboardCheck} color="emerald" />
+        <StatsCard title="Tests Conducted" value={overallStats.totalTests} icon={BarChart3} color="purple" />
+        <StatsCard title="Avg Score" value={`${overallStats.avgScore}%`} icon={TrendingUp} color="amber" />
       </div>
 
       {/* Batch Performance */}
@@ -525,7 +525,7 @@ const AnalyticsPage = () => {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="rounded-2xl border border-gray-200 bg-white p-6"
+        className="rounded-2xl border border-blue-200/60 dark:border-blue-900/40 bg-gradient-to-br from-white via-white to-blue-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/20 p-6 shadow-xs"
       >
         <div className="flex items-center gap-2 mb-6">
           <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-slate-100 text-slate-700 border border-slate-200'} shadow-sm`}>
@@ -578,7 +578,7 @@ const AnalyticsPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="rounded-2xl border border-gray-200 bg-white p-6"
+          className="rounded-2xl border border-emerald-200/60 dark:border-emerald-900/40 bg-gradient-to-br from-white via-white to-emerald-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-emerald-950/20 p-6 shadow-xs"
         >
           <div className="flex items-center gap-2 mb-6">
             <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
@@ -619,7 +619,7 @@ const AnalyticsPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="rounded-2xl border border-gray-200 bg-white p-6"
+          className="rounded-2xl border border-rose-200/60 dark:border-rose-900/40 bg-gradient-to-br from-white via-white to-rose-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-rose-950/20 p-6 shadow-xs"
         >
           <div className="flex items-center gap-2 mb-6">
             <div className="p-2 rounded-lg bg-red-500/10 text-red-500">

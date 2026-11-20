@@ -9,9 +9,9 @@ const GoalRow = ({ icon: Icon, label, current, target, setTarget, suffix = '', p
   const isAhead = target && current >= target
 
   return (
-    <div className="px-4 py-4 rounded-xl border border-gray-200 bg-gray-50">
+    <div className="px-4 py-4 rounded-xl border border-violet-200/50 dark:border-violet-900/30 bg-violet-50/30 dark:bg-violet-950/20">
       <div className="flex items-center gap-2 mb-3">
-        <Icon className="w-4 h-4 text-gray-600" />
+        <Icon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
         <span className="text-xs font-semibold uppercase tracking-wider text-gray-600">{label}</span>
       </div>
 
@@ -62,10 +62,10 @@ const Goals = ({ currentStats }) => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.25 }}
-      className="rounded-2xl border border-gray-200 bg-white p-6"
+      className="rounded-2xl border border-violet-200/60 dark:border-violet-900/40 bg-gradient-to-br from-white via-white to-violet-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-violet-950/20 p-6 shadow-xs"
     >
       <div className="flex items-center gap-2 mb-5">
-        <div className="p-2 rounded-lg bg-[var(--border-subtle)] text-gray-900">
+        <div className="p-2 rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
           <Target className="w-5 h-5" />
         </div>
         <h3 className="text-lg font-bold text-gray-900">Personal Goals</h3>

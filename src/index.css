@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Outfit:wght@100;200;300;400;500&family=Montserrat:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* ═══════════════════════════════════════════════
    DARK MODE — Slate Gray + Cyan + Pink + Lavender
@@ -524,16 +524,12 @@ input:-webkit-autofill:active {
 
 /* Dashboard sidebar styles */
 .dashboard-sidebar {
-  background: #FFFFFF;
-  border-right: 1px solid #E5E7EB;
-  width: 240px;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
+  background: var(--bg-surface, #FFFFFF);
+  border-right: 1px solid var(--border-subtle, #E5E7EB);
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .dashboard-nav-item {
@@ -719,7 +715,6 @@ input:-webkit-autofill:active {
   color: #D97706;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600&family=Outfit:wght@100;200;300;400;500&family=Montserrat:wght@400;500;600;700&display=swap');
 .premium-font { font-family: 'Montserrat', 'Inter', 'Outfit', sans-serif !important; }
 @media (pointer: fine) { .premium-font { cursor: none; } .premium-font * { cursor: none; } }
 html { scroll-behavior: smooth; }

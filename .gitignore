@@ -53,6 +53,9 @@ eslint.json
 *.tmp
 *.bak
 ~*
+ai-website-cloner-template/
+scripts/
+worklist_live.html
 
 # Coverage and test outputs
 coverage/

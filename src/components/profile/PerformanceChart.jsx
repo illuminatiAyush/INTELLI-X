@@ -16,7 +16,7 @@ import { TrendingUp } from 'lucide-react'
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
 
 const Skeleton = () => (
-  <div className="rounded-2xl border border-gray-200 bg-white p-6 animate-pulse">
+  <div className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/40 bg-gradient-to-br from-white via-white to-indigo-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-indigo-950/20 p-6 animate-pulse">
     <div className="h-5 w-48 rounded bg-[var(--border-subtle)] mb-6" />
     <div className="h-52 w-full rounded-xl bg-[var(--border-subtle)]" />
   </div>
@@ -101,10 +101,10 @@ const PerformanceChart = ({ testScores, loading }) => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="rounded-2xl border border-gray-200 bg-white p-6"
+      className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/40 bg-gradient-to-br from-white via-white to-indigo-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-indigo-950/20 p-6 shadow-xs"
     >
       <div className="flex items-center gap-2 mb-6">
-        <div className="p-2 rounded-lg bg-white/10 text-white border border-white/10">
+        <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
           <TrendingUp className="w-5 h-5" />
         </div>
         <h3 className="text-lg font-bold text-gray-900">Performance Trend</h3>
