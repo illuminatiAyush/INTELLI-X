@@ -158,8 +158,37 @@ html.light {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Button Hover & Press Animations
+   Button Hover & Press Animations + Rolling Text Effect
    ═══════════════════════════════════════════════════════════════ */
+
+.landing-page-root .roll-clip {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  height: 1.3em;
+  line-height: 1.3em;
+  vertical-align: middle;
+}
+
+.landing-page-root .roll-track {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.landing-page-root .group:hover .roll-track,
+.landing-page-root button:hover .roll-track {
+  transform: translateY(-50%);
+}
+
+.landing-page-root .roll-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  height: 1.3em;
+}
 
 .landing-page-root .wl-btn {
   position: relative;

@@ -32,11 +32,31 @@ import {
   MessageSquare,
   ChevronRight,
   Lock,
-  Globe
+  Globe,
+  GraduationCap,
+  CreditCard
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import './LandingPage.css';
+
+// ── ROLLING TEXT HOVER ANIMATION (Text scrolls up, same text rolls in) ──
+function RollText({ children, icon: Icon, className = "" }) {
+  return (
+    <span className={`roll-clip relative inline-block overflow-hidden h-[1.3em] leading-[1.3em] align-middle ${className}`}>
+      <span className="roll-track flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1/2">
+        <span className="roll-item inline-flex items-center gap-1.5 h-[1.3em]">
+          <span>{children}</span>
+          {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+        </span>
+        <span className="roll-item inline-flex items-center gap-1.5 h-[1.3em]">
+          <span>{children}</span>
+          {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+        </span>
+      </span>
+    </span>
+  );
+}
 
 // ── EXACT WORKLIST INTERACTIVE ASCII PIXEL FIELD ──
 const ASCII_CHARS = " .·:-=+*#@";
@@ -595,10 +615,9 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
           <Link to="/register">
             <button
               type="button"
-              className="wl-btn wl-btn-primary h-9 rounded-[10px] px-4 text-[13px] inline-flex items-center gap-1.5"
+              className="group relative overflow-hidden wl-btn wl-btn-primary h-9 rounded-[10px] px-4 text-[13px] inline-flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_22px_rgba(59,130,246,0.5)] transition-all cursor-pointer"
             >
-              <span>Get started</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <RollText icon={ArrowRight}>Get started</RollText>
             </button>
           </Link>
 
@@ -664,8 +683,8 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
                 Sign in
               </Link>
               <Link to="/register">
-                <button className="wl-btn wl-btn-primary h-8 px-3 text-xs rounded-lg">
-                  Get started →
+                <button className="group relative overflow-hidden wl-btn wl-btn-primary h-8 px-3 text-xs rounded-lg inline-flex items-center justify-center">
+                  <RollText icon={ArrowRight}>Get started</RollText>
                 </button>
               </Link>
             </div>
@@ -712,18 +731,17 @@ const Hero = () => {
           <Link to="/register">
             <button
               type="button"
-              className="wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px]"
+              className="group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_28px_rgba(59,130,246,0.55)] transition-all cursor-pointer"
             >
-              <span>Get started</span>
-              <ArrowRight className="w-4 h-4" />
+              <RollText icon={ArrowRight}>Get started</RollText>
             </button>
           </Link>
           <a href="#proof-demo">
             <button
               type="button"
-              className="wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px]"
+              className="group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_15px_rgba(255,255,255,0.06)] transition-all cursor-pointer"
             >
-              <span>Try the live demo</span>
+              <RollText>Try the live demo</RollText>
             </button>
           </a>
         </div>
@@ -1125,7 +1143,12 @@ const KanbanPipelineSection = () => {
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-[var(--wl-faint)]">
                       <span>{card.time}</span>
-                      {card.comments && <span>💬 {card.comments}</span>}
+                      {card.comments && (
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="w-3 h-3 text-[var(--wl-faint)]" />
+                          <span>{card.comments}</span>
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -1347,7 +1370,8 @@ const ProofRoleAndSplitComparison = () => {
               </div>
               <div>
                 <div className="inline-flex items-center gap-2 rounded-lg bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 text-xs text-rose-400">
-                  📎 Monthly_Notice_Scanned.pdf
+                  <FileText className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                  <span>Monthly_Notice_Scanned.pdf</span>
                 </div>
               </div>
             </div>
@@ -1375,7 +1399,8 @@ const ProofRoleAndSplitComparison = () => {
               </div>
               <div>
                 <div className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3.5 py-1.5 text-xs text-white font-medium shadow-md hover:bg-blue-700 transition-colors">
-                  🔗 intelli-x.in/r/aarav-12a · Live scorecard
+                  <ExternalLink className="w-3.5 h-3.5 text-white shrink-0" />
+                  <span>intelli-x.in/r/aarav-12a · Live scorecard</span>
                 </div>
               </div>
             </div>
@@ -1494,20 +1519,22 @@ const ProofWindowSection = () => {
 
         {/* Interactive Tab pills */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          {['Academics', 'Attendance', 'Fee Collection'].map((tab) => (
+          {[
+            { id: 'Academics', icon: GraduationCap },
+            { id: 'Attendance', icon: Clock },
+            { id: 'Fee Collection', icon: CreditCard }
+          ].map(({ id: tab, icon: Icon }) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+              className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5 ${
                 activeTab === tab
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'bg-[var(--wl-surface)] text-[var(--wl-muted)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]'
               }`}
             >
-              {tab === 'Academics' && '📚 '}
-              {tab === 'Attendance' && '⏱️ '}
-              {tab === 'Fee Collection' && '💳 '}
-              {tab}
+              <Icon className="w-3.5 h-3.5 shrink-0" />
+              <span>{tab}</span>
             </button>
           ))}
         </div>
@@ -1631,10 +1658,19 @@ const ProofWindowSection = () => {
               {/* Based on */}
               <div className="space-y-2 pt-4 border-t border-[var(--wl-line)] text-xs text-[var(--wl-muted)]">
                 <span className="font-semibold text-[var(--wl-fg)]">Based on</span>
-                <div className="space-y-1 text-[11px] text-[var(--wl-faint)]">
-                  <div className="flex items-center gap-1.5">📋 OMR Scanner evaluation</div>
-                  <div className="flex items-center gap-1.5">⏱️ Biometric gate check-in</div>
-                  <div className="flex items-center gap-1.5">✍️ Faculty remark notes</div>
+                <div className="space-y-1.5 text-[11px] text-[var(--wl-faint)]">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                    <span>OMR Scanner evaluation</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Biometric gate check-in</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    <span>Faculty remark notes</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1892,8 +1928,8 @@ const TabbedToolSection = () => {
 
           {/* Left Text */}
           <div className="relative z-10 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <Sparkles className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] text-blue-400 flex items-center justify-center shadow-xs">
+              <Sliders className="w-5 h-5" />
             </div>
             <h3 className="text-2xl sm:text-3xl font-semibold font-geist text-[var(--wl-fg)]">
               {activeTab}
@@ -2203,23 +2239,23 @@ const SmallToolsBentoSection = () => {
             </div>
           </div>
 
-          {/* Card 4: Standout high-contrast card: Know when parents open reports */}
-          <div className="rounded-3xl border border-zinc-200 dark:border-white/20 bg-gradient-to-br from-white to-zinc-100 dark:from-white dark:to-zinc-100 text-zinc-950 p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-2xl group hover:scale-[1.02] transition-all">
-            <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-3.5 text-xs text-white shadow-xl flex items-center justify-between">
+          {/* Card 4: Know when parents open reports */}
+          <div className="rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm group hover:border-blue-500/40 transition-all">
+            <div className="rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-3.5 text-xs text-[var(--wl-fg)] shadow-sm flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
-                  <Eye className="w-4 h-4 animate-pulse text-blue-400" />
+                <div className="w-8 h-8 rounded-full bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/25">
+                  <Eye className="w-4 h-4 text-blue-400" />
                 </div>
                 <div>
-                  <div className="font-bold text-xs text-white">intelli-x.in/r/aarav-sharma</div>
-                  <div className="text-[11px] text-zinc-400">Anil Sharma (Father) viewed test report</div>
+                  <div className="font-bold text-xs text-[var(--wl-fg)]">intelli-x.in/r/aarav-sharma</div>
+                  <div className="text-[11px] text-[var(--wl-muted)]">Anil Sharma (Father) viewed test report</div>
                 </div>
               </div>
-              <span className="text-[10px] text-zinc-500 font-mono">3m</span>
+              <span className="text-[10px] text-[var(--wl-faint)] font-mono">3m</span>
             </div>
             <div>
-              <h4 className="text-lg font-bold font-geist text-zinc-950">Know when parents open reports</h4>
-              <p className="mt-1 text-xs text-zinc-600 leading-relaxed font-normal">
+              <h4 className="text-lg font-bold font-geist text-[var(--wl-fg)]">Know when parents open reports</h4>
+              <p className="mt-1 text-xs text-[var(--wl-muted)] leading-relaxed">
                 Track exact timestamps when parents review marks and attendance so counselors can reach out at the right moment.
               </p>
             </div>
@@ -2354,19 +2390,19 @@ const BatchesSection = () => {
 
                 <div className="space-y-2.5 pt-2 text-xs text-[var(--wl-muted)]">
                   <div className="flex items-start gap-2">
-                    <span className="text-rose-500 font-bold shrink-0">✕</span>
+                    <X className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                     <span>Paper registers and roll-calls taking 15+ minutes every lecture</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-rose-500 font-bold shrink-0">✕</span>
+                    <X className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                     <span>Unorganized WhatsApp groups where test circulars get buried</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-rose-500 font-bold shrink-0">✕</span>
+                    <X className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                     <span>Manual fee reminder phone calls and lost physical receipts</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-rose-500 font-bold shrink-0">✕</span>
+                    <X className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                     <span>Zero automated visibility for parents into daily test analytics</span>
                   </div>
                 </div>
@@ -2565,11 +2601,13 @@ const PricingSection = () => {
                 <Link to="/register" className="block">
                   <button
                     type="button"
-                    className={`wl-btn w-full h-11 text-xs rounded-xl font-semibold ${
-                      p.popular ? 'wl-btn-primary' : 'wl-btn-secondary'
+                    className={`group relative overflow-hidden w-full h-11 text-xs rounded-xl font-semibold transition-all duration-300 flex items-center justify-center cursor-pointer ${
+                      p.popular
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.25)] hover:shadow-[0_0_28px_rgba(59,130,246,0.5)] border border-blue-400/30'
+                        : 'bg-[var(--wl-surface-2)] text-[var(--wl-fg)] border border-[var(--wl-line)] hover:border-zinc-500/60 hover:shadow-[0_0_15px_rgba(255,255,255,0.06)]'
                     }`}
                   >
-                    {p.cta}
+                    <RollText icon={ArrowRight}>{p.cta}</RollText>
                   </button>
                 </Link>
               </div>
@@ -2609,43 +2647,62 @@ const FAQSection = () => {
   ];
 
   return (
-    <section id="faq" className="py-24 border-t border-[var(--wl-line)]">
+    <section id="faq" className="py-24 border-t border-[var(--wl-line)] relative">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] md:gap-16">
-          {/* Left Sticky Header */}
-          <div className="md:sticky md:top-28 md:self-start">
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-10 md:gap-16 items-start">
+          {/* Left Sticky Header (stays pinned while right accordion scrolls) */}
+          <div className="md:sticky md:top-28 md:self-start space-y-4">
+            <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-1 text-[11px] font-semibold text-blue-500 inline-block">
+              Knowledge Base
+            </span>
             <h2 className="text-3xl sm:text-5xl font-normal text-[var(--wl-fg)] leading-tight">
               Questions,<br />
               <span className="text-[var(--wl-muted)]">answered.</span>
             </h2>
-            <p className="mt-4 text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed">
-              Have any other queries? Reach out anytime at{' '}
-              <a href="mailto:support@intelli-x.app" className="text-blue-500 underline font-medium">
-                support@intelli-x.app
-              </a>.
+            <p className="text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed max-w-xs">
+              Everything you need to know about switching your coaching institute or school to Intelli-X.
             </p>
+            <div className="pt-2">
+              <a
+                href="mailto:support@intelli-x.app"
+                className="inline-flex items-center gap-1.5 text-xs text-blue-500 hover:text-blue-400 font-semibold underline underline-offset-4"
+              >
+                <span>Need custom integration? Talk to our team</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
           </div>
 
-          {/* Right Accordion */}
+          {/* Right Accordion with smooth animated reveal */}
           <div className="border-t border-[var(--wl-line)] divide-y divide-[var(--wl-line)]">
             {faqs.map((faq, idx) => {
               const isOpen = openIndex === idx;
               return (
-                <div key={idx} className="py-4">
+                <div key={idx} className="py-5 transition-colors duration-200">
                   <button
                     onClick={() => setOpenIndex(isOpen ? -1 : idx)}
-                    className="w-full flex items-center justify-between text-left text-sm sm:text-base font-semibold text-[var(--wl-fg)] hover:text-blue-500 transition-colors cursor-pointer gap-4"
+                    className="w-full flex items-center justify-between text-left text-sm sm:text-base font-semibold text-[var(--wl-fg)] hover:text-blue-500 transition-colors cursor-pointer gap-4 group"
                   >
-                    <span>{faq.q}</span>
-                    <span className={`grid size-7 place-items-center rounded-full bg-[var(--wl-surface-2)] text-[var(--wl-fg)] transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-45 bg-blue-500 text-white' : ''}`}>
+                    <span className="group-hover:translate-x-0.5 transition-transform">{faq.q}</span>
+                    <span
+                      className={`grid size-7 place-items-center rounded-full bg-[var(--wl-surface-2)] text-[var(--wl-fg)] transition-all duration-300 shrink-0 ${
+                        isOpen ? 'rotate-45 bg-blue-600 text-white shadow-md' : 'group-hover:bg-blue-500/10 group-hover:text-blue-500'
+                      }`}
+                    >
                       <Plus className="w-4 h-4" />
                     </span>
                   </button>
-                  {isOpen && (
-                    <p className="mt-3 text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed pr-6">
-                      {faq.a}
-                    </p>
-                  )}
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      isOpen ? 'grid-rows-[1fr] opacity-100 mt-3.5' : 'grid-rows-[0fr] opacity-0'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed pr-6">
+                        {faq.a}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -2664,19 +2721,22 @@ const InteractiveFooter = ({ isDark }) => {
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative pt-12 pb-2">
           {/* 4 Interactive Speech Bubbles Floating Above Character Heads */}
-          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-4 mb-2 max-w-4xl mx-auto">
-            <div className="speech-bubble relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] px-3 py-2 text-center shadow-lg">
-              <span className="text-[11px] text-[var(--wl-fg)] font-medium">Did the parent open the test report?</span>
-            </div>
-            <div className="speech-bubble relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] px-3 py-2 text-center shadow-lg">
-              <span className="text-[11px] text-[var(--wl-fg)] font-medium">JEE Mock Test this Sunday 9am.</span>
-            </div>
-            <div className="speech-bubble relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] px-3 py-2 text-center shadow-lg">
-              <span className="text-[11px] text-[var(--wl-fg)] font-medium">Fee installment received via UPI!</span>
-            </div>
-            <div className="speech-bubble relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] px-3 py-2 text-center shadow-lg">
-              <span className="text-[11px] text-[var(--wl-fg)] font-medium">Batch 12-A completed syllabus.</span>
-            </div>
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-2 max-w-4xl mx-auto items-stretch">
+            {[
+              "Did the parent open the test report?",
+              "JEE Mock Test this Sunday 9am.",
+              "Fee installment received via UPI!",
+              "Batch 12-A completed syllabus."
+            ].map((text, i) => (
+              <div
+                key={i}
+                className="speech-bubble relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] px-3.5 py-2.5 text-center shadow-lg flex items-center justify-center min-h-[52px]"
+              >
+                <span className="text-[11px] sm:text-xs text-[var(--wl-fg)] font-medium leading-tight">
+                  {text}
+                </span>
+              </div>
+            ))}
           </div>
 
           {/* Crowd Illustration Image (dynamically adapts invert filter to dark/light mode!) */}
