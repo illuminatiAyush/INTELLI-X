@@ -15,14 +15,9 @@ import {
   Lock,
   User,
   Phone,
-  Sparkles,
-  ShieldCheck,
-  Zap,
-  BarChart3,
   CheckCircle2,
   ArrowLeft,
   KeyRound,
-  Layers,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import './LandingPage.css'
@@ -385,20 +380,14 @@ const AuthPage = () => {
       <header className="relative z-20 border-b border-[var(--wl-line)]/70 bg-[var(--wl-bg)]/60 backdrop-blur-md px-4 sm:px-8 py-3.5 transition-colors">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           
-          {/* Logo & Terminal Tag */}
-          <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2 group">
-              <img
-                src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
-                alt="IntelliX"
-                className="h-6 sm:h-7 w-auto object-contain transition-opacity group-hover:opacity-80"
-              />
-            </Link>
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] text-[10px] font-mono text-[var(--wl-muted)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>AUTH TERMINAL</span>
-            </div>
-          </div>
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <img
+              src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+              alt="IntelliX"
+              className="h-6 sm:h-7 w-auto object-contain transition-opacity group-hover:opacity-80"
+            />
+          </Link>
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
@@ -438,76 +427,32 @@ const AuthPage = () => {
         <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
           {/* ══ LEFT: Brand & Capabilities Showcase ══ */}
-          <div className="hidden lg:flex lg:col-span-6 flex-col space-y-8 pr-4">
+          <div className="hidden lg:flex lg:col-span-6 flex-col justify-center space-y-6 pr-6">
             
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-                <span>INTELLI-X // COHORT OS 2.8</span>
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl font-light text-[var(--wl-fg)] tracking-tight leading-[1.08] font-heading">
+            <div className="space-y-3">
+              <h1 className="text-4xl sm:text-5xl font-light text-[var(--wl-fg)] tracking-tight leading-[1.12] font-heading">
                 The <span className="font-editorial-italic font-normal text-blue-500">intelligent</span> command center for modern institutes.
               </h1>
 
-              <p className="text-base text-[var(--wl-muted)] leading-relaxed max-w-lg">
+              <p className="text-sm text-[var(--wl-muted)] leading-relaxed max-w-md">
                 Autonomous attendance tracking, algorithmic marksheet generation, and automated parent communication in one unified, real-time interface.
               </p>
             </div>
 
-            {/* Feature Pills */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-[var(--wl-surface-2)]/70 border border-[var(--wl-line)]/80 backdrop-blur-xs">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 shrink-0 mt-0.5">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-semibold text-[var(--wl-fg)] font-mono uppercase tracking-wider">
-                    Role-Gated Enclave
-                  </h4>
-                  <p className="text-xs text-[var(--wl-muted)] mt-0.5">
-                    Separated portals for institutional directors, faculty instructors, students, and parents.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-[var(--wl-surface-2)]/70 border border-[var(--wl-line)]/80 backdrop-blur-xs">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shrink-0 mt-0.5">
-                  <Zap className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-semibold text-[var(--wl-fg)] font-mono uppercase tracking-wider">
-                    Sub-Millisecond Data Sync
-                  </h4>
-                  <p className="text-xs text-[var(--wl-muted)] mt-0.5">
-                    Live batch updates, offline-tolerant marks entry, and instantaneous leaderboard recalculations.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-[var(--wl-surface-2)]/70 border border-[var(--wl-line)]/80 backdrop-blur-xs">
-                <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-500 shrink-0 mt-0.5">
-                  <BarChart3 className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-semibold text-[var(--wl-fg)] font-mono uppercase tracking-wider">
-                    Automated Performance Intelligence
-                  </h4>
-                  <p className="text-xs text-[var(--wl-muted)] mt-0.5">
-                    Deep test metrics and scheduled dispatch directly into parent messaging channels.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Meta */}
-            <div className="flex items-center gap-6 pt-2 text-xs font-mono text-[var(--wl-faint)]">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                99.98% System Uptime
+            {/* Minimal Indicators */}
+            <div className="pt-1 flex flex-wrap items-center gap-x-6 gap-y-2.5 text-xs font-mono text-[var(--wl-muted)]">
+              <span className="inline-flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Real-time Sync
               </span>
-              <span>256-Bit SSL Enclave</span>
-              <span>ISO 27001 Certified</span>
+              <span className="inline-flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                Automated Dispatches
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+                Encrypted Gradebooks
+              </span>
             </div>
 
           </div>
