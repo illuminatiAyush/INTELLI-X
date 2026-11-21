@@ -61,8 +61,13 @@ function RollText({ children, icon: Icon, className = "" }) {
 // ── EXACT WORKLIST INTERACTIVE ASCII PIXEL FIELD ──
 const ASCII_CHARS = " .·:-=+*#@";
 
-function AsciiField({ hollow = 0.2, opacity = 1 }) {
+function AsciiField({ hollow = 0.2, opacity = 1, isButtonHovered = false }) {
   const canvasRef = useRef(null);
+  const isHoveredRef = useRef(isButtonHovered);
+
+  useEffect(() => {
+    isHoveredRef.current = isButtonHovered;
+  }, [isButtonHovered]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -114,22 +119,28 @@ function AsciiField({ hollow = 0.2, opacity = 1 }) {
             Math.sin((x - y) * 0.03 + 0.0006 * time)
           ) / 3;
 
-          const hollowFactor = Math.min(1, Math.max(0, (Math.abs(x - midX) / midX - hollow) / 0.42));
+          let hollowFactor = Math.min(1, Math.max(0, (Math.abs(x - midX) / midX - hollow) / 0.42));
+          if (isHoveredRef.current) {
+            hollowFactor *= 0.35;
+          }
           const distToMouse = Math.hypot(x - mouse.x, y - mouse.y);
-          // Large generous hover influence radius (180px)
-          const mouseInfluence = distToMouse < 180 ? Math.pow(1 - distToMouse / 180, 1.1) : 0;
+          // When button is hovered, shrink and calm the background influence radius so focus is purely on button
+          const effectiveRadius = isHoveredRef.current ? 70 : 180;
+          const mouseInfluence = distToMouse < effectiveRadius
+            ? Math.pow(1 - distToMouse / effectiveRadius, 1.1) * (isHoveredRef.current ? 0.2 : 1)
+            : 0;
 
-          // Intensity combines ambient wave, hollow layout, and bright hover illumination
-          const intensity = ((wave + 1) / 2) * hollowFactor * rowFade + 0.85 * mouseInfluence;
+          // Intensity combines ambient wave, hollow layout, and hover illumination (calmed when button is hovered)
+          const intensity = (((wave + 1) / 2) * hollowFactor * rowFade + 0.85 * mouseInfluence) * (isHoveredRef.current ? 0.4 : 1);
           const charIndex = Math.min(ASCII_CHARS.length - 1, Math.floor(intensity * ASCII_CHARS.length));
 
           if (charIndex !== 0 || mouseInfluence > 0.04) {
             const finalCharIdx = Math.max(charIndex, mouseInfluence > 0.35 ? 6 : (mouseInfluence > 0.1 ? 3 : 1));
-            const baseAlpha = 0.15 + (finalCharIdx / ASCII_CHARS.length) * 0.45;
-            const hoverAlpha = 0.58 * mouseInfluence;
+            const baseAlpha = (0.15 + (finalCharIdx / ASCII_CHARS.length) * 0.45) * (isHoveredRef.current ? 0.45 : 1);
+            const hoverAlpha = (0.58 * mouseInfluence) * (isHoveredRef.current ? 0.25 : 1);
             const alpha = Math.min(0.98, baseAlpha + hoverAlpha);
 
-            if (mouseInfluence > 0.05) {
+            if (mouseInfluence > 0.05 && !isHoveredRef.current) {
               const root = canvas.closest('.landing-page-root') || document.documentElement;
               const isLight = root.classList.contains('light');
               const hue = Math.round(210 + mouseInfluence * 70 + (x / width) * 40) % 360;
@@ -143,7 +154,7 @@ function AsciiField({ hollow = 0.2, opacity = 1 }) {
             let posY = y;
             if (mouseInfluence > 0) {
               const angle = Math.atan2(y - mouse.y, x - mouse.x);
-              const push = Math.sin(mouseInfluence * Math.PI) * 3.5;
+              const push = Math.sin(mouseInfluence * Math.PI) * (isHoveredRef.current ? 1.2 : 3.5);
               posX += Math.cos(angle) * push;
               posY += Math.sin(angle) * push;
             }
@@ -892,12 +903,15 @@ const Hero = ({ isDark: propDark }) => {
     themeContext = null;
   }
   const isDark = propDark !== undefined ? propDark : (themeContext ? themeContext.isDark : true);
+  const [buttonHovered, setButtonHovered] = useState(false);
 
   return (
     <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28">
-      {/* Interactive AsciiField Background Layer */}
-      <div className="pointer-events-none absolute inset-0 size-full overflow-hidden z-0">
-        <AsciiField hollow={0.16} opacity={0.95} />
+      {/* Interactive AsciiField Background Layer - smoothly quiets, dims, and scales down when hovering on buttons */}
+      <div className={`pointer-events-none absolute inset-0 size-full overflow-hidden z-0 transition-all duration-500 ease-out ${
+        buttonHovered ? 'opacity-25 scale-[0.98]' : 'opacity-95 scale-100'
+      }`}>
+        <AsciiField hollow={0.16} opacity={buttonHovered ? 0.25 : 0.95} isButtonHovered={buttonHovered} />
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-center">
@@ -920,12 +934,18 @@ const Hero = ({ isDark: propDark }) => {
           Intelli-X searches 90,000+ sessions, evaluates tests, logs attendance, and sends verifiable proof of progress to parents and management.
         </p>
 
-        {/* Action Buttons */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        {/* Action Buttons - triggering focus highlight and quiet background */}
+        <div
+          className="mt-8 flex flex-wrap items-center justify-center gap-3"
+          onMouseEnter={() => setButtonHovered(true)}
+          onMouseLeave={() => setButtonHovered(false)}
+        >
           <Link to="/register">
             <button
               type="button"
-              className="group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_28px_rgba(59,130,246,0.55)] transition-all cursor-pointer"
+              onMouseEnter={() => setButtonHovered(true)}
+              onMouseLeave={() => setButtonHovered(false)}
+              className="group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_32px_rgba(59,130,246,0.65)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <RollText icon={ArrowRight}>Get started</RollText>
             </button>
@@ -933,7 +953,9 @@ const Hero = ({ isDark: propDark }) => {
           <a href="#proof-demo">
             <button
               type="button"
-              className="group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_15px_rgba(255,255,255,0.06)] transition-all cursor-pointer"
+              onMouseEnter={() => setButtonHovered(true)}
+              onMouseLeave={() => setButtonHovered(false)}
+              className="group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_18px_rgba(255,255,255,0.08)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <RollText>Try the live demo</RollText>
             </button>
