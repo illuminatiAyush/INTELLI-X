@@ -131,7 +131,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className={`pt-8 border-t ${borderColor} flex flex-col md:flex-row justify-between items-center gap-6 relative z-10`}>
           <p className={`text-xs tracking-wide ${textColor}`}>
-            © 2026 IntelliX. All rights reserved.
+            © 2026 IntelliX · Powered by <span className="font-semibold text-blue-500">Cadence Labs</span>. All rights reserved.
           </p>
 
           <div className="flex gap-8">

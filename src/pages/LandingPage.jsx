@@ -3010,13 +3010,12 @@ const FAQSection = () => {
               Everything you need to know about switching your coaching institute or school to Intelli-X.
             </p>
             <div className="pt-2">
-              <a
-                href="mailto:support@intelli-x.app"
-                className="inline-flex items-center gap-1.5 text-xs text-blue-500 hover:text-blue-400 font-semibold underline underline-offset-4"
-              >
-                <span>Need custom integration? Talk to our team</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </a>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] text-xs text-[var(--wl-muted)] shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                <span>
+                  Powered by <span className="font-semibold text-[var(--wl-fg)] tracking-tight">Cadence Labs</span>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -3213,7 +3212,7 @@ const InteractiveFooter = ({ isDark }) => {
 
         {/* Bottom copyright line */}
         <div className="flex flex-wrap items-center justify-between py-6 border-t border-[var(--wl-line)] text-[11px] text-[var(--wl-faint)] gap-2">
-          <span>© Intelli-X. The Operating System for Modern Coaching Institutes · ISO 27001 Certified · Encrypted Data</span>
+          <span>© Intelli-X. Built & Powered by <strong className="text-[var(--wl-fg)] font-medium">Cadence Labs</strong> · The Operating System for Modern Coaching Institutes</span>
           <span>Empowering 1,200+ coaching institutes across India.</span>
         </div>
       </div>
