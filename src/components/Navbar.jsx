@@ -73,14 +73,18 @@ const Navbar = () => {
         width: 'calc(100% - 24px)',
         zIndex: 100
       }}
-      className={`fixed max-w-[1240px] px-6 transition-all duration-240 ease-out flex items-center justify-between ${
+      className={`fixed max-w-[1240px] px-6 transition-all duration-300 ease-out flex items-center justify-between backdrop-blur-xl backdrop-saturate-150 ${
         scrolled
-          ? `rounded-[14px] py-3.5 border ${
+          ? `rounded-[14px] py-3.5 border shadow-xl ${
               isDark 
-                ? 'bg-[#000000]/80 border-white/[0.08] backdrop-blur-[12px]' 
-                : 'bg-white/80 border-black/[0.08] backdrop-blur-[12px]'
+                ? 'bg-black/40 border-white/[0.12] shadow-black/40' 
+                : 'bg-white/45 border-black/[0.08] shadow-zinc-500/10'
             }`
-          : 'bg-transparent py-5 border-transparent'
+          : `rounded-[14px] py-4 border ${
+              isDark
+                ? 'bg-black/20 border-white/[0.06]'
+                : 'bg-white/25 border-black/[0.05]'
+            }`
       }`}
     >
       {/* Brand: Official IntelliX Wordmark */}

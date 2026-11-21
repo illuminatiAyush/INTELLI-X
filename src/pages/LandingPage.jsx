@@ -700,10 +700,10 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-200 ${
+      className={`sticky top-0 z-50 transition-all duration-300 backdrop-blur-xl backdrop-saturate-150 ${
         scrolled
-          ? 'bg-[var(--wl-bg)]/85 backdrop-blur-md border-b border-[var(--wl-line)] shadow-xs'
-          : 'bg-transparent border-b border-transparent'
+          ? 'bg-[var(--wl-bg)]/45 border-b border-[var(--wl-line)]/80 shadow-[0_4px_30px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.35)]'
+          : 'bg-[var(--wl-bg)]/20 border-b border-[var(--wl-line)]/40 shadow-none'
       }`}
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 flex h-16 items-center justify-between gap-4">
@@ -717,7 +717,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
         </Link>
 
         {/* Center Pill Menu (Exact Worklist 5-Item Pill) */}
-        <nav className="hidden md:flex items-center gap-1 rounded-full bg-[var(--wl-surface-2)]/90 border border-[var(--wl-line)] p-1 shadow-xs backdrop-blur-xs">
+        <nav className="hidden md:flex items-center gap-1 rounded-full bg-[var(--wl-surface-2)]/60 border border-[var(--wl-line)]/70 p-1 shadow-xs backdrop-blur-md">
           <a href="#search-dir" className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-[var(--wl-muted)] hover:text-[var(--wl-fg)] transition-colors">
             How it works
           </a>
