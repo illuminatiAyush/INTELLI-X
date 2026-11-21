@@ -218,10 +218,8 @@ const AuthPage = () => {
           </div>
 
           {/* INTELLIX wordmark */}
-          <div>
-            <h1 className="text-5xl font-black tracking-tight leading-none text-gray-900">
-              INTELLI<span className="text-gray-400">X</span>
-            </h1>
+          <div className="flex flex-col items-center">
+            <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-10 w-auto object-contain" />
             <div className="w-8 h-0.5 bg-gray-400 mx-auto mt-4 mb-4 rounded-full" />
             <p className="text-sm text-gray-500 leading-relaxed max-w-[200px]">
               The <strong className="text-gray-800">Intelligent</strong> Operating System<br />
@@ -244,10 +242,7 @@ const AuthPage = () => {
       >
         {/* Mobile logo */}
         <div className="absolute top-6 left-10 lg:hidden flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center">
-            <span className="text-white font-black text-sm">iX</span>
-          </div>
-          <span className="text-gray-900 font-bold text-sm">IntelliX</span>
+          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-6 w-auto object-contain" />
         </div>
 
         <AnimatePresence mode="wait">

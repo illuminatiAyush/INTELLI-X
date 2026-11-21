@@ -25,8 +25,12 @@ const Footer = () => {
           
           {/* Brand Section */}
           <div className="md:col-span-2 space-y-8">
-            <Link to="/" className={`text-xl font-semibold tracking-tight ${isDark ? 'text-white' : 'text-gray-950'}`}>
-              IntelliX
+            <Link to="/" className="inline-block py-1" aria-label="IntelliX">
+              <img
+                src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+                alt="IntelliX"
+                className="h-7 w-auto object-contain"
+              />
             </Link>
             
             <p className={`text-sm leading-relaxed max-w-xs ${textColor}`}>

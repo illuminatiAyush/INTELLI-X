@@ -89,8 +89,12 @@ const Navbar = () => {
         whileHover={{ opacity: 1 }}
         transition={{ duration: 0.16 }}
       >
-        <Link to="/" className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
-          IntelliX
+        <Link to="/" className="inline-block py-1" aria-label="IntelliX">
+          <img
+            src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+            alt="IntelliX"
+            className="h-6 w-auto object-contain"
+          />
         </Link>
       </motion.div>
 

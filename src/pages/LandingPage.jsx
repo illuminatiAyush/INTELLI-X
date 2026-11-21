@@ -376,36 +376,62 @@ function DotWordmark({ text = "INTELLI-X" }) {
       canvas.height = height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Offscreen rasterization
-      const offCanvas = document.createElement("canvas");
-      offCanvas.width = width;
-      offCanvas.height = height;
-      const offCtx = offCanvas.getContext("2d");
-      const fontFamily = getComputedStyle(document.body).fontFamily || "sans-serif";
-      offCtx.font = `700 100px ${fontFamily}`;
-      const fontSize = Math.min((100 * width) / offCtx.measureText(text).width, 1.45 * height);
-      offCtx.font = `700 ${fontSize}px ${fontFamily}`;
-      offCtx.textAlign = "center";
-      offCtx.textBaseline = "alphabetic";
-      const baselineY = height - 0.72 * fontSize;
-      offCtx.fillText(text, width / 2, height + 0.06 * fontSize);
+      // Offscreen rasterization using official brand logo
+      const logoImg = new Image();
+      logoImg.src = "/intellix-wordmark-white.png";
 
-      const imgData = offCtx.getImageData(0, 0, width, height).data;
-      points = [];
-      for (let row = 0, y = 0; y < height; row++, y += 4) {
-        for (let col = 0, x = 0; x < width; col++, x += 4) {
-          const pixelAlpha = imgData[(Math.floor(y + 2) * width + Math.floor(x + 2)) * 4 + 3];
-          if (pixelAlpha > 128) {
-            points.push({
-              x,
-              y,
-              t: Math.max(0, (y - baselineY) / (height - baselineY)),
-              b: BAYER_4X4[(row % 4) * 4 + (col % 4)]
-            });
+      const rasterize = (img) => {
+        const offCanvas = document.createElement("canvas");
+        offCanvas.width = width;
+        offCanvas.height = height;
+        const offCtx = offCanvas.getContext("2d");
+        if (!offCtx) return;
+
+        let baselineY = height * 0.85;
+
+        if (img && img.complete && img.naturalWidth > 0) {
+          const imgAspect = img.naturalWidth / img.naturalHeight;
+          const targetW = Math.min(width * 0.94, height * imgAspect * 1.05);
+          const targetH = targetW / imgAspect;
+          const drawX = (width - targetW) / 2;
+          const drawY = (height - targetH) / 2;
+          offCtx.drawImage(img, drawX, drawY, targetW, targetH);
+          baselineY = drawY + targetH;
+        } else {
+          const fontFamily = getComputedStyle(document.body).fontFamily || "sans-serif";
+          offCtx.font = `700 100px ${fontFamily}`;
+          const fontSize = Math.min((100 * width) / offCtx.measureText(text).width, 1.45 * height);
+          offCtx.font = `700 ${fontSize}px ${fontFamily}`;
+          offCtx.textAlign = "center";
+          offCtx.textBaseline = "alphabetic";
+          baselineY = height - 0.72 * fontSize;
+          offCtx.fillText(text, width / 2, height + 0.06 * fontSize);
+        }
+
+        const imgData = offCtx.getImageData(0, 0, width, height).data;
+        points = [];
+        for (let row = 0, y = 0; y < height; row++, y += 4) {
+          for (let col = 0, x = 0; x < width; col++, x += 4) {
+            const pixelAlpha = imgData[(Math.floor(y + 2) * width + Math.floor(x + 2)) * 4 + 3];
+            if (pixelAlpha > 120) {
+              points.push({
+                x,
+                y,
+                t: Math.max(0, (y - (height * 0.2)) / (height * 0.8)),
+                b: BAYER_4X4[(row % 4) * 4 + (col % 4)]
+              });
+            }
           }
         }
+        render();
+      };
+
+      if (logoImg.complete && logoImg.naturalWidth > 0) {
+        rasterize(logoImg);
+      } else {
+        logoImg.onload = () => rasterize(logoImg);
+        rasterize(null);
       }
-      render();
     };
 
     const render = () => {
@@ -525,14 +551,13 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
       }`}
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 flex h-16 items-center justify-between gap-4">
-        {/* Brand */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-7 h-7 rounded-lg overflow-hidden flex items-center justify-center shrink-0 shadow-xs">
-            <img src="/intellix-icon.svg" alt="Intelli-X" className="w-full h-full object-contain" />
-          </div>
-          <span className="font-bold tracking-tight text-[17px] text-[var(--wl-fg)]">
-            INTELLI<span className="text-blue-500">-X</span>
-          </span>
+        {/* Brand: Official IntelliX Wordmark */}
+        <Link to="/" className="flex items-center group py-1" aria-label="IntelliX">
+          <img
+            src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+            alt="IntelliX"
+            className="h-6 sm:h-7 w-auto object-contain transition-opacity duration-200"
+          />
         </Link>
 
         {/* Center Pill Menu (Exact Worklist 5-Item Pill) */}
@@ -635,6 +660,13 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-b border-[var(--wl-line)] bg-[var(--wl-bg)] px-4 py-3 space-y-2">
+          <div className="pb-2 border-b border-[var(--wl-line)] flex items-center justify-between">
+            <img
+              src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+              alt="IntelliX"
+              className="h-5 w-auto object-contain"
+            />
+          </div>
           <a
             href="#search-dir"
             onClick={() => setMobileMenuOpen(false)}
@@ -757,11 +789,13 @@ const Hero = () => {
             {/* Header row */}
             <div className="flex flex-wrap items-center justify-between border-b border-[var(--wl-line)] pb-4 mb-4 gap-3">
               <div className="flex items-center gap-2">
-                <svg viewBox="0 0 32 20" fill="none" className="w-5 h-3.5 text-blue-500">
-                  <path d="M3 14C6 4 10 4 13 14C16 4 20 4 23 14C26 6 29 6 31 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                </svg>
-                <span className="font-semibold text-sm text-[var(--wl-fg)]">Intelli-X Workspace</span>
-                <span className="rounded-md bg-[var(--wl-surface-2)] px-2 py-0.5 text-[11px] text-[var(--wl-muted)]">Sessions</span>
+                <img
+                  src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+                  alt="IntelliX"
+                  className="h-4 sm:h-5 w-auto object-contain"
+                />
+                <span className="rounded-md bg-[var(--wl-surface-2)] px-2 py-0.5 text-[11px] text-[var(--wl-muted)] font-medium">Workspace</span>
+                <span className="text-[12px] text-[var(--wl-faint)]">Sessions</span>
                 <span className="text-[12px] text-[var(--wl-faint)]">Attendance</span>
                 <span className="text-[12px] text-[var(--wl-faint)]">Proofs <span className="rounded-full bg-blue-500/20 px-1.5 py-0.2 text-blue-500 text-[10px]">6</span></span>
               </div>
@@ -2752,14 +2786,15 @@ const InteractiveFooter = ({ isDark }) => {
 
         {/* 4-Column Footer Navigation Links */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 py-14 border-t border-[var(--wl-line)]">
-          {/* Brand Col */}
+          {/* Brand Col: Official IntelliX Logo Wordmark */}
           <div className="col-span-2 md:col-span-1 space-y-3">
-            <div className="flex items-center gap-1.5 font-bold tracking-tight text-[17px] text-[var(--wl-fg)]">
-              <svg viewBox="0 0 32 20" fill="none" className="w-6 h-4 text-blue-500">
-                <path d="M3 14C6 4 10 4 13 14C16 4 20 4 23 14C26 6 29 6 31 10" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" />
-              </svg>
-              <span>INTELLI<span className="font-editorial-italic font-normal text-blue-500">-X</span></span>
-            </div>
+            <Link to="/" className="inline-block py-1" aria-label="IntelliX">
+              <img
+                src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+                alt="IntelliX"
+                className="h-6 sm:h-7 w-auto object-contain"
+              />
+            </Link>
             <div className="text-sm font-normal text-[var(--wl-fg)]">
               Empowering educators.<br />
               <span className="text-[var(--wl-muted)] font-editorial-italic">Inspiring students.</span>
@@ -2826,7 +2861,7 @@ const InteractiveFooter = ({ isDark }) => {
 
       {/* Giant Interactive Dot Matrix Watermark Canvas across bottom */}
       <div className="w-full relative border-t border-[var(--wl-line)]">
-        <DotWordmark text="INTELLI-X" />
+        <DotWordmark text="IntelliX" />
       </div>
     </footer>
   );

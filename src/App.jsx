@@ -55,15 +55,14 @@ const Preloader = ({ onComplete }) => {
       exit={{ y: '-100%', transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
     >
       <div className="overflow-hidden">
-        <motion.h1
+        <motion.div
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
-          className="text-5xl md:text-7xl font-light tracking-tighter"
-          style={{ fontFamily: "'Inter', sans-serif" }}
+          className="flex items-center justify-center p-4"
         >
-          INTELLI-X<span className="text-blue-500">.</span>
-        </motion.h1>
+          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-14 sm:h-20 w-auto object-contain" />
+        </motion.div>
       </div>
     </motion.div>
   );

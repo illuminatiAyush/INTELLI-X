@@ -44,14 +44,16 @@ const DashboardLayout = () => {
   const SidebarContent = ({ collapsed = false, isDesktop = false }) => (
     <div className="dashboard-sidebar h-full flex flex-col">
       {/* Logo row */}
-      <div className="flex items-center gap-2 px-4 py-4 border-b border-dashboard-border">
+      <div className="flex items-center gap-2.5 px-4 py-4 border-b border-dashboard-border">
         <div className="w-8 h-8 bg-dashboard-text rounded-lg flex items-center justify-center flex-shrink-0">
           <span className="text-white font-bold text-sm">iX</span>
         </div>
         {!collapsed && (
-          <span className="text-dashboard-text font-bold text-base whitespace-nowrap">
-            IntelliX
-          </span>
+          <img
+            src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+            alt="IntelliX"
+            className="h-5 w-auto object-contain"
+          />
         )}
       </div>
 
