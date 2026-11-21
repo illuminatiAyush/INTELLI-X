@@ -271,15 +271,16 @@ const BatchList = () => {
               onClick={() => handleRowClick(batch)}
               className="dashboard-card flex flex-col p-5 group cursor-pointer hover:shadow-md transition-all"
             >
-              {/* Top: Year & Status */}
+              {/* Top: Year & Code */}
               <div className="flex justify-between items-center mb-4">
-                <span className="text-xs font-semibold tracking-wide text-gray-500 uppercase bg-gray-50 px-2.5 py-1 rounded border border-gray-200">
+                <span className="text-xs font-semibold tracking-wide text-dashboard-text-secondary uppercase bg-dashboard-border-light px-2.5 py-1 rounded border border-dashboard-border">
                   {new Date(batch.created_at).getFullYear()} BATCH
                 </span>
-                <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[10px] uppercase tracking-wide font-semibold text-green-600">Ongoing</span>
-                </div>
+                {batch.join_code && (
+                  <span className="text-[11px] font-mono font-medium text-dashboard-text-muted bg-dashboard-border-light/60 px-2 py-0.5 rounded border border-dashboard-border">
+                    {batch.join_code}
+                  </span>
+                )}
               </div>
 
               {/* Middle: Title & Tags */}
@@ -288,11 +289,8 @@ const BatchList = () => {
                   {batch.name}
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                    #{batch.subject || 'Core'}
-                  </span>
-                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-dashboard-border-light text-dashboard-text-secondary border border-dashboard-border">
-                    Div A
+                  <span className="px-2.5 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                    {batch.subject || 'Core'}
                   </span>
                 </div>
               </div>
