@@ -435,19 +435,19 @@ const TestManagement = () => {
   if (role === 'admin') {
     const adminBatchTests = tests.filter(t => t.batch_id === adminSelBatch)
     const adminTestObj = tests.find(t => t.id === adminSelTest)
-    const selectCls = 'w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-sm outline-none focus:border-blue-400 transition-all appearance-none cursor-pointer'
-    const labelCls = 'block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2'
+    const selectCls = 'w-full px-4 py-2.5 rounded-xl bg-dashboard-card border border-dashboard-border text-dashboard-text text-sm outline-none focus:border-dashboard-primary transition-all appearance-none cursor-pointer'
+    const labelCls = 'block text-xs font-bold text-dashboard-text-secondary uppercase tracking-wider mb-2'
 
     return (
       <div className="space-y-6">
         <div>
           <motion.h1 initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-bold text-gray-900 tracking-tight">Tests &amp; Results</motion.h1>
-          <p className="text-gray-600 text-sm mt-1 font-medium">View and download test result reports</p>
+            className="text-3xl font-bold text-dashboard-text tracking-tight">Tests &amp; Results</motion.h1>
+          <p className="text-dashboard-text-secondary text-sm mt-1 font-medium">View and download test result reports</p>
         </div>
 
         {/* Selectors card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-dashboard-card p-6 rounded-2xl border border-dashboard-border">
           <div>
             <label className={labelCls}>Batch</label>
             <select
@@ -479,12 +479,12 @@ const TestManagement = () => {
         </div>
 
         {/* Results table */}
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="bg-dashboard-card border border-dashboard-border rounded-2xl overflow-hidden">
           {adminSelTest && adminResults.length > 0 && (
-            <div className="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
+            <div className="p-5 border-b border-dashboard-border flex justify-between items-center bg-dashboard-border-light/40">
               <div>
-                <p className="font-semibold text-gray-900">{adminTestObj?.title}</p>
-                <p className="text-xs text-gray-600 mt-0.5">{adminResults.length} students &bull; Total: {adminTestObj?.total_marks} marks</p>
+                <p className="font-semibold text-dashboard-text">{adminTestObj?.title}</p>
+                <p className="text-xs text-dashboard-text-secondary mt-0.5">{adminResults.length} students &bull; Total: {adminTestObj?.total_marks} marks</p>
               </div>
               <button
                 onClick={downloadAdminResultsPDF}
@@ -572,22 +572,22 @@ const TestManagement = () => {
             <motion.h1 
               initial={{ opacity: 0, x: -10 }} 
               animate={{ opacity: 1, x: 0 }} 
-              className="text-3xl font-bold text-gray-900 tracking-tight"
+              className="text-3xl font-bold text-dashboard-text tracking-tight"
             >
               Tests & Results
             </motion.h1>
-            <p className="text-gray-600 text-sm mt-1 font-medium">{tests.length} tests conducted</p>
+            <p className="text-dashboard-text-secondary text-sm mt-1 font-medium">{tests.length} tests conducted</p>
           </div>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dashboard-text-muted" />
             <input
               type="text"
               placeholder="Search tests..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-900 text-sm placeholder-gray-400 outline-none focus:border-blue-400 focus:bg-white w-64 transition-all"
+              className="pl-10 pr-4 py-2.5 rounded-xl bg-dashboard-card border border-dashboard-border text-dashboard-text text-sm placeholder-dashboard-text-muted outline-none focus:border-dashboard-primary w-64 transition-all"
             />
           </div>
           {canManage && (
@@ -596,7 +596,7 @@ const TestManagement = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setAiModalOpen(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black hover:bg-gray-200 text-sm font-bold active:scale-95 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-dashboard-primary text-white hover:opacity-90 text-sm font-bold active:scale-95 transition-all shadow-sm"
               >
                 <Brain className="w-5 h-5 font-bold" /> Create AI Test
               </motion.button>
@@ -604,7 +604,7 @@ const TestManagement = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setModalOpen(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-900 text-sm font-semibold hover:border-gray-300 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-dashboard-card border border-dashboard-border text-dashboard-text text-sm font-semibold hover:bg-dashboard-border-light transition-all"
               >
                 <Plus className="w-5 h-5" /> Manual Test
               </motion.button>
@@ -613,7 +613,7 @@ const TestManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+      <div className="bg-dashboard-card border border-dashboard-border rounded-2xl overflow-hidden">
         <DataTable columns={columns} data={filtered} emptyMessage="No tests found" />
       </div>
 

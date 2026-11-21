@@ -25,20 +25,20 @@ const DataTable = ({ columns, data, onRowClick, emptyMessage = 'No data found' }
   })
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white/30 backdrop-blur-sm">
+    <div className="overflow-x-auto rounded-xl border border-dashboard-border bg-dashboard-card backdrop-blur-sm">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50/50">
+          <tr className="border-b border-dashboard-border bg-dashboard-border-light/60">
             {columns.map((col) => (
               <th
                 key={col.key}
                 onClick={() => col.sortable !== false && handleSort(col.key)}
-                className={`text-left px-5 py-3.5 text-xs font-semibold text-gray-600 uppercase tracking-wider transition-colors ${col.sortable !== false ? 'cursor-pointer hover:text-gray-900 select-none' : ''}`}
+                className={`text-left px-5 py-3.5 text-xs font-semibold text-dashboard-text-secondary uppercase tracking-wider transition-colors ${col.sortable !== false ? 'cursor-pointer hover:text-dashboard-text select-none' : ''}`}
               >
                 <div className="flex items-center gap-1.5">
                   {col.label}
                   {sortKey === col.key && (
-                    <div className="text-white">
+                    <div className="text-dashboard-text">
                       {sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                     </div>
                   )}
@@ -50,7 +50,7 @@ const DataTable = ({ columns, data, onRowClick, emptyMessage = 'No data found' }
         <tbody>
           {sorted.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="text-center py-16 text-gray-600 font-medium">
+              <td colSpan={columns.length} className="text-center py-16 text-dashboard-text-secondary font-medium">
                 {emptyMessage}
               </td>
             </tr>
@@ -62,10 +62,10 @@ const DataTable = ({ columns, data, onRowClick, emptyMessage = 'No data found' }
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
                 onClick={() => onRowClick?.(row)}
-                className={`border-b border-gray-200/50 ${onRowClick ? 'cursor-pointer hover:bg-white/5' : ''} transition-colors last:border-0`}
+                className={`border-b border-dashboard-border/60 ${onRowClick ? 'cursor-pointer hover:bg-dashboard-border-light/50' : ''} transition-colors last:border-0`}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-5 py-4 text-gray-900 font-medium">
+                  <td key={col.key} className="px-5 py-4 text-dashboard-text font-medium">
                     {col.render ? col.render(row) : row[col.key]}
                   </td>
                 ))}

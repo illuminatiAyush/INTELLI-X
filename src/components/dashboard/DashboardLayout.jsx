@@ -135,7 +135,7 @@ const DashboardLayout = () => {
   )
 
   return (
-    <div className="min-h-screen bg-dashboard-bg flex dashboard-layout">
+    <div className={`min-h-screen bg-dashboard-bg text-dashboard-text flex dashboard-layout ${isDark ? 'dark' : 'light'}`}>
 
       {/* ── Desktop Sidebar ── */}
       <motion.aside
@@ -153,7 +153,7 @@ const DashboardLayout = () => {
           ease: [0.25, 1, 0.5, 1], 
           duration: 0.35 
         }}
-        className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white border-r border-dashboard-border overflow-hidden shadow-xs will-change-[width]"
+        className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-dashboard-card border-r border-dashboard-border overflow-hidden shadow-xs will-change-[width]"
       >
         <SidebarContent collapsed={!(sidebarOpen || sidebarHovered)} isDesktop={true} />
       </motion.aside>
@@ -167,14 +167,14 @@ const DashboardLayout = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="lg:hidden fixed inset-0 bg-black/30 z-40 backdrop-blur-sm"
+              className="lg:hidden fixed inset-0 bg-black/40 z-40 backdrop-blur-sm"
             />
             <motion.aside
               initial={{ x: -240 }}
               animate={{ x: 0 }}
               exit={{ x: -240 }}
               transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-dashboard-border"
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 bg-dashboard-card border-r border-dashboard-border"
               style={{ width: 240 }}
             >
               <SidebarContent collapsed={false} isDesktop={false} />
@@ -218,10 +218,11 @@ const DashboardLayout = () => {
             <NotificationsMenu />
             <button
               onClick={toggleTheme}
-              className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+              className="p-2 text-dashboard-text-secondary hover:text-dashboard-text rounded-lg hover:bg-dashboard-border-light transition-colors flex-shrink-0 cursor-pointer"
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle theme"
             >
-              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-slate-600" />}
             </button>
           </div>
         </header>
@@ -266,10 +267,11 @@ const DashboardLayout = () => {
             <NotificationsMenu />
             <button
               onClick={toggleTheme}
-              className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+              className="p-2 text-dashboard-text-secondary hover:text-dashboard-text rounded-lg hover:bg-dashboard-border-light transition-colors flex-shrink-0 cursor-pointer"
               title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle theme"
             >
-              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-slate-600" />}
             </button>
           </div>
         </header>

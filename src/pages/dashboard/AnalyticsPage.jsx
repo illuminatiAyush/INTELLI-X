@@ -352,11 +352,11 @@ const AnalyticsPage = () => {
           <motion.h1
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-bold text-gray-900 tracking-tight"
+            className="text-3xl font-bold text-dashboard-text tracking-tight"
           >
             Performance Analytics
           </motion.h1>
-          <p className="text-gray-600 text-sm mt-1 font-medium">
+          <p className="text-dashboard-text-secondary text-sm mt-1 font-medium">
             Comprehensive insights into your academic journey and learning progress
           </p>
         </div>
@@ -511,11 +511,11 @@ const AnalyticsPage = () => {
         <motion.h1
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          className="text-3xl font-bold text-gray-900 tracking-tight"
+          className="text-3xl font-bold text-dashboard-text tracking-tight"
         >
           {role === 'master_admin' ? 'System Analytics' : role === 'teacher' ? 'My Batch Analytics' : 'Institute Analytics'}
         </motion.h1>
-        <p className="text-gray-600 text-sm mt-1 font-medium">
+        <p className="text-dashboard-text-secondary text-sm mt-1 font-medium">
           {role === 'teacher' 
             ? 'Performance analytics for your assigned batches' 
             : 'Comprehensive performance and engagement metrics'

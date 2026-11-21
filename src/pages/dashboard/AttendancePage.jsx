@@ -75,10 +75,10 @@ const StudentAttendanceView = ({ user }) => {
 
   if (!subjects.length) {
     return (
-      <div className="text-center py-16 border border-dashed border-gray-300 rounded-2xl bg-white">
-        <ClipboardCheck className="w-12 h-12 mx-auto mb-3 opacity-20" />
-        <p className="text-gray-600 font-medium">You are not enrolled in any subjects yet.</p>
-        <p className="text-gray-600 text-sm mt-1 opacity-60">Ask your teacher for a join code to get started.</p>
+      <div className="text-center py-16 border border-dashed border-dashboard-border rounded-2xl bg-dashboard-card">
+        <ClipboardCheck className="w-12 h-12 mx-auto mb-3 opacity-20 text-dashboard-text" />
+        <p className="text-dashboard-text font-medium">You are not enrolled in any subjects yet.</p>
+        <p className="text-dashboard-text-secondary text-sm mt-1 opacity-60">Ask your teacher for a join code to get started.</p>
       </div>
     )
   }
@@ -88,7 +88,7 @@ const StudentAttendanceView = ({ user }) => {
   return (
     <div className="space-y-3">
       {/* Table Header */}
-      <div className="hidden sm:grid grid-cols-12 gap-4 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-gray-600">
+      <div className="hidden sm:grid grid-cols-12 gap-4 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-dashboard-text-secondary">
         <span className="col-span-5 flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Subject</span>
         <span className="col-span-4 flex items-center gap-1.5"><User className="w-3.5 h-3.5" /> Teacher</span>
         <span className="col-span-2 flex items-center gap-1.5"><Percent className="w-3.5 h-3.5" /> Attendance</span>
@@ -101,34 +101,34 @@ const StudentAttendanceView = ({ user }) => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
-          className="rounded-2xl border border-gray-200 bg-white overflow-hidden"
+          className="rounded-2xl border border-dashboard-border bg-dashboard-card overflow-hidden"
         >
           {/* Subject Row */}
           <button
             onClick={() => toggle(batch.id)}
-            className="w-full grid grid-cols-12 gap-4 items-center px-5 py-4 hover:bg-white transition-colors text-left"
+            className="w-full grid grid-cols-12 gap-4 items-center px-5 py-4 hover:bg-dashboard-border-light/50 transition-colors text-left"
           >
             {/* Subject name */}
             <div className="col-span-5 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[var(--border-subtle)] text-gray-900 flex items-center justify-center font-bold text-sm flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-dashboard-border-light text-dashboard-text flex items-center justify-center font-bold text-sm flex-shrink-0">
                 {batch.name.charAt(0).toUpperCase()}
               </div>
-              <span className="font-semibold text-gray-900 text-sm truncate">{batch.name}</span>
+              <span className="font-semibold text-dashboard-text text-sm truncate">{batch.name}</span>
             </div>
 
             {/* Teacher */}
             <div className="col-span-4 flex items-center gap-2">
-              <User className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
-              <span className="text-sm text-gray-600 truncate">{teacher}</span>
+              <User className="w-3.5 h-3.5 text-dashboard-text-secondary flex-shrink-0" />
+              <span className="text-sm text-dashboard-text-secondary truncate">{teacher}</span>
             </div>
 
             {/* Attendance % */}
             <div className="col-span-2">
               {rate === null ? (
-                <span className="text-xs text-gray-600 opacity-50">No data</span>
+                <span className="text-xs text-dashboard-text-secondary opacity-50">No data</span>
               ) : (
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 rounded-full bg-[var(--border-subtle)] overflow-hidden max-w-[60px]">
+                  <div className="flex-1 h-1.5 rounded-full bg-dashboard-border-light overflow-hidden max-w-[60px]">
                     <div
                       className={`h-full rounded-full transition-all ${rate >= 75 ? 'bg-emerald-500' : rate >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
                       style={{ width: `${rate}%` }}
@@ -144,8 +144,8 @@ const StudentAttendanceView = ({ user }) => {
             {/* Expand icon */}
             <div className="col-span-1 flex justify-end">
               {expanded === batch.id
-                ? <ChevronUp className="w-4 h-4 text-gray-600" />
-                : <ChevronDown className="w-4 h-4 text-gray-600" />
+                ? <ChevronUp className="w-4 h-4 text-dashboard-text-secondary" />
+                : <ChevronDown className="w-4 h-4 text-dashboard-text-secondary" />
               }
             </div>
           </button>
@@ -158,25 +158,25 @@ const StudentAttendanceView = ({ user }) => {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="overflow-hidden border-t border-gray-200"
+                className="overflow-hidden border-t border-dashboard-border"
               >
-                <div className="px-5 py-4 bg-gray-50/40">
+                <div className="px-5 py-4 bg-dashboard-border-light/30">
                   {records.length === 0 ? (
-                    <p className="text-sm text-gray-600 text-center py-4 opacity-60">
+                    <p className="text-sm text-dashboard-text-secondary text-center py-4 opacity-60">
                       No attendance recorded yet for this subject.
                     </p>
                   ) : (
                     <>
                       {/* Summary pills */}
                       <div className="flex items-center gap-3 mb-4 flex-wrap">
-                        <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Summary</span>
+                        <span className="text-xs font-semibold text-dashboard-text-secondary uppercase tracking-wider">Summary</span>
                         <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold">
                           Present: {records.filter(r => r.status === 'present').length}
                         </span>
                         <span className="px-3 py-1 rounded-full bg-red-500/10 text-red-500 text-xs font-bold">
                           Absent: {records.filter(r => r.status === 'absent').length}
                         </span>
-                        <span className="px-3 py-1 rounded-full bg-[var(--border-subtle)] text-gray-600 text-xs font-bold">
+                        <span className="px-3 py-1 rounded-full bg-dashboard-border-light text-dashboard-text text-xs font-bold">
                           Total: {records.length}
                         </span>
                       </div>
@@ -391,7 +391,7 @@ const AdminAttendanceView = ({ user, role }) => {
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-dashboard-card p-6 rounded-2xl border border-dashboard-border">
         <div className="flex-1">
           <Select
             label="Select Subject"
@@ -401,12 +401,12 @@ const AdminAttendanceView = ({ user, role }) => {
           />
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-semibold text-gray-600 mb-1.5 uppercase tracking-wider">Date</label>
+          <label className="block text-sm font-semibold text-dashboard-text-secondary mb-1.5 uppercase tracking-wider">Date</label>
           <input
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-900 text-sm outline-none focus:border-white focus:bg-white transition-all"
+            className="w-full px-4 py-2.5 rounded-xl bg-dashboard-card border border-dashboard-border text-dashboard-text text-sm outline-none focus:border-dashboard-primary transition-all"
           />
         </div>
       </div>

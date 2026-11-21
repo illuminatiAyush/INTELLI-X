@@ -184,7 +184,7 @@ const LeaderboardPage = ({ hideHeader = false }) => {
               <motion.h1 
                 initial={{ opacity: 0, x: -10 }} 
                 animate={{ opacity: 1, x: 0 }} 
-                className="text-3xl font-bold text-gray-900 tracking-tight"
+                className="text-3xl font-bold text-dashboard-text tracking-tight"
               >
                 Leaderboard
               </motion.h1>
@@ -203,10 +203,10 @@ const LeaderboardPage = ({ hideHeader = false }) => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-        <div className="bg-white p-4 rounded-2xl border border-gray-200">
+        <div className="bg-dashboard-card p-4 rounded-2xl border border-dashboard-border">
           <Select label="Select Batch" options={batchOptions} value={selectedBatch} onChange={(e) => setSelectedBatch(e.target.value)} />
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-gray-200">
+        <div className="bg-dashboard-card p-4 rounded-2xl border border-dashboard-border">
           <Select 
             label="Select Test" 
             options={testOptions} 
@@ -218,12 +218,12 @@ const LeaderboardPage = ({ hideHeader = false }) => {
       </div>
 
       {!selectedBatch ? (
-        <div className="text-center py-20 bg-white/50 rounded-3xl border border-dashed border-gray-200">
-          <p className="text-gray-600 font-medium">Please select a batch to view leaderboard</p>
+        <div className="text-center py-20 bg-dashboard-card/50 rounded-3xl border border-dashed border-dashboard-border">
+          <p className="text-dashboard-text-secondary font-medium">Please select a batch to view leaderboard</p>
         </div>
       ) : tests.length === 0 ? (
-        <div className="text-center py-20 bg-white/50 rounded-3xl border border-dashed border-gray-200">
-          <p className="text-gray-600 font-medium">No published tests found for this batch</p>
+        <div className="text-center py-20 bg-dashboard-card/50 rounded-3xl border border-dashed border-dashboard-border">
+          <p className="text-dashboard-text-secondary font-medium">No published tests found for this batch</p>
         </div>
       ) : (isInitialLoading || loading) ? (
         <div className="space-y-4 max-w-4xl">

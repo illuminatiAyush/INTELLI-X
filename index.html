@@ -22,24 +22,23 @@
   <!-- Apply dark class immediately before React loads to prevent white flash -->
   <script>
     ;(function () {
-      var saved = localStorage.getItem('theme')
-      // Force dark if no preference or old 'light' was saved
-      if (!saved || saved === 'light') {
-        localStorage.setItem('theme', 'dark')
-      }
-      var isDark = localStorage.getItem('theme') !== 'light'
-      var root = document.documentElement
-      root.classList.remove('light-mode', 'dark')
-      if (isDark) {
-        root.classList.add('dark')
-        root.style.backgroundColor = '#2C2C2C'
-        root.style.colorScheme = 'dark'
-      } else {
-        root.classList.add('light-mode')
-        root.style.backgroundColor = '#E8F4F5'
-        root.style.colorScheme = 'light'
-      }
-    })()
+      try {
+        var saved = localStorage.getItem('theme') || localStorage.getItem('intellix_theme');
+        var isDark = saved ? (saved === 'dark') : true;
+        var root = document.documentElement;
+        if (isDark) {
+          root.classList.add('dark');
+          root.classList.remove('light-mode', 'light');
+          root.setAttribute('data-theme', 'dark');
+          root.style.colorScheme = 'dark';
+        } else {
+          root.classList.remove('dark');
+          root.classList.add('light-mode', 'light');
+          root.setAttribute('data-theme', 'light');
+          root.style.colorScheme = 'light';
+        }
+      } catch (e) {}
+    })();
   </script>
 </head>
 

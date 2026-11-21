@@ -232,12 +232,12 @@ const BatchList = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Batches</h1>
-          <p className="text-sm text-gray-600 mt-1">{batches.length} active batches</p>
+          <h1 className="text-2xl font-semibold text-dashboard-text">Batches</h1>
+          <p className="text-sm text-dashboard-text-secondary mt-1">{batches.length} active batches</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dashboard-text-muted" />
             <input
               type="text"
               placeholder="Search batches..."
@@ -260,8 +260,8 @@ const BatchList = () => {
 
       {/* Grid Layout replacing DataTable */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 bg-white border border-gray-200 rounded-2xl">
-          <p className="text-gray-600 font-medium">No batches found</p>
+        <div className="flex flex-col items-center justify-center h-64 bg-dashboard-card border border-dashboard-border rounded-2xl">
+          <p className="text-dashboard-text-secondary font-medium">No batches found</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -284,26 +284,26 @@ const BatchList = () => {
 
               {/* Middle: Title & Tags */}
               <div className="flex flex-col gap-2 mb-4 flex-1">
-                <h2 className="text-xl font-bold text-gray-900 leading-tight line-clamp-2">
+                <h2 className="text-xl font-bold text-dashboard-text leading-tight line-clamp-2">
                   {batch.name}
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
                     #{batch.subject || 'Core'}
                   </span>
-                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200">
+                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-dashboard-border-light text-dashboard-text-secondary border border-dashboard-border">
                     Div A
                   </span>
                 </div>
               </div>
 
               {/* Bottom: Teacher & CTA */}
-              <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+              <div className="pt-4 border-t border-dashboard-border flex items-center justify-between">
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-700 flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-dashboard-border-light flex items-center justify-center text-xs font-semibold text-dashboard-text flex-shrink-0">
                     {batch.teachers?.name?.charAt(0) || 'T'}
                   </div>
-                  <span className="text-sm font-medium text-gray-600 truncate">
+                  <span className="text-sm font-medium text-dashboard-text-secondary truncate">
                     {batch.teachers?.name || 'Unassigned'}
                   </span>
                 </div>
@@ -312,7 +312,7 @@ const BatchList = () => {
                   {role === 'admin' && (
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(batch); }}
-                      className="p-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors"
+                      className="p-2 rounded-lg bg-dashboard-border-light hover:bg-dashboard-border text-dashboard-text-secondary transition-colors"
                       title="Edit Batch"
                     >
                       <Pencil className="w-4 h-4" />
