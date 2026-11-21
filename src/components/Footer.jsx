@@ -25,11 +25,16 @@ const Footer = () => {
           
           {/* Brand Section */}
           <div className="md:col-span-2 space-y-8">
-            <Link to="/" className="inline-block py-1" aria-label="IntelliX">
+            <Link to="/" className="inline-flex items-center gap-2.5 py-1" aria-label="IntelliX">
+              <img
+                src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"}
+                alt="iX"
+                className="w-7 h-7 object-contain"
+              />
               <img
                 src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
                 alt="IntelliX"
-                className="h-7 w-auto object-contain"
+                className="h-6 w-auto object-contain"
               />
             </Link>
             

@@ -551,12 +551,17 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
       }`}
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 flex h-16 items-center justify-between gap-4">
-        {/* Brand: Official IntelliX Wordmark */}
-        <Link to="/" className="flex items-center group py-1" aria-label="IntelliX">
+        {/* Brand: Official IntelliX Logo & Wordmark */}
+        <Link to="/" className="flex items-center gap-2 sm:gap-2.5 group py-1" aria-label="IntelliX">
+          <img
+            src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"}
+            alt="iX"
+            className="w-6 h-6 sm:w-7 sm:h-7 object-contain shrink-0"
+          />
           <img
             src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
             alt="IntelliX"
-            className="h-6 sm:h-7 w-auto object-contain transition-opacity duration-200"
+            className="h-5 sm:h-5.5 w-auto object-contain transition-opacity duration-200"
           />
         </Link>
 
@@ -660,11 +665,16 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-b border-[var(--wl-line)] bg-[var(--wl-bg)] px-4 py-3 space-y-2">
-          <div className="pb-2 border-b border-[var(--wl-line)] flex items-center justify-between">
+          <div className="pb-2 border-b border-[var(--wl-line)] flex items-center gap-2">
+            <img
+              src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"}
+              alt="iX"
+              className="w-5 h-5 object-contain shrink-0"
+            />
             <img
               src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
               alt="IntelliX"
-              className="h-5 w-auto object-contain"
+              className="h-4.5 w-auto object-contain"
             />
           </div>
           <a
@@ -2786,13 +2796,18 @@ const InteractiveFooter = ({ isDark }) => {
 
         {/* 4-Column Footer Navigation Links */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 py-14 border-t border-[var(--wl-line)]">
-          {/* Brand Col: Official IntelliX Logo Wordmark */}
+          {/* Brand Col: Official IntelliX Logo & Wordmark */}
           <div className="col-span-2 md:col-span-1 space-y-3">
-            <Link to="/" className="inline-block py-1" aria-label="IntelliX">
+            <Link to="/" className="flex items-center gap-2.5 py-1" aria-label="IntelliX">
+              <img
+                src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"}
+                alt="iX"
+                className="w-7 h-7 object-contain shrink-0"
+              />
               <img
                 src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
                 alt="IntelliX"
-                className="h-6 sm:h-7 w-auto object-contain"
+                className="h-5.5 w-auto object-contain"
               />
             </Link>
             <div className="text-sm font-normal text-[var(--wl-fg)]">

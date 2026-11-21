@@ -209,12 +209,12 @@ const AuthPage = () => {
           transition={{ duration: 0.55, ease: 'easeOut' }}
           className="flex flex-col items-center gap-6 text-center"
         >
-          {/* Big black iX square */}
+          {/* Official iX Brand Icon */}
           <div
-            className="w-44 h-44 rounded-[32px] flex items-center justify-center"
+            className="w-44 h-44 rounded-[32px] flex items-center justify-center p-8 shadow-xl"
             style={{ background: '#111111' }}
           >
-            <span className="text-white font-black text-6xl tracking-tighter select-none">iX</span>
+            <img src="/intellix-icon-white.svg" alt="iX" className="w-full h-full object-contain" />
           </div>
 
           {/* INTELLIX wordmark */}
@@ -240,9 +240,10 @@ const AuthPage = () => {
         className="flex-1 flex items-center justify-center px-8 py-12 bg-white relative"
         style={{ clipPath: 'polygon(5% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
       >
-        {/* Mobile logo */}
+        {/* Mobile logo: Official iX icon + wordmark for white mode */}
         <div className="absolute top-6 left-10 lg:hidden flex items-center gap-2">
-          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-6 w-auto object-contain" />
+          <img src="/intellix-icon-black.svg" alt="iX" className="w-6 h-6 object-contain" />
+          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-5 w-auto object-contain" />
         </div>
 
         <AnimatePresence mode="wait">

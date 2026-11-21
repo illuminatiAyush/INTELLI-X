@@ -75,7 +75,7 @@ const Navbar = () => {
       }}
       className={`fixed max-w-[1240px] px-6 transition-all duration-240 ease-out flex items-center justify-between ${
         scrolled
-          ? `rounded-[14px] py-3.5$1 border ${
+          ? `rounded-[14px] py-3.5 border ${
               isDark 
                 ? 'bg-[#000000]/80 border-white/[0.08] backdrop-blur-[12px]' 
                 : 'bg-white/80 border-black/[0.08] backdrop-blur-[12px]'
@@ -83,17 +83,22 @@ const Navbar = () => {
           : 'bg-transparent py-5 border-transparent'
       }`}
     >
-      {/* Wordmark */}
+      {/* Brand: Official iX Icon + Wordmark */}
       <motion.div
         initial={{ opacity: 0.85 }}
         whileHover={{ opacity: 1 }}
         transition={{ duration: 0.16 }}
       >
-        <Link to="/" className="inline-block py-1" aria-label="IntelliX">
+        <Link to="/" className="inline-flex items-center gap-2 py-1" aria-label="IntelliX">
+          <img
+            src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"}
+            alt="iX"
+            className="w-6 h-6 object-contain"
+          />
           <img
             src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
             alt="IntelliX"
-            className="h-6 w-auto object-contain"
+            className="h-5 w-auto object-contain"
           />
         </Link>
       </motion.div>

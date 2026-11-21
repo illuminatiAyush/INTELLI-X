@@ -113,17 +113,16 @@ const RegisterPage = () => {
         />
 
         <Link to="/" className="flex items-center gap-3 group w-fit">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0"
-            style={{ background: 'var(--text-primary)' }}
-          >
-            <img
-              src={isDark ? '/intellix-icon-black.svg' : '/intellix-icon-white.svg'}
-              alt="IntelliX"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <span className="text-sm font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>IntelliX</span>
+          <img
+            src={isDark ? '/intellix-icon-white.svg' : '/intellix-icon-black.svg'}
+            alt="IntelliX"
+            className="w-8 h-8 object-contain"
+          />
+          <img
+            src={isDark ? '/intellix-wordmark-white.png' : '/intellix-wordmark-black.png'}
+            alt="IntelliX"
+            className="h-5 w-auto object-contain"
+          />
         </Link>
 
         <motion.div

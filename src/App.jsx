@@ -59,9 +59,10 @@ const Preloader = ({ onComplete }) => {
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
-          className="flex items-center justify-center p-4"
+          className="flex items-center justify-center gap-3.5 sm:gap-4 p-4"
         >
-          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-14 sm:h-20 w-auto object-contain" />
+          <img src="/intellix-icon-black.svg" alt="iX" className="h-10 sm:h-14 w-auto object-contain" />
+          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-9 sm:h-13 w-auto object-contain" />
         </motion.div>
       </div>
     </motion.div>
