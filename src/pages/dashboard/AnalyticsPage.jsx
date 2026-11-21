@@ -464,42 +464,9 @@ const AnalyticsPage = () => {
           </motion.div>
         </div>
 
-        {/* Notifications */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Notifications Preferences */}
+        <div>
           <Notifications />
-          
-          {/* Analytics Summary Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-2xl border border-blue-200/60 dark:border-blue-900/40 bg-gradient-to-br from-white via-white to-blue-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/20 p-6 shadow-xs"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                <BarChart3 className="w-5 h-5" />
-              </div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Analytics Summary</h2>
-            </div>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between items-center py-1.5 px-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
-                <span className="text-gray-600 dark:text-gray-300 font-medium">Overall Performance:</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">{overallStats.avgScore}%</span>
-              </div>
-              <div className="flex justify-between items-center py-1.5 px-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
-                <span className="text-gray-600 dark:text-gray-300 font-medium">Attendance Rate:</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">{overallStats.avgAttendance}%</span>
-              </div>
-              <div className="flex justify-between items-center py-1.5 px-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
-                <span className="text-gray-600 dark:text-gray-300 font-medium">Tests Completed:</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">{overallStats.totalTests}</span>
-              </div>
-              <div className="flex justify-between items-center py-1.5 px-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
-                <span className="text-gray-600 dark:text-gray-300 font-medium">Current Rank:</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">{overallStats.rank === '-' ? 'Not Available' : `#${overallStats.rank}`}</span>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
     )

@@ -110,29 +110,12 @@ const AdminDashboard = () => {
 
       {/* ── Header with Greeting ── */}
       <motion.div {...fadeUp()}>
-        <h1 className="text-3xl font-bold text-dashboard-text mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-dashboard-text tracking-tight mb-1">
           {getGreeting()}, {displayName.toLowerCase()}.
         </h1>
-        <div className="flex items-center gap-6 mt-4">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-            <span className="text-sm text-dashboard-text-secondary">
-              <span className="font-semibold text-dashboard-text">{stats.students}</span> Total Students
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-600"></div>
-            <span className="text-sm text-dashboard-text-secondary">
-              <span className="font-semibold text-dashboard-text">{stats.batches}</span> Total Batches
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-orange-600"></div>
-            <span className="text-sm text-dashboard-text-secondary">
-              <span className="font-semibold text-dashboard-text">{stats.tests}</span> Upcoming Tests
-            </span>
-          </div>
-        </div>
+        <p className="text-dashboard-text-secondary text-xs sm:text-sm font-medium">
+          Welcome back to your institute command center
+        </p>
       </motion.div>
 
       {/* ── Quick Actions ── */}
