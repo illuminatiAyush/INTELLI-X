@@ -240,6 +240,162 @@ function AsciiField({ hollow = 0.2, opacity = 1 }) {
   );
 }
 
+// ── CYBER PIXEL MATRIX FIELD (High-tech variation for bottom half: small-tools, batches, pricing, faq) ──
+function PixelMatrixField({ hollow = 0.12, opacity = 0.8, gridStep = 16 }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const mouse = { x: -9999, y: -9999, active: false };
+    let width = 0;
+    let height = 0;
+    let animId = 0;
+    let lastTime = 0;
+    let isIntersecting = true;
+    let lastScrollTime = -1e9;
+
+    const updateSize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = rect.width;
+      height = rect.height;
+      if (width < 1 || height < 1) return;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    updateSize();
+
+    const draw = (time) => {
+      if (width < 1 || height < 1) return;
+      ctx.clearRect(0, 0, width, height);
+      const root = canvas.closest('.landing-page-root') || document.documentElement;
+      const isLight = root.classList.contains('light');
+
+      const midX = width / 2;
+      const tSec = time * 0.001;
+
+      for (let y = 10; y < height; y += gridStep) {
+        const rowFade = Math.sin((y / height) * Math.PI) * 0.75 + 0.25;
+        for (let x = 10; x < width; x += gridStep) {
+          // Complex digital wave interference
+          const wave = (
+            Math.sin(0.016 * x + 1.1 * tSec) * Math.cos(0.016 * y - 0.9 * tSec) +
+            Math.sin((x * 0.012 + y * 0.014) - 1.4 * tSec)
+          ) * 0.5;
+
+          const hollowFactor = Math.min(1, Math.max(0, (Math.abs(x - midX) / midX - hollow) / 0.38));
+          const dist = Math.hypot(x - mouse.x, y - mouse.y);
+          const mouseInfluence = dist < 220 ? Math.pow(1 - dist / 220, 1.2) : 0;
+
+          const rawIntensity = ((wave + 1) * 0.5) * hollowFactor * rowFade + mouseInfluence * 1.35;
+
+          if (rawIntensity > 0.16 || mouseInfluence > 0.02) {
+            let pxSize = 2;
+            let alpha = Math.min(0.95, rawIntensity * 0.65 + mouseInfluence * 0.55);
+
+            if (mouseInfluence > 0.4) {
+              pxSize = 3.5;
+            } else if (rawIntensity > 0.68) {
+              pxSize = 2.5;
+            }
+
+            if (mouseInfluence > 0.04) {
+              // Dynamic Chromatic hover aura: electric violet -> cyan -> sapphire
+              const hue = Math.round(210 + mouseInfluence * 90 + (x / width) * 60) % 360;
+              ctx.fillStyle = `hsl(${hue}, 95%, ${isLight ? 42 : 68}%)`;
+              ctx.shadowColor = `hsl(${hue}, 95%, ${isLight ? 45 : 68}%)`;
+              ctx.shadowBlur = 8 * mouseInfluence;
+            } else {
+              ctx.shadowBlur = 0;
+              if (isLight) {
+                ctx.fillStyle = `rgba(30, 41, 59, ${alpha * 0.32})`;
+              } else {
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.38})`;
+              }
+            }
+
+            // High-intensity crosshair pixel vs solid micro-pixel
+            if (rawIntensity > 0.72 && mouseInfluence > 0.18) {
+              const arm = pxSize + 1.5;
+              ctx.fillRect(x - arm, y, arm * 2 + 1, 1);
+              ctx.fillRect(x, y - arm, 1, arm * 2 + 1);
+            } else {
+              ctx.fillRect(Math.floor(x - pxSize / 2), Math.floor(y - pxSize / 2), pxSize, pxSize);
+            }
+          }
+        }
+      }
+      ctx.shadowBlur = 0;
+    };
+
+    const loop = (time) => {
+      animId = requestAnimationFrame(loop);
+      if (!isIntersecting) return;
+      if (time - lastTime < 30 || time - lastScrollTime < 90) return;
+      lastTime = time;
+      draw(time);
+    };
+
+    const handlePointerMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+      mouse.active = true;
+    };
+
+    const handlePointerLeave = () => {
+      mouse.x = -9999;
+      mouse.y = -9999;
+      mouse.active = false;
+    };
+
+    const handleScroll = () => {
+      lastScrollTime = performance.now();
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateSize();
+      draw(performance.now());
+    });
+    resizeObserver.observe(canvas);
+
+    const intersectionObserver = new IntersectionObserver(([entry]) => {
+      isIntersecting = entry.isIntersecting;
+    }, { threshold: 0.05 });
+    intersectionObserver.observe(canvas);
+
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("pointerleave", handlePointerLeave, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+
+    animId = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerleave", handlePointerLeave);
+      window.removeEventListener("scroll", handleScroll, { capture: true });
+    };
+  }, [hollow, gridStep]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      style={{ opacity }}
+      className="pointer-events-none absolute inset-0 size-full"
+    />
+  );
+}
+
 // ── EXACT WORKLIST DITHER PIXEL WORD ANIMATION (Orange -> Pink -> Blue -> Purple every 4s) ──
 const DITHER_COLORS = ["#f5821f", "#ec4f86", "#3f6dff", "#7c5cff"];
 const DITHER_STEPS = [0.75, 0.5, 0.25, 0];
@@ -1876,7 +2032,7 @@ const AlternatingFeaturesSection = () => {
   );
 };
 
-// ── SECTION 6: ATS KEYWORD MATCH / INTERACTIVE GAUGE (Screenshot 6: 118b71ed.png) ──
+// ── SECTION 6: UNIFIED INTERACTIVE COMMAND CENTER (TabbedToolSection) ──
 const TabbedToolSection = () => {
   const [activeTab, setActiveTab] = useState('Syllabus coverage');
   const [inResume, setInResume] = useState(['Thermodynamics', 'Calculus', 'Optics', 'Electrostatics', 'Kinetics']);
@@ -1885,6 +2041,7 @@ const TabbedToolSection = () => {
   const [aiReplies, setAiReplies] = useState([
     { from: 'ai', text: 'Ask me anything about batch performance, attendance trends, or fee collection!' }
   ]);
+  const [reportTone, setReportTone] = useState('detailed');
 
   const addMissingSkill = (skill) => {
     setMissing(missing.filter((s) => s !== skill));
@@ -1908,7 +2065,7 @@ const TabbedToolSection = () => {
     }, 600);
   };
 
-  const syllabusProgress = Math.min(98, 45 + inResume.length * 9);
+  const syllabusProgress = Math.min(100, 45 + inResume.length * 9);
 
   return (
     <section className="relative py-20 border-t border-[var(--wl-line)] overflow-hidden">
@@ -1927,208 +2084,348 @@ const TabbedToolSection = () => {
         <div className="text-center max-w-2xl mx-auto mb-10">
           <h2 className="text-3xl sm:text-5xl font-normal text-[var(--wl-fg)] leading-tight">
             Ready to run,<br />
-            <span className="text-[var(--wl-muted)]">in one operating system.</span>
+            <span className="text-[var(--wl-muted)] font-editorial-italic">in one operating system.</span>
           </h2>
           <p className="mt-4 text-[var(--wl-muted)] text-sm sm:text-base leading-relaxed">
             Analyze syllabus completion, generate OMR exam papers, track fee dues, and query your institute's AI assistant without opening ten different apps.
           </p>
         </div>
 
-        {/* Tab Pills Bar (Apple/Linear/Worklist floating pill container) */}
-        <div className="flex justify-center mb-12">
-          <div className="inline-flex flex-wrap items-center gap-1 rounded-full bg-[var(--wl-surface-2)] p-1.5 border border-[var(--wl-line)] shadow-xl backdrop-blur-md">
-            {[
-              { id: 'Syllabus coverage', icon: Maximize2 },
-              { id: 'Report card tone', icon: Mail },
-              { id: 'Fee verification', icon: FileText },
-              { id: 'Ask Intelli-X AI', icon: MessageSquare }
-            ].map(({ id: tab, icon: Icon }) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`rounded-full px-5 py-2.5 text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
-                  activeTab === tab
-                    ? 'bg-white text-zinc-950 shadow-md ring-1 ring-black/5 dark:bg-white dark:text-zinc-950'
-                    : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)] hover:bg-[var(--wl-surface)]/60'
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${activeTab === tab ? 'text-zinc-950' : 'text-[var(--wl-faint)]'}`} />
-                <span>{tab}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Large Card with Split Layout */}
-        <div className="relative rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-12 shadow-2xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center overflow-hidden">
+        {/* Unified Command Workbench Window */}
+        <div className="relative rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] shadow-2xl overflow-hidden">
+          {/* Background Ambient Ascii Field */}
           <div className="pointer-events-none absolute inset-0 size-full overflow-hidden z-0">
-            <AsciiField hollow={0.12} opacity={0.8} />
+            <AsciiField hollow={0.15} opacity={0.65} />
           </div>
 
-          {/* Left Text */}
-          <div className="relative z-10 space-y-4">
-            <div className="w-10 h-10 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] text-blue-400 flex items-center justify-center shadow-xs">
-              <Sliders className="w-5 h-5" />
+          {/* Window Header Control Bar with Embedded Tab Switcher */}
+          <div className="relative z-10 flex flex-wrap items-center justify-between border-b border-[var(--wl-line)] bg-[var(--wl-surface-2)]/80 px-6 py-4 gap-4 backdrop-blur-md">
+            {/* Left: Window dots + breadcrumb */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+              </div>
+              <span className="text-xs font-mono font-medium text-[var(--wl-muted)] hidden sm:inline">
+                intellix-os / command-center
+              </span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-semibold font-geist text-[var(--wl-fg)]">
-              {activeTab}
-            </h3>
-            <p className="text-[var(--wl-muted)] text-sm sm:text-base leading-relaxed">
-              {activeTab === 'Syllabus coverage' &&
-                "Track NCERT & competitive syllabus completion chapter by chapter. See which topics are mastered, which require revision lectures, and how upcoming test scores align."}
-              {activeTab === 'Report card tone' &&
-                "Generate tailored, concise score updates for parents with automated teacher remarks, attendance percentages, and percentile rankings."}
-              {activeTab === 'Fee verification' &&
-                "Instantly verify UPI and cash collections, reconcile branch fee ledgers, and trigger automated WhatsApp receipts for parents."}
-              {activeTab === 'Ask Intelli-X AI' &&
-                "Query your institute's AI assistant directly to surface low-attendance batches, identify high-risk students, and optimize classroom timetables."}
-            </p>
+
+            {/* Center: Integrated 4-Tab Switcher */}
+            <div className="inline-flex items-center gap-1 rounded-full bg-[var(--wl-surface)] p-1 border border-[var(--wl-line)] shadow-xs">
+              {[
+                { id: 'Syllabus coverage', icon: Maximize2, label: 'Syllabus' },
+                { id: 'Report card tone', icon: Mail, label: 'Reports' },
+                { id: 'Fee verification', icon: FileText, label: 'Fees' },
+                { id: 'Ask Intelli-X AI', icon: MessageSquare, label: 'AI Copilot' }
+              ].map(({ id: tab, icon: Icon, label }) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeTab === tab
+                      ? 'bg-[var(--wl-fg)] text-[var(--wl-bg)] shadow-xs'
+                      : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)] hover:bg-[var(--wl-surface-2)]'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">{tab}</span>
+                  <span className="md:hidden">{label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Right: Live Engine Badge */}
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Engine Sync: 99.4%</span>
+            </div>
           </div>
 
-          {/* Right Dynamic Interactive Preview */}
-          <div className="relative z-10 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-6 space-y-6 shadow-xl">
-            {activeTab === 'Syllabus coverage' && (
-              <>
-                <div className="flex items-center gap-5">
-                  {/* Dynamic Glowing Circular SVG Gauge */}
-                  <div className="relative w-18 h-18 shrink-0 flex items-center justify-center">
-                    <svg className="w-18 h-18 transform -rotate-90">
-                      <defs>
-                        <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#06b6d4" />
-                          <stop offset="100%" stopColor="#3b82f6" />
-                        </linearGradient>
-                      </defs>
-                      <circle cx="36" cy="36" r="30" stroke="currentColor" className="text-[var(--wl-line)]" strokeWidth="6" fill="none" />
-                      <circle
-                        cx="36"
-                        cy="36"
-                        r="30"
-                        stroke="url(#scoreGradient)"
-                        strokeWidth="6"
-                        strokeDasharray="188"
-                        strokeDashoffset={188 - (188 * syllabusProgress) / 100}
-                        strokeLinecap="round"
-                        fill="none"
-                        className="transition-all duration-700"
-                      />
-                    </svg>
-                    <span className="absolute font-mono text-base font-extrabold text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]">{syllabusProgress}%</span>
-                  </div>
-                  <div>
-                    <div className="text-base font-bold text-[var(--wl-fg)]">Syllabus coverage</div>
-                    <div className="text-xs text-[var(--wl-muted)] flex items-center gap-1.5 mt-0.5">
-                      <span className="text-rose-400 font-medium">Term 1 target 45%</span>
-                      <span>→</span>
-                      <span className="text-emerald-400 font-bold">completed {syllabusProgress}%</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Completed chapters */}
-                <div className="space-y-2.5">
-                  <div className="text-[11px] font-semibold text-[var(--wl-muted)] uppercase tracking-wider">Completed Chapters</div>
-                  <div className="flex flex-wrap gap-2">
-                    {inResume.map((chip, idx) => (
-                      <span key={idx} className="rounded-lg bg-emerald-500/15 border border-emerald-500/35 px-3 py-1.5 text-xs text-emerald-400 font-semibold flex items-center gap-1.5 shadow-xs">
-                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        {chip}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Pending syllabus chapters (Clickable to add) */}
-                <div className="space-y-2.5">
-                  <div className="text-[11px] font-semibold text-[var(--wl-muted)] uppercase tracking-wider">
-                    Pending Revision Chapters <span className="text-[10px] text-amber-400 lowercase font-normal">(click to mark complete)</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {missing.map((chip, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => addMissingSkill(chip)}
-                        className="rounded-lg bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-400 px-3 py-1.5 text-xs text-amber-300 font-semibold cursor-pointer transition-all flex items-center gap-1.5 shadow-xs"
-                      >
-                        <Plus className="w-3.5 h-3.5 text-amber-400" />
-                        {chip}
-                      </button>
-                    ))}
-                    {missing.length === 0 && (
-                      <span className="text-xs text-emerald-400 font-bold flex items-center gap-1.5 py-1">
-                        <Check className="w-4 h-4 text-emerald-400" />
-                        All term syllabus modules covered! 100% completed.
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {activeTab === 'Report card tone' && (
+          {/* Workbench Body: Balanced 2-Column Grid */}
+          <div className="relative z-10 p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            {/* Left Column (5 cols): Contextual Controls & Telemetry */}
+            <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
               <div className="space-y-4">
-                <div className="text-xs font-semibold text-[var(--wl-fg)]">Parent Notification Tone:</div>
-                <div className="flex gap-2">
-                  <span className="rounded-full bg-blue-600 text-white px-3.5 py-1 text-xs font-semibold shadow-xs">Detailed Analysis</span>
-                  <span className="rounded-full bg-pink-500/15 text-pink-400 border border-pink-500/30 px-3.5 py-1 text-xs font-semibold">Compact SMS</span>
-                  <span className="rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-3.5 py-1 text-xs font-semibold">Visual Scorecard</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-medium">
+                  <Sliders className="w-3.5 h-3.5" />
+                  <span>Module active: {activeTab}</span>
                 </div>
-                <div className="text-xs text-[var(--wl-fg)] bg-[var(--wl-surface)] p-4 rounded-xl border border-[var(--wl-line)] leading-relaxed shadow-sm">
-                  <span className="text-blue-400 font-mono text-[11px] block mb-1">Preview for Mr. Anil Sharma:</span>
-                  "Dear Mr. Sharma, Aarav scored 92% in Thermodynamics with 100% attendance this month. He placed Rank #3 in Batch 12-A. Recommended focus: Rotational Motion revision."
+                <h3 className="text-2xl sm:text-3xl font-normal text-[var(--wl-fg)] leading-snug">
+                  {activeTab === 'Syllabus coverage' && 'Real-time curriculum & chapter mastery.'}
+                  {activeTab === 'Report card tone' && 'Automated parent updates with tailored tone.'}
+                  {activeTab === 'Fee verification' && 'Instant UPI reconciliation & fee ledgers.'}
+                  {activeTab === 'Ask Intelli-X AI' && 'Academic Intelligence for every classroom.'}
+                </h3>
+                <p className="text-sm text-[var(--wl-muted)] leading-relaxed">
+                  {activeTab === 'Syllabus coverage' &&
+                    'Track NCERT and competitive modules chapter-by-chapter. Spot pending revision topics and align test dates before exams.'}
+                  {activeTab === 'Report card tone' &&
+                    'Send verified scorecards with percentile rankings, attendance rates, and customized teacher remarks straight to parent WhatsApp.'}
+                  {activeTab === 'Fee verification' &&
+                    'Track tuition installments, test series registrations, and lab charges with zero paper receipts and zero reconciliation errors.'}
+                  {activeTab === 'Ask Intelli-X AI' &&
+                    'Query faculty workloads, detect attendance dips early, and optimize timetable allocations using conversational intelligence.'}
+                </p>
+              </div>
+
+              {/* Status Telemetry Cards */}
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-[var(--wl-line)]">
+                <div className="p-3 rounded-xl bg-[var(--wl-surface-2)]/70 border border-[var(--wl-line)]">
+                  <div className="text-[10px] font-mono text-[var(--wl-muted)] uppercase tracking-wider">Active Cohort</div>
+                  <div className="text-sm font-bold text-[var(--wl-fg)] mt-0.5">Batch 12-A</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[var(--wl-surface-2)]/70 border border-[var(--wl-line)]">
+                  <div className="text-[10px] font-mono text-[var(--wl-muted)] uppercase tracking-wider">Verification</div>
+                  <div className="text-sm font-bold text-emerald-400 mt-0.5">100% Synced</div>
                 </div>
               </div>
-            )}
 
-            {activeTab === 'Fee verification' && (
-              <div className="space-y-3 text-xs">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] shadow-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="font-medium text-[var(--wl-fg)]">Batch 12-A tuition installments?</span>
-                  </div>
-                  <span className="rounded-md bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 text-[10px]">Verified (₹3.4L)</span>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] shadow-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="font-medium text-[var(--wl-fg)]">Test series registration fees?</span>
-                  </div>
-                  <span className="rounded-md bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 text-[10px]">Verified (₹1.2L)</span>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] shadow-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                    <span className="font-medium text-[var(--wl-fg)]">Study material & lab charges?</span>
-                  </div>
-                  <span className="rounded-md bg-amber-500/20 text-amber-400 font-bold px-2 py-0.5 text-[10px]">Pending (₹28K)</span>
-                </div>
-              </div>
-            )}
+              {/* Action Button */}
+              <Link to="/register">
+                <button className="w-full wl-btn wl-btn-primary h-10 px-5 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                  <RollText icon={ArrowRight}>Deploy for your institute</RollText>
+                </button>
+              </Link>
+            </div>
 
-            {activeTab === 'Ask Intelli-X AI' && (
-              <div className="space-y-3">
-                <div className="h-36 overflow-y-auto space-y-2.5 p-3 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] text-xs">
-                  {aiReplies.map((r, i) => (
-                    <div key={i} className={`p-2.5 rounded-xl ${r.from === 'user' ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white ml-auto max-w-[80%] shadow-xs' : 'bg-[var(--wl-surface-2)] text-[var(--wl-fg)] max-w-[85%] border border-[var(--wl-line)]'}`}>
-                      {r.text}
+            {/* Right Column (7 cols): Interactive Live Workbench */}
+            <div className="lg:col-span-7 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-6 sm:p-7 shadow-xl flex flex-col justify-between">
+              {/* Tab 1: Syllabus coverage */}
+              {activeTab === 'Syllabus coverage' && (
+                <div className="space-y-6">
+                  {/* Progress Header */}
+                  <div className="flex items-center justify-between pb-4 border-b border-[var(--wl-line)] gap-4">
+                    <div className="flex items-center gap-4">
+                      {/* Circular Gauge */}
+                      <div className="relative w-16 h-16 shrink-0 flex items-center justify-center">
+                        <svg className="w-16 h-16 transform -rotate-90">
+                          <defs>
+                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#06b6d4" />
+                              <stop offset="100%" stopColor="#3b82f6" />
+                            </linearGradient>
+                          </defs>
+                          <circle cx="32" cy="32" r="26" stroke="currentColor" className="text-[var(--wl-line)]" strokeWidth="5" fill="none" />
+                          <circle
+                            cx="32"
+                            cy="32"
+                            r="26"
+                            stroke="url(#gaugeGradient)"
+                            strokeWidth="5"
+                            strokeDasharray="163"
+                            strokeDashoffset={163 - (163 * syllabusProgress) / 100}
+                            strokeLinecap="round"
+                            fill="none"
+                            className="transition-all duration-700"
+                          />
+                        </svg>
+                        <span className="absolute font-mono text-sm font-bold text-cyan-400">{syllabusProgress}%</span>
+                      </div>
+                      <div>
+                        <div className="text-base font-bold text-[var(--wl-fg)]">Syllabus Completion</div>
+                        <div className="text-xs text-[var(--wl-muted)] flex items-center gap-1.5 mt-0.5">
+                          <span className="text-rose-400 font-medium">Term target 45%</span>
+                          <span>→</span>
+                          <span className="text-emerald-400 font-bold">{syllabusProgress}% achieved</span>
+                        </div>
+                      </div>
                     </div>
-                  ))}
+                    <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono font-medium border border-blue-500/20">
+                      JEE Advanced
+                    </span>
+                  </div>
+
+                  {/* Completed chapters */}
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-mono font-semibold text-[var(--wl-muted)] uppercase tracking-wider">Completed Modules ({inResume.length})</span>
+                      <span className="text-[11px] text-emerald-400 font-medium">Mastered</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {inResume.map((chip, idx) => (
+                        <span key={idx} className="rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-3 py-1.5 text-xs text-emerald-400 font-medium flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          {chip}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pending chapters (Clickable to complete) */}
+                  <div className="space-y-2.5 pt-2 border-t border-[var(--wl-line)]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-mono font-semibold text-[var(--wl-muted)] uppercase tracking-wider">
+                        Pending Revision Modules
+                      </span>
+                      <span className="text-[10px] text-amber-400 font-normal">Click to mark complete</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {missing.map((chip, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => addMissingSkill(chip)}
+                          className="rounded-lg bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-400 px-3 py-1.5 text-xs text-amber-300 font-medium cursor-pointer transition-all flex items-center gap-1.5 shadow-xs hover:scale-105 active:scale-95"
+                        >
+                          <Plus className="w-3.5 h-3.5 text-amber-400" />
+                          {chip}
+                        </button>
+                      ))}
+                      {missing.length === 0 && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1.5 py-1">
+                          <Check className="w-4 h-4 text-emerald-400" />
+                          All term modules 100% completed!
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <form onSubmit={handleSendChat} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={aiChatInput}
-                    onChange={(e) => setAiChatInput(e.target.value)}
-                    placeholder="Ask AI e.g. low attendance in Batch 12-A..."
-                    className="flex-1 bg-[var(--wl-surface)] border border-[var(--wl-line)] rounded-xl px-3 py-2 text-xs text-[var(--wl-fg)] outline-none focus:border-blue-500"
-                  />
-                  <button type="submit" className="wl-btn wl-btn-primary px-3.5 py-2 text-xs rounded-xl">
-                    <Send className="w-3.5 h-3.5" />
-                  </button>
-                </form>
-              </div>
-            )}
+              )}
+
+              {/* Tab 2: Report card tone */}
+              {activeTab === 'Report card tone' && (
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between pb-3 border-b border-[var(--wl-line)]">
+                    <span className="text-xs font-mono font-semibold text-[var(--wl-muted)] uppercase">Notification Mode</span>
+                    <div className="flex gap-1.5">
+                      {['detailed', 'sms', 'visual'].map((tone) => (
+                        <button
+                          key={tone}
+                          onClick={() => setReportTone(tone)}
+                          className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                            reportTone === tone
+                              ? 'bg-blue-600 text-white shadow-xs'
+                              : 'bg-[var(--wl-surface)] text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
+                          }`}
+                        >
+                          {tone === 'detailed' ? 'Detailed Analysis' : tone === 'sms' ? 'Compact SMS' : 'Visual Scorecard'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] space-y-3 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xs flex items-center justify-center">
+                          AS
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-[var(--wl-fg)]">Aarav Sharma</div>
+                          <div className="text-[11px] text-[var(--wl-muted)]">Roll #104 · Batch 12-A</div>
+                        </div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 font-mono text-[11px] font-bold">
+                        Rank #3 (92%)
+                      </span>
+                    </div>
+
+                    <div className="text-xs text-[var(--wl-fg)] leading-relaxed bg-[var(--wl-surface-2)] p-3 rounded-lg border border-[var(--wl-line)]">
+                      {reportTone === 'detailed' &&
+                        '"Dear Mr. Sharma, Aarav scored 92% in Thermodynamics with 100% attendance this month. He placed Rank #3 in Batch 12-A. Recommended focus: Rotational Motion revision."'}
+                      {reportTone === 'sms' &&
+                        '"IntelliX Alert: Aarav Sharma scored 92% (Rank 3) in Mock Test 4. Attendance: 100%. Full report: ix.io/r/104"'}
+                      {reportTone === 'visual' &&
+                        '"Visual Report Generated: Physics (94%), Chemistry (91%), Math (90%). Overall Percentile: 98.6%. Digital certificate issued."'}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-[var(--wl-muted)] pt-1">
+                      <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+                        <Check className="w-3.5 h-3.5" /> WhatsApp Dispatch Verified
+                      </span>
+                      <span className="font-mono">Delivered in 1.2s</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 3: Fee verification */}
+              {activeTab === 'Fee verification' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-[var(--wl-line)]">
+                    <span className="text-xs font-mono font-semibold text-[var(--wl-muted)] uppercase">Batch 12-A Fee Ledger</span>
+                    <span className="text-xs font-mono font-bold text-emerald-400">Total Settled: ₹4.60L</span>
+                  </div>
+
+                  <div className="space-y-2.5 text-xs">
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] shadow-xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <div>
+                          <div className="font-semibold text-[var(--wl-fg)]">Tuition Installments</div>
+                          <div className="text-[11px] text-[var(--wl-muted)]">38 students paid via UPI QR</div>
+                        </div>
+                      </div>
+                      <span className="rounded-md bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 text-[10px]">Verified (₹3.4L)</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] shadow-xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <div>
+                          <div className="font-semibold text-[var(--wl-fg)]">Mock Test Series Registration</div>
+                          <div className="text-[11px] text-[var(--wl-muted)]">Automated bank receipt reconciliation</div>
+                        </div>
+                      </div>
+                      <span className="rounded-md bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 text-[10px]">Verified (₹1.2L)</span>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] shadow-xs">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        <div>
+                          <div className="font-semibold text-[var(--wl-fg)]">Study Materials & Lab Fees</div>
+                          <div className="text-[11px] text-[var(--wl-muted)]">4 invoices pending parent confirmation</div>
+                        </div>
+                      </div>
+                      <span className="rounded-md bg-amber-500/20 text-amber-400 font-bold px-2 py-0.5 text-[10px]">Pending (₹28K)</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 4: Ask Intelli-X AI */}
+              {activeTab === 'Ask Intelli-X AI' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-[var(--wl-line)]">
+                    <span className="text-xs font-mono font-semibold text-[var(--wl-muted)] uppercase">Intelli-X AI Copilot</span>
+                    <span className="flex items-center gap-1.5 text-xs text-blue-400 font-mono">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                      Academic Engine Active
+                    </span>
+                  </div>
+
+                  <div className="h-44 overflow-y-auto space-y-2.5 p-3 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] text-xs">
+                    {aiReplies.map((r, i) => (
+                      <div
+                        key={i}
+                        className={`p-2.5 rounded-xl ${
+                          r.from === 'user'
+                            ? 'bg-blue-600 text-white ml-auto max-w-[80%] shadow-xs'
+                            : 'bg-[var(--wl-surface-2)] text-[var(--wl-fg)] max-w-[88%] border border-[var(--wl-line)]'
+                        }`}
+                      >
+                        {r.text}
+                      </div>
+                    ))}
+                  </div>
+
+                  <form onSubmit={handleSendChat} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={aiChatInput}
+                      onChange={(e) => setAiChatInput(e.target.value)}
+                      placeholder="Ask AI e.g. which batch needs revision in Optics?..."
+                      className="flex-1 bg-[var(--wl-surface)] border border-[var(--wl-line)] rounded-xl px-3 py-2 text-xs text-[var(--wl-fg)] outline-none focus:border-blue-500"
+                    />
+                    <button type="submit" className="wl-btn wl-btn-primary px-3.5 py-2 text-xs rounded-xl flex items-center justify-center">
+                      <Send className="w-3.5 h-3.5" />
+                    </button>
+                  </form>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -2159,30 +2456,35 @@ const SmallToolsBentoSection = () => {
   };
 
   return (
-    <section id="small-tools" className="py-20 border-t border-[var(--wl-line)]">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Header with Girl Reading Drawing */}
+    <section id="small-tools" className="relative py-20 border-t border-[var(--wl-line)] overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 size-full overflow-hidden z-0">
+        <PixelMatrixField hollow={0.12} opacity={0.8} gridStep={15} />
+      </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
+        {/* Header with Institute Engine Emblem */}
         <div className="flex flex-wrap items-center justify-between mb-12 gap-6">
           <div className="max-w-xl">
             <h2 className="text-3xl sm:text-5xl font-normal text-[var(--wl-fg)] leading-tight">
               The coaching tools<br />
-              <span className="text-[var(--wl-muted)]">you'll use every day.</span>
+              <span className="text-[var(--wl-muted)] font-editorial-italic">you'll use every day.</span>
             </h2>
             <p className="mt-4 text-[var(--wl-muted)] text-sm sm:text-base leading-relaxed">
               Engineered specifically for coaching owners, branch managers, teachers, and accountants.
             </p>
           </div>
 
-          {/* Line art illustration of student reading */}
-          <div className="w-28 h-28 sm:w-36 sm:h-36 opacity-90 drop-shadow-md">
-            <svg viewBox="0 0 100 100" fill="none" className="w-full h-full text-[var(--wl-fg)]">
-              <path d="M50 15 C40 15 35 22 35 30 C35 38 42 42 50 42 C58 42 65 38 65 30 C65 22 60 15 50 15 Z" stroke="currentColor" strokeWidth="2" />
-              <path d="M38 30 Q35 38 32 45 Q30 52 28 65 Q45 68 55 65 Q62 60 65 52 Q68 40 62 30" stroke="currentColor" strokeWidth="2" />
-              <path d="M45 42 L42 60 L62 60 L60 42" stroke="currentColor" strokeWidth="2" />
-              <path d="M30 65 L20 85 L70 85 L65 65" stroke="currentColor" strokeWidth="2" />
-              <rect x="52" y="35" width="22" height="15" rx="2" stroke="currentColor" strokeWidth="2" />
-              <rect x="58" y="28" width="22" height="15" rx="2" stroke="currentColor" strokeWidth="2" transform="rotate(-15 58 28)" />
-            </svg>
+          {/* High-tech coaching engine emblem */}
+          <div className="relative group shrink-0">
+            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-500/25 via-indigo-500/20 to-purple-500/25 blur-xl opacity-75 group-hover:opacity-100 transition-opacity" />
+            <div className="relative rounded-2xl border border-[var(--wl-line)] bg-[var(--wl-surface-2)]/90 backdrop-blur-md p-4 sm:p-5 flex flex-col items-center justify-center gap-2.5 shadow-xl">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/25">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--wl-surface)] border border-[var(--wl-line)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--wl-muted)]">Active OS</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2395,8 +2697,11 @@ const SmallToolsBentoSection = () => {
 // ── SECTION: BATCHES & INSTITUTES TRANSFORMATION (#batches) ──
 const BatchesSection = () => {
   return (
-    <section id="batches" className="py-24 border-t border-[var(--wl-line)]">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section id="batches" className="relative py-24 border-t border-[var(--wl-line)] overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 size-full overflow-hidden z-0">
+        <PixelMatrixField hollow={0.1} opacity={0.8} gridStep={16} />
+      </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-[var(--wl-line)] bg-[var(--wl-surface-2)] px-3.5 py-1 text-xs text-[var(--wl-muted)] mb-4">
             <Users className="w-3.5 h-3.5 text-blue-500" />
@@ -2565,8 +2870,11 @@ const PricingSection = () => {
   ];
 
   return (
-    <section id="pricing" className="py-24 border-t border-[var(--wl-line)]">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section id="pricing" className="relative py-24 border-t border-[var(--wl-line)] overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 size-full overflow-hidden z-0">
+        <PixelMatrixField hollow={0.12} opacity={0.85} gridStep={15} />
+      </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <h2 className="text-3xl sm:text-5xl font-normal text-[var(--wl-fg)] leading-tight">
             Pick the plan for<br />
@@ -2686,8 +2994,11 @@ const FAQSection = () => {
   ];
 
   return (
-    <section id="faq" className="py-24 border-t border-[var(--wl-line)] relative">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section id="faq" className="relative py-24 border-t border-[var(--wl-line)] overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 size-full overflow-hidden z-0">
+        <PixelMatrixField hollow={0.16} opacity={0.75} gridStep={16} />
+      </div>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-10 md:gap-16 items-start">
           {/* Left Sticky Header (stays pinned while right accordion scrolls) */}
           <div className="md:sticky md:top-28 md:self-start space-y-4">
