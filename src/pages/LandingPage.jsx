@@ -728,7 +728,15 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
 };
 
 // ── HERO SECTION: Dynamic Interactive AsciiField + Preview Card ──
-const Hero = () => {
+const Hero = ({ isDark: propDark }) => {
+  let themeContext = null;
+  try {
+    themeContext = useTheme();
+  } catch (e) {
+    themeContext = null;
+  }
+  const isDark = propDark !== undefined ? propDark : (themeContext ? themeContext.isDark : true);
+
   return (
     <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28">
       {/* Interactive AsciiField Background Layer */}
@@ -2884,7 +2892,7 @@ export default function LandingPage() {
     <div className={`landing-page-root ${isDark ? 'dark' : 'light'} min-h-screen bg-[var(--wl-bg)] text-[var(--wl-fg)]`}>
       <Navbar isDark={isDark} toggleTheme={toggleTheme} />
       <main>
-        <Hero />
+        <Hero isDark={isDark} />
         <SearchDirectorySection />
         <KanbanPipelineSection />
         <ProofRoleAndSplitComparison />
