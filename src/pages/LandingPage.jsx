@@ -931,11 +931,15 @@ const Hero = ({ isDark: propDark }) => {
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-center">
-        {/* Banner Pill badge */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-[var(--wl-line)] bg-[var(--wl-surface)]/80 px-3.5 py-1.5 text-[12px] text-[var(--wl-muted)] backdrop-blur-sm mb-7 shadow-xs">
-          <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[11px] font-semibold text-blue-500">New</span>
-          <span className="rounded bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[10px] font-bold px-1.5 py-0.2">Y</span>
-          <span>900+ Institutes switched to Intelli-X. See results →</span>
+        {/* Powered by Cadence Labs (Minimal without rounded rectangle) */}
+        <div className="flex items-center justify-center gap-2.5 mb-6 sm:mb-7 text-[11px] sm:text-xs font-mono tracking-[0.18em] uppercase text-[var(--wl-muted)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+          <span>
+            Powered by{' '}
+            <span className="font-semibold text-[var(--wl-fg)]">
+              Cadence Labs
+            </span>
+          </span>
         </div>
 
         {/* Display H1 - Cormorant upright with Newsreader italic accent */}
