@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ArrowRight,
   Sparkles,
@@ -143,10 +143,10 @@ function AsciiField({ hollow = 0.2, opacity = 1, isButtonHovered = false }) {
             if (mouseInfluence > 0.05 && !isHoveredRef.current) {
               const root = canvas.closest('.landing-page-root') || document.documentElement;
               const isLight = root.classList.contains('light');
-              const hue = Math.round(82 + mouseInfluence * 18 + (x / width) * 12) % 360;
-              ctx.fillStyle = `hsl(${hue}, 88%, ${isLight ? 42 : 56}%)`;
-              ctx.shadowColor = `hsl(${hue}, 95%, ${isLight ? 40 : 58}%)`;
-              ctx.shadowBlur = Math.min(8, mouseInfluence * 12);
+              const hue = Math.round(78 + mouseInfluence * 12 + (x / width) * 8) % 360;
+              ctx.fillStyle = `hsl(${hue}, 92%, ${isLight ? 44 : 66}%)`;
+              ctx.shadowColor = `hsl(${hue}, 95%, ${isLight ? 42 : 68}%)`;
+              ctx.shadowBlur = Math.min(10, mouseInfluence * 14);
             } else {
               ctx.shadowBlur = 0;
               ctx.fillStyle = getColor(alpha);
@@ -320,11 +320,11 @@ function PixelMatrixField({ hollow = 0.12, opacity = 0.8, gridStep = 16 }) {
             }
 
             if (mouseInfluence > 0.04) {
-              // Vibrant dynamic hover aura: glowing neon lime green
-              const hue = Math.round(82 + mouseInfluence * 18 + (x / width) * 12) % 360;
-              ctx.fillStyle = `hsl(${hue}, 88%, ${isLight ? 42 : 56}%)`;
-              ctx.shadowColor = `hsl(${hue}, 95%, ${isLight ? 40 : 58}%)`;
-              ctx.shadowBlur = Math.min(8, 6 * mouseInfluence);
+              // Vibrant dynamic hover aura: glowing radiant light lime
+              const hue = Math.round(78 + mouseInfluence * 12 + (x / width) * 8) % 360;
+              ctx.fillStyle = `hsl(${hue}, 92%, ${isLight ? 44 : 66}%)`;
+              ctx.shadowColor = `hsl(${hue}, 95%, ${isLight ? 42 : 68}%)`;
+              ctx.shadowBlur = Math.min(10, 7 * mouseInfluence);
             } else {
               ctx.shadowBlur = 0;
               if (isLight) {
@@ -729,7 +729,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
             className="h-6 sm:h-7 w-auto object-contain transition-opacity duration-200"
           />
           <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-[var(--wl-faint)] border-l border-[var(--wl-line)] pl-2.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_8px_rgba(163,230,53,0.8)] animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_8px_rgba(190, 242, 100,0.8)] animate-pulse" />
             by Cadence Labs
           </span>
         </Link>
@@ -778,12 +778,12 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
                     }}
                     className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between transition-colors ${
                       selectedLang === l.code
-                        ? 'bg-lime-500/10 text-lime-500 font-semibold'
+                        ? 'bg-lime-400/10 text-lime-400 font-semibold'
                         : 'text-[var(--wl-muted)] hover:bg-[var(--wl-surface-2)] hover:text-[var(--wl-fg)]'
                     }`}
                   >
                     <span>{l.label}</span>
-                    {selectedLang === l.code && <Check className="w-3 h-3 text-lime-500" />}
+                    {selectedLang === l.code && <Check className="w-3 h-3 text-lime-400" />}
                   </button>
                 ))}
               </div>
@@ -814,7 +814,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
           <Link to="/register">
             <button
               type="button"
-              className="group relative overflow-hidden wl-btn wl-btn-primary h-8 sm:h-9 rounded-[10px] px-3 sm:px-4 text-xs sm:text-[13px] inline-flex items-center justify-center shadow-[0_0_14px_rgba(163,230,53,0.32)] hover:shadow-[0_0_22px_rgba(163,230,53,0.5)] transition-all cursor-pointer shrink-0"
+              className="group relative overflow-hidden wl-btn wl-btn-primary h-8 sm:h-9 rounded-[10px] px-3 sm:px-4 text-xs sm:text-[13px] inline-flex items-center justify-center shadow-[0_0_14px_rgba(190, 242, 100,0.32)] hover:shadow-[0_0_22px_rgba(190, 242, 100,0.5)] transition-all cursor-pointer shrink-0"
             >
               <RollText icon={ArrowRight}>Get started</RollText>
             </button>
@@ -848,7 +848,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
                   onClick={() => setSelectedLang(l.code)}
                   className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
                     selectedLang === l.code
-                      ? 'bg-lime-500 text-zinc-950 font-bold'
+                      ? 'bg-lime-400 text-zinc-950 font-bold'
                       : 'text-[var(--wl-muted)] hover:bg-[var(--wl-surface-2)]'
                   }`}
                 >
@@ -968,7 +968,7 @@ const Hero = ({ isDark: propDark, heroMounted = true, siteRevealed = true }) => 
                 type="button"
                 onMouseEnter={() => setButtonHovered(true)}
                 onMouseLeave={() => setButtonHovered(false)}
-                className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_18px_rgba(163,230,53,0.3)] hover:shadow-[0_0_26px_rgba(163,230,53,0.48)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
+                className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_18px_rgba(190, 242, 100,0.3)] hover:shadow-[0_0_26px_rgba(190, 242, 100,0.48)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
               >
                 <RollText icon={ArrowRight}>Get started</RollText>
               </button>
@@ -992,7 +992,7 @@ const Hero = ({ isDark: propDark, heroMounted = true, siteRevealed = true }) => 
             <span>Instant setup for schools, coaching batches & academies</span>
             <span>·</span>
             <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--wl-muted)] font-medium inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_6px_rgba(163,230,53,0.8)] animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_6px_rgba(190, 242, 100,0.8)] animate-pulse" />
               Powered by Cadence Labs
             </span>
           </p>
@@ -1014,7 +1014,7 @@ const Hero = ({ isDark: propDark, heroMounted = true, siteRevealed = true }) => 
                 <span className="rounded-md bg-[var(--wl-surface-2)] px-2 py-0.5 text-[10px] sm:text-[11px] text-[var(--wl-muted)] font-medium">Workspace</span>
                 <span className="hidden sm:inline text-[12px] text-[var(--wl-faint)]">Sessions</span>
                 <span className="hidden sm:inline text-[12px] text-[var(--wl-faint)]">Attendance</span>
-                <span className="text-[11px] sm:text-[12px] text-[var(--wl-faint)]">Proofs <span className="rounded-full bg-lime-500/20 px-1.5 py-0.2 text-lime-500 text-[10px]">6</span></span>
+                <span className="text-[11px] sm:text-[12px] text-[var(--wl-faint)]">Proofs <span className="rounded-full bg-lime-400/20 px-1.5 py-0.2 text-lime-400 text-[10px]">6</span></span>
               </div>
               <div className="flex items-center gap-2">
                 <button className="wl-btn wl-btn-primary h-7 px-2.5 sm:px-3 text-[11px] sm:text-[12px] rounded-lg">
@@ -1032,9 +1032,9 @@ const Hero = ({ isDark: propDark, heroMounted = true, siteRevealed = true }) => 
                   <span className="text-[11px] text-[var(--wl-faint)]">Synced 8m ago</span>
                 </div>
                 {/* Row 1 */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-colors">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-lime-500 flex items-center justify-center font-bold text-xs text-white shadow-xs">
+                    <div className="w-8 h-8 rounded-lg bg-lime-400 flex items-center justify-center font-bold text-xs text-white shadow-xs">
                       P
                     </div>
                     <div>
@@ -1048,9 +1048,9 @@ const Hero = ({ isDark: propDark, heroMounted = true, siteRevealed = true }) => 
                   </div>
                 </div>
                 {/* Row 2 */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-colors">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-lime-500 flex items-center justify-center font-bold text-xs text-white shadow-xs">
+                    <div className="w-8 h-8 rounded-lg bg-lime-400 flex items-center justify-center font-bold text-xs text-white shadow-xs">
                       C
                     </div>
                     <div>
@@ -1059,7 +1059,7 @@ const Hero = ({ isDark: propDark, heroMounted = true, siteRevealed = true }) => 
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-lime-500/10 border border-lime-500/20 px-2 py-0.5 text-[10px] text-lime-500 font-medium">96% score</span>
+                    <span className="rounded-md bg-lime-400/10 border border-lime-400/20 px-2 py-0.5 text-[10px] text-lime-400 font-medium">96% score</span>
                     <span className="text-[11px] text-[var(--wl-faint)]">4h ago</span>
                   </div>
                 </div>
@@ -1080,7 +1080,7 @@ const Hero = ({ isDark: propDark, heroMounted = true, siteRevealed = true }) => 
                     </div>
                     <div className="flex justify-between py-1">
                       <span>Pending Proofs</span>
-                      <span className="font-mono text-lime-500 font-semibold">6</span>
+                      <span className="font-mono text-lime-400 font-semibold">6</span>
                     </div>
                   </div>
                 </div>
@@ -1106,9 +1106,9 @@ const SearchDirectorySection = () => {
   const searchInputRef = useRef(null);
 
   const allBatches = [
-    { title: 'JEE Advanced 2026 · Batch Alpha', wing: 'Apex Wing · Prof. Sharma', mode: 'Offline · Room 401', color: 'bg-lime-500', icon: 'JEE' },
+    { title: 'JEE Advanced 2026 · Batch Alpha', wing: 'Apex Wing · Prof. Sharma', mode: 'Offline · Room 401', color: 'bg-lime-400', icon: 'JEE' },
     { title: 'NEET UG Medical · Target Batch', wing: 'Medical Wing · Dr. Priya', mode: 'Hybrid · Hall B', color: 'bg-emerald-600', icon: 'NEET' },
-    { title: 'Foundation Class 10 · Mathematics', wing: 'Olympiad Division · Room 102', mode: 'Offline · Room 102', color: 'bg-lime-500', icon: 'CBSE' },
+    { title: 'Foundation Class 10 · Mathematics', wing: 'Olympiad Division · Room 102', mode: 'Offline · Room 102', color: 'bg-lime-400', icon: 'CBSE' },
     { title: 'CUET + Board Exam Mastery', wing: 'Senior Secondary · Lab 2', mode: 'Hybrid · Lab 2', color: 'bg-orange-600', icon: 'CUET' },
     { title: 'Commerce & Accounts Pro', wing: 'CA Foundation Wing · Room 204', mode: 'Offline · Room 204', color: 'bg-slate-700', icon: 'CA' },
     { title: 'Data Science & AI for Juniors', wing: 'Tech Academy · Online Campus', mode: 'Online · Live', color: 'bg-amber-600', icon: 'AI' }
@@ -1174,7 +1174,7 @@ const SearchDirectorySection = () => {
                 )}
                 <kbd
                   onClick={() => searchInputRef.current?.focus()}
-                  className="hidden sm:inline-flex items-center gap-1 rounded bg-[var(--wl-surface-2)] px-2 py-1 font-mono text-[11px] text-[var(--wl-muted)] border border-[var(--wl-line)] cursor-pointer hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)]"
+                  className="hidden sm:inline-flex items-center gap-1 rounded bg-[var(--wl-surface-2)] px-2 py-1 font-mono text-[11px] text-[var(--wl-muted)] border border-[var(--wl-line)] cursor-pointer hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)]"
                 >
                   ⌘K
                 </kbd>
@@ -1189,7 +1189,7 @@ const SearchDirectorySection = () => {
                     onClick={() => setFilterMode(f)}
                     className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
                       filterMode === f
-                        ? 'bg-lime-500 text-zinc-950 font-bold shadow-xs'
+                        ? 'bg-lime-400 text-zinc-950 font-bold shadow-xs'
                         : 'bg-[var(--wl-surface-2)] text-[var(--wl-muted)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]'
                     }`}
                   >
@@ -1204,7 +1204,7 @@ const SearchDirectorySection = () => {
                   filteredBatches.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between rounded-xl bg-[var(--wl-surface-2)] p-3 border border-[var(--wl-line)] hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] hover:shadow-sm transition-all"
+                      className="flex items-center justify-between rounded-xl bg-[var(--wl-surface-2)] p-3 border border-[var(--wl-line)] hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] hover:shadow-sm transition-all"
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-9 h-9 rounded-xl ${item.color} flex items-center justify-center font-bold text-xs text-white shadow-xs`}>
@@ -1276,10 +1276,10 @@ const KanbanPipelineSection = () => {
     {
       id: 'Inquiries',
       title: 'Inquiries',
-      dotColor: 'bg-lime-500',
+      dotColor: 'bg-lime-400',
       count: 6,
       cards: [
-        { id: 1, title: 'Aarav Sharma · JEE 2026', company: 'Apex Wing · JEE Prep', char: 'A', color: 'bg-lime-500 text-zinc-950 font-bold', msg: 'Website lead form submitted', time: 'Nov 4, 10:33 AM', notes: 'Interested in 2-year classroom program. Parent phone verified.' },
+        { id: 1, title: 'Aarav Sharma · JEE 2026', company: 'Apex Wing · JEE Prep', char: 'A', color: 'bg-lime-400 text-zinc-950 font-bold', msg: 'Website lead form submitted', time: 'Nov 4, 10:33 AM', notes: 'Interested in 2-year classroom program. Parent phone verified.' },
         { id: 2, title: 'Rohan Gupta · NEET Dropper', company: 'Medical Wing · Biology', char: 'R', color: 'bg-emerald-600 text-white', msg: 'WhatsApp inquiry received', time: 'Nov 3, 6:12 PM', notes: 'Requested fee structure for Medical Target Batch B.' }
       ]
     },
@@ -1290,7 +1290,7 @@ const KanbanPipelineSection = () => {
       count: 2,
       cards: [
         { id: 3, title: 'Ananya Patel · Class 10 NTSE', company: 'Olympiad Division', char: 'A', color: 'bg-amber-600 text-white', msg: 'Demo: Thursday 4pm (Room 204)', time: 'Nov 2, 4:05 PM', comments: 2, notes: 'Demo lecture with Prof. Verma. SMS reminder sent to parents.' },
-        { id: 4, title: 'Sneha Reddy · Class 12 Boards', company: 'Senior Secondary PCM', char: 'S', color: 'bg-lime-500 text-zinc-950 font-bold', msg: 'Attended demo · Highly satisfied', time: 'Oct 30, 11:20 AM', notes: 'Parent requested scholarship admission test.' }
+        { id: 4, title: 'Sneha Reddy · Class 12 Boards', company: 'Senior Secondary PCM', char: 'S', color: 'bg-lime-400 text-zinc-950 font-bold', msg: 'Attended demo · Highly satisfied', time: 'Oct 30, 11:20 AM', notes: 'Parent requested scholarship admission test.' }
       ]
     },
     {
@@ -1299,7 +1299,7 @@ const KanbanPipelineSection = () => {
       dotColor: 'bg-emerald-500',
       count: 1,
       cards: [
-        { id: 5, title: 'Kabir Mehta · JEE Advanced Alpha', company: 'Batch A · Enrolled', char: 'K', color: 'bg-lime-500 text-zinc-950 font-bold', msg: 'Fee installment 1 paid (₹25,000)', time: 'Oct 28, 9:41 AM', comments: 3, notes: 'Admission confirmed. RFID card & student portal issued.' }
+        { id: 5, title: 'Kabir Mehta · JEE Advanced Alpha', company: 'Batch A · Enrolled', char: 'K', color: 'bg-lime-400 text-zinc-950 font-bold', msg: 'Fee installment 1 paid (₹25,000)', time: 'Oct 28, 9:41 AM', comments: 3, notes: 'Admission confirmed. RFID card & student portal issued.' }
       ]
     },
     {
@@ -1338,7 +1338,7 @@ const KanbanPipelineSection = () => {
               onClick={() => setActiveTab('All')}
               className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                 activeTab === 'All'
-                  ? 'bg-lime-500 text-zinc-950 font-bold shadow-xs'
+                  ? 'bg-lime-400 text-zinc-950 font-bold shadow-xs'
                   : 'bg-[var(--wl-surface-2)] text-[var(--wl-muted)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]'
               }`}
             >
@@ -1350,7 +1350,7 @@ const KanbanPipelineSection = () => {
                 onClick={() => setActiveTab(c.id)}
                 className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                   activeTab === c.id
-                    ? 'bg-lime-500 text-zinc-950 font-bold shadow-xs'
+                    ? 'bg-lime-400 text-zinc-950 font-bold shadow-xs'
                     : 'bg-[var(--wl-surface-2)] text-[var(--wl-muted)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]'
                 }`}
               >
@@ -1377,7 +1377,7 @@ const KanbanPipelineSection = () => {
                   <div
                     key={card.id}
                     onClick={() => setSelectedCard(card)}
-                    className="rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] p-3 space-y-2 hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] hover:shadow-md cursor-pointer transition-all"
+                    className="rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] p-3 space-y-2 hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] hover:shadow-md cursor-pointer transition-all"
                   >
                     <div className="flex items-center gap-2.5">
                       <div className={`w-6 h-6 rounded-md ${card.color} font-bold text-[10px] flex items-center justify-center`}>
@@ -1450,7 +1450,7 @@ const KanbanPipelineSection = () => {
         {/* 4 Bottom Feature Blocks */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[var(--wl-surface)] border border-[var(--wl-line)] flex items-center justify-center shrink-0 text-lime-500">
+            <div className="w-8 h-8 rounded-lg bg-[var(--wl-surface)] border border-[var(--wl-line)] flex items-center justify-center shrink-0 text-lime-400">
               <Search className="w-4 h-4" />
             </div>
             <div>
@@ -1474,7 +1474,7 @@ const KanbanPipelineSection = () => {
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[var(--wl-surface)] border border-[var(--wl-line)] flex items-center justify-center shrink-0 text-lime-500">
+            <div className="w-8 h-8 rounded-lg bg-[var(--wl-surface)] border border-[var(--wl-line)] flex items-center justify-center shrink-0 text-lime-400">
               <Mail className="w-4 h-4" />
             </div>
             <div>
@@ -1509,11 +1509,11 @@ const ProofRoleAndSplitComparison = () => {
   const isDragging = useRef(false);
 
   const [roles, setRoles] = useState([
-    { name: 'JEE Advanced (Physics)', checked: true, color: 'bg-lime-500' },
+    { name: 'JEE Advanced (Physics)', checked: true, color: 'bg-lime-400' },
     { name: 'NEET UG (Biology)', checked: true, color: 'bg-emerald-600' },
     { name: 'Class 10 CBSE Math', checked: true, color: 'bg-amber-600' },
-    { name: 'Organic Mechanisms', checked: false, color: 'bg-lime-500' },
-    { name: 'Calculus & Vectors', checked: true, color: 'bg-lime-500' },
+    { name: 'Organic Mechanisms', checked: false, color: 'bg-lime-400' },
+    { name: 'Calculus & Vectors', checked: true, color: 'bg-lime-400' },
     { name: 'CA Foundation Accounts', checked: false, color: 'bg-rose-600' },
     { name: 'CUET General Test', checked: false, color: 'bg-cyan-600' },
     { name: 'NTSE Mental Ability', checked: true, color: 'bg-teal-600' },
@@ -1574,7 +1574,7 @@ const ProofRoleAndSplitComparison = () => {
               className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all flex items-center gap-1.5 border cursor-pointer ${
                 r.checked
                   ? `${r.color} text-white border-transparent shadow-xs`
-                  : 'bg-[var(--wl-surface)] text-[var(--wl-muted)] border-[var(--wl-line)] hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] hover:text-[var(--wl-fg)]'
+                  : 'bg-[var(--wl-surface)] text-[var(--wl-muted)] border-[var(--wl-line)] hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] hover:text-[var(--wl-fg)]'
               }`}
             >
               {r.checked && <Check className="w-3 h-3 text-white" />}
@@ -1629,7 +1629,7 @@ const ProofRoleAndSplitComparison = () => {
 
             {/* Right Side: Clipped Overlaid Intelli-X Student Proof */}
             <div
-              className="absolute inset-0 p-4 sm:p-10 bg-[var(--wl-surface-2)] flex flex-col justify-between border-l border-lime-500/60"
+              className="absolute inset-0 p-4 sm:p-10 bg-[var(--wl-surface-2)] flex flex-col justify-between border-l border-lime-400/60"
               style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
             >
               <div>
@@ -1638,7 +1638,7 @@ const ProofRoleAndSplitComparison = () => {
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     Read by parent · 98% open
                   </span>
-                  <span className="rounded-full bg-lime-500/20 border border-lime-500/30 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] text-lime-400 font-bold">Rank #3</span>
+                  <span className="rounded-full bg-lime-400/20 border border-lime-400/30 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] text-lime-400 font-bold">Rank #3</span>
                 </div>
                 <div className="mt-3 sm:mt-4 text-sm sm:text-xl font-medium text-[var(--wl-fg)]">
                   Subject: Aarav scored 92% in Thermodynamics (+18% growth)
@@ -1649,7 +1649,7 @@ const ProofRoleAndSplitComparison = () => {
                 </div>
               </div>
               <div>
-                <div className="inline-flex items-center gap-2 rounded-lg bg-lime-500 px-3 sm:px-3.5 py-1.5 text-xs text-zinc-950 font-semibold shadow-md shadow-lime-500/25 hover:bg-lime-400 transition-colors">
+                <div className="inline-flex items-center gap-2 rounded-lg bg-lime-400 px-3 sm:px-3.5 py-1.5 text-xs text-zinc-950 font-semibold shadow-md shadow-lime-400/25 hover:bg-lime-400 transition-colors">
                   <ExternalLink className="w-3.5 h-3.5 text-zinc-950 shrink-0" />
                   <span className="truncate">intelli-x.in/r/aarav-12a</span>
                 </div>
@@ -1662,8 +1662,8 @@ const ProofRoleAndSplitComparison = () => {
               style={{ left: `${sliderPos}%` }}
               onPointerDown={handlePointerDown}
             >
-              <div className="w-0.5 h-full bg-lime-400 shadow-[0_0_8px_rgba(163,230,53,0.8)]" />
-              <div className="absolute w-8 h-8 rounded-full bg-lime-500 border-2 border-white flex items-center justify-center shadow-[0_0_12px_rgba(163,230,53,0.6)] text-zinc-950 text-xs font-mono font-bold">
+              <div className="w-0.5 h-full bg-lime-400 shadow-[0_0_8px_rgba(190, 242, 100,0.8)]" />
+              <div className="absolute w-8 h-8 rounded-full bg-lime-400 border-2 border-white flex items-center justify-center shadow-[0_0_12px_rgba(190, 242, 100,0.6)] text-zinc-950 text-xs font-mono font-bold">
                 |||
               </div>
             </div>
@@ -1692,12 +1692,12 @@ const ProofRoleAndSplitComparison = () => {
               <span className="rounded-full bg-emerald-500/15 border border-emerald-500/35 px-3 py-1 text-[11px] text-emerald-400 font-semibold shadow-xs">Topic-level accuracy</span>
             </div>
             <div className="flex items-center gap-2 justify-end">
-              <div className="w-8 h-px bg-lime-500/40" />
-              <span className="rounded-full bg-lime-500/15 border border-lime-500/35 px-3 py-1 text-[11px] text-lime-400 font-semibold shadow-xs">Shows student progress</span>
+              <div className="w-8 h-px bg-lime-400/40" />
+              <span className="rounded-full bg-lime-400/15 border border-lime-400/35 px-3 py-1 text-[11px] text-lime-400 font-semibold shadow-xs">Shows student progress</span>
             </div>
             <div className="flex items-center gap-2 justify-end">
-              <div className="w-8 h-px bg-lime-500/40" />
-              <span className="rounded-full bg-lime-500/15 border border-lime-500/35 px-3 py-1 text-[11px] text-lime-400 font-semibold shadow-xs">Interactive parent portal</span>
+              <div className="w-8 h-px bg-lime-400/40" />
+              <span className="rounded-full bg-lime-400/15 border border-lime-400/35 px-3 py-1 text-[11px] text-lime-400 font-semibold shadow-xs">Interactive parent portal</span>
             </div>
           </div>
         </div>
@@ -1720,8 +1720,8 @@ const ProofWindowSection = () => {
       role: 'Head of Academics',
       heading: 'Batch 12-A · Weekly Physics & Chemistry Test Distribution',
       companies: [
-        { name: 'Aarav Sharma', title: 'Roll #1042 · AIR Rank 45', badge: 'Top 1% in Thermodynamics', char: 'A', color: 'bg-lime-500' },
-        { name: 'Priya Verma', title: 'Roll #1058 · AIR Rank 82', badge: '98% Accuracy in Mechanisms', char: 'P', color: 'bg-lime-500' },
+        { name: 'Aarav Sharma', title: 'Roll #1042 · AIR Rank 45', badge: 'Top 1% in Thermodynamics', char: 'A', color: 'bg-lime-400' },
+        { name: 'Priya Verma', title: 'Roll #1058 · AIR Rank 82', badge: '98% Accuracy in Mechanisms', char: 'P', color: 'bg-lime-400' },
         { name: 'Rohan Gupta', title: 'Roll #1089 · AIR Rank 120', badge: '+24 marks growth in 3 weeks', char: 'R', color: 'bg-emerald-600' }
       ]
     },
@@ -1731,7 +1731,7 @@ const ProofWindowSection = () => {
       companies: [
         { name: 'Morning Batch Alpha', title: 'Room 401 · Prof. Sharma', badge: '98.2% present (2 alerted)', char: 'M', color: 'bg-amber-600' },
         { name: 'Evening Medical Wing', title: 'Hall B · Dr. Verma', badge: '100% present · Zero leaves', char: 'E', color: 'bg-emerald-600' },
-        { name: 'Foundation Class 10', title: 'Room 102 · Olympiad', badge: '96.5% present (SMS sent)', char: 'F', color: 'bg-lime-500' }
+        { name: 'Foundation Class 10', title: 'Room 102 · Olympiad', badge: '96.5% present (SMS sent)', char: 'F', color: 'bg-lime-400' }
       ]
     },
     'Fee Collection': {
@@ -1739,7 +1739,7 @@ const ProofWindowSection = () => {
       heading: 'Automated Fee Installments & UPI Settlement Engine',
       companies: [
         { name: 'Tuition Installment #2', title: 'Batch 12-A · 32 Students', badge: '₹4,80,000 collected via UPI', char: 'T', color: 'bg-emerald-600' },
-        { name: 'Scholarship Tier A', title: 'Olympiad Wing · 14 Students', badge: '100% cleared · Receipts issued', char: 'S', color: 'bg-lime-500' },
+        { name: 'Scholarship Tier A', title: 'Olympiad Wing · 14 Students', badge: '100% cleared · Receipts issued', char: 'S', color: 'bg-lime-400' },
         { name: 'Pending Reminders', title: 'Due today · 4 Students', badge: 'Automated WhatsApp sent at 9am', char: 'P', color: 'bg-rose-600' }
       ]
     }
@@ -1781,7 +1781,7 @@ const ProofWindowSection = () => {
               onClick={() => setActiveTab(tab)}
               className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5 ${
                 activeTab === tab
-                  ? 'bg-lime-500 text-zinc-950 font-bold shadow-xs'
+                  ? 'bg-lime-400 text-zinc-950 font-bold shadow-xs'
                   : 'bg-[var(--wl-surface)] text-[var(--wl-muted)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]'
               }`}
             >
@@ -1823,7 +1823,7 @@ const ProofWindowSection = () => {
                 {current.companies.map((c, i) => (
                   <div
                     key={i}
-                    className="flex flex-wrap items-center justify-between p-3 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-colors gap-2"
+                    className="flex flex-wrap items-center justify-between p-3 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] transition-colors gap-2"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-lg ${c.color} flex items-center justify-center font-bold text-xs text-white`}>
@@ -1842,7 +1842,7 @@ const ProofWindowSection = () => {
                 ))}
               </div>
 
-              <div className="text-xs text-lime-500 font-medium cursor-pointer hover:underline">
+              <div className="text-xs text-lime-400 font-medium cursor-pointer hover:underline">
                 + View all 42 students in roster
               </div>
             </div>
@@ -1852,11 +1852,11 @@ const ProofWindowSection = () => {
               {/* Activity notification */}
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 text-xs font-semibold text-[var(--wl-fg)]">
-                  <Eye className="w-3.5 h-3.5 text-lime-500" />
+                  <Eye className="w-3.5 h-3.5 text-lime-400" />
                   <span>Activity</span>
                 </div>
-                <div className="text-xs text-lime-500 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-lime-500 animate-ping" />
+                <div className="text-xs text-lime-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-lime-400 animate-ping" />
                   <span className="font-medium text-[var(--wl-fg)]">Parent opened report card</span>
                 </div>
                 <div className="text-[11px] text-[var(--wl-faint)]">Viewed for 4 minutes · Signed via OTP</div>
@@ -1871,7 +1871,7 @@ const ProofWindowSection = () => {
                   </div>
                   <button
                     onClick={() => setIsEditing(!isEditing)}
-                    className="text-[11px] text-lime-500 hover:underline"
+                    className="text-[11px] text-lime-400 hover:underline"
                   >
                     {isEditing ? 'Done' : 'Edit'}
                   </button>
@@ -1882,7 +1882,7 @@ const ProofWindowSection = () => {
                     value={emailText}
                     onChange={(e) => setEmailText(e.target.value)}
                     rows={3}
-                    className="w-full text-xs text-[var(--wl-fg)] bg-[var(--wl-surface)] p-2.5 rounded-xl border border-[var(--wl-line)] outline-none focus:border-lime-500"
+                    className="w-full text-xs text-[var(--wl-fg)] bg-[var(--wl-surface)] p-2.5 rounded-xl border border-[var(--wl-line)] outline-none focus:border-lime-400"
                   />
                 ) : (
                   <p className="text-xs text-[var(--wl-muted)] leading-relaxed bg-[var(--wl-surface)] p-3 rounded-xl border border-[var(--wl-line)]">
@@ -1988,13 +1988,13 @@ const AlternatingFeaturesSection = () => {
                 </div>
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)]">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-7 h-7 rounded-full bg-lime-500 text-zinc-950 font-bold font-bold text-[11px] flex items-center justify-center shadow-sm">A</span>
+                    <span className="w-7 h-7 rounded-full bg-lime-400 text-zinc-950 font-bold font-bold text-[11px] flex items-center justify-center shadow-sm">A</span>
                     <div>
                       <div className="font-medium text-[var(--wl-fg)]">Attendance Alert</div>
                       <div className="text-[10px] text-[var(--wl-faint)]">3 absentees flagged & parents alerted</div>
                     </div>
                   </div>
-                  <span className="text-[10px] text-[var(--wl-faint)] flex items-center gap-1.5">Yesterday <span className="w-2 h-2 rounded-full bg-lime-500 shadow-sm shadow-lime-500/50" /></span>
+                  <span className="text-[10px] text-[var(--wl-faint)] flex items-center gap-1.5">Yesterday <span className="w-2 h-2 rounded-full bg-lime-400 shadow-sm shadow-lime-400/50" /></span>
                 </div>
                 <div className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)]">
                   <div className="flex items-center gap-2.5">
@@ -2028,7 +2028,7 @@ const AlternatingFeaturesSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Text Left */}
           <div className="order-2 lg:order-1 lg:pr-8 space-y-4">
-            <div className="w-10 h-10 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] flex items-center justify-center text-lime-500">
+            <div className="w-10 h-10 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] flex items-center justify-center text-lime-400">
               <Layers className="w-5 h-5" />
             </div>
             <h3 className="text-2xl sm:text-3xl font-semibold font-geist text-[var(--wl-fg)]">
@@ -2066,13 +2066,13 @@ const AlternatingFeaturesSection = () => {
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   <span className="rounded bg-[var(--wl-surface)] px-2 py-0.5 text-[10px] text-emerald-400 border border-emerald-500/30">Physics: 94%</span>
-                  <span className="rounded bg-[var(--wl-surface)] px-2 py-0.5 text-[10px] text-lime-400 border border-lime-500/30">Chemistry: 91%</span>
-                  <span className="rounded bg-[var(--wl-surface)] px-2 py-0.5 text-[10px] text-lime-400 border border-lime-500/30">Maths: 96%</span>
+                  <span className="rounded bg-[var(--wl-surface)] px-2 py-0.5 text-[10px] text-lime-400 border border-lime-400/30">Chemistry: 91%</span>
+                  <span className="rounded bg-[var(--wl-surface)] px-2 py-0.5 text-[10px] text-lime-400 border border-lime-400/30">Maths: 96%</span>
                   <span className="rounded bg-[var(--wl-surface)] px-2 py-0.5 text-[10px] text-amber-400 border border-amber-500/30">AIR Rank 45</span>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-[var(--wl-line)]">
                   <span className="text-xs text-[var(--wl-faint)] flex items-center gap-1.5">
-                    <Eye className="w-3.5 h-3.5 text-lime-500" />
+                    <Eye className="w-3.5 h-3.5 text-lime-400" />
                     <span>Tests completed <strong className="text-[var(--wl-fg)] font-mono">24</strong></span>
                   </span>
                   <button className="rounded-lg bg-[var(--wl-surface)] hover:bg-[var(--wl-surface-2)] px-3 py-1 text-xs text-[var(--wl-fg)] font-medium border border-[var(--wl-line)] transition-colors">
@@ -2204,7 +2204,7 @@ const TabbedToolSection = () => {
             {/* Left Column (5 cols): Contextual Controls & Telemetry */}
             <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-500/10 border border-lime-500/30 text-lime-400 text-xs font-medium">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-400/10 border border-lime-400/30 text-lime-400 text-xs font-medium">
                   <Sliders className="w-3.5 h-3.5" />
                   <span>Module active: {activeTab}</span>
                 </div>
@@ -2288,7 +2288,7 @@ const TabbedToolSection = () => {
                         </div>
                       </div>
                     </div>
-                    <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-lime-500/10 text-lime-400 text-xs font-mono font-medium border border-lime-500/20">
+                    <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-lime-400/10 text-lime-400 text-xs font-mono font-medium border border-lime-400/20">
                       JEE Advanced
                     </span>
                   </div>
@@ -2355,7 +2355,7 @@ const TabbedToolSection = () => {
                           onClick={() => setReportTone(tone)}
                           className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
                             reportTone === tone
-                              ? 'bg-lime-500 text-zinc-950 font-bold shadow-xs'
+                              ? 'bg-lime-400 text-zinc-950 font-bold shadow-xs'
                               : 'bg-[var(--wl-surface)] text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
                           }`}
                         >
@@ -2369,7 +2369,7 @@ const TabbedToolSection = () => {
                   <div className="p-4 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] space-y-3 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-lime-500/20 text-lime-400 font-bold text-xs flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-lime-400/20 text-lime-400 font-bold text-xs flex items-center justify-center">
                           AS
                         </div>
                         <div>
@@ -2463,7 +2463,7 @@ const TabbedToolSection = () => {
                         key={i}
                         className={`p-2.5 rounded-xl ${
                           r.from === 'user'
-                            ? 'bg-lime-500 text-zinc-950 font-bold ml-auto max-w-[80%] shadow-xs'
+                            ? 'bg-lime-400 text-zinc-950 font-bold ml-auto max-w-[80%] shadow-xs'
                             : 'bg-[var(--wl-surface-2)] text-[var(--wl-fg)] max-w-[88%] border border-[var(--wl-line)]'
                         }`}
                       >
@@ -2478,7 +2478,7 @@ const TabbedToolSection = () => {
                       value={aiChatInput}
                       onChange={(e) => setAiChatInput(e.target.value)}
                       placeholder="Ask AI e.g. which batch needs revision in Optics?..."
-                      className="flex-1 bg-[var(--wl-surface)] border border-[var(--wl-line)] rounded-xl px-3 py-2 text-xs text-[var(--wl-fg)] outline-none focus:border-lime-500"
+                      className="flex-1 bg-[var(--wl-surface)] border border-[var(--wl-line)] rounded-xl px-3 py-2 text-xs text-[var(--wl-fg)] outline-none focus:border-lime-400"
                     />
                     <button type="submit" className="wl-btn wl-btn-primary px-3.5 py-2 text-xs rounded-xl flex items-center justify-center">
                       <Send className="w-3.5 h-3.5" />
@@ -2497,13 +2497,13 @@ const TabbedToolSection = () => {
 // ── SECTION 7: THE SMALL TOOLS BENTO GRID (Screenshot 7: 80a857a7.png) ──
 const SmallToolsBentoSection = () => {
   const [filterPills, setFilterPills] = useState([
-    { name: 'JEE Prep', active: true, color: 'bg-lime-500' },
-    { name: 'NEET 2026', active: true, color: 'bg-lime-500' },
+    { name: 'JEE Prep', active: true, color: 'bg-lime-400' },
+    { name: 'NEET 2026', active: true, color: 'bg-lime-400' },
     { name: 'Class 10 CBSE', active: false, color: 'bg-amber-600' },
-    { name: 'Morning Batch', active: false, color: 'bg-lime-500' },
+    { name: 'Morning Batch', active: false, color: 'bg-lime-400' },
     { name: 'Evening Batch', active: true, color: 'bg-pink-600' },
     { name: 'Fee Cleared', active: true, color: 'bg-emerald-600' },
-    { name: 'Scholarship Tier', active: false, color: 'bg-lime-500' },
+    { name: 'Scholarship Tier', active: false, color: 'bg-lime-400' },
     { name: 'Offline Hall A', active: false, color: 'bg-orange-600' },
     { name: 'Hostel Wing', active: false, color: 'bg-teal-600' }
   ]);
@@ -2536,13 +2536,13 @@ const SmallToolsBentoSection = () => {
 
           {/* High-tech coaching engine emblem */}
           <div className="relative group shrink-0">
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-lime-500/25 via-lime-400/20 to-emerald-500/25 blur-lg opacity-40 group-hover:opacity-80 transition-opacity" />
+            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-lime-400/25 via-lime-400/20 to-emerald-500/25 blur-lg opacity-40 group-hover:opacity-80 transition-opacity" />
             <div className="relative rounded-2xl border border-[var(--wl-line)] bg-[var(--wl-surface-2)]/90 backdrop-blur-md p-4 sm:p-5 flex flex-col items-center justify-center gap-2.5 shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-lime-400 to-lime-600 flex items-center justify-center shadow-md shadow-lime-500/35">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-lime-400 to-lime-400 flex items-center justify-center shadow-md shadow-lime-400/35">
                 <GraduationCap className="w-6 h-6 text-zinc-950" />
               </div>
               <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--wl-surface)] border border-[var(--wl-line)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_8px_rgba(163,230,53,0.8)] animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_8px_rgba(190, 242, 100,0.8)] animate-pulse" />
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--wl-muted)]">Active OS</span>
               </div>
             </div>
@@ -2552,7 +2552,7 @@ const SmallToolsBentoSection = () => {
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Card 1: Smart student & batch filters */}
-          <div className="relative md:col-span-2 rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm overflow-hidden group hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-all">
+          <div className="relative md:col-span-2 rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm overflow-hidden group hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] transition-all">
             <div className="pointer-events-none absolute inset-0 size-full overflow-hidden z-0">
               <AsciiField hollow={0.06} opacity={0.75} />
             </div>
@@ -2565,7 +2565,7 @@ const SmallToolsBentoSection = () => {
                   className={`rounded-full px-4 py-2 text-xs font-semibold transition-all cursor-pointer border flex items-center gap-1.5 shadow-xs hover:scale-105 active:scale-95 ${
                     pill.active
                       ? `${pill.color} text-white border-transparent shadow-md`
-                      : 'bg-[var(--wl-surface-2)] text-[var(--wl-muted)] border-[var(--wl-line)] hover:text-[var(--wl-fg)] hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)]'
+                      : 'bg-[var(--wl-surface-2)] text-[var(--wl-muted)] border-[var(--wl-line)] hover:text-[var(--wl-fg)] hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)]'
                   }`}
                 >
                   {pill.active && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
@@ -2589,7 +2589,7 @@ const SmallToolsBentoSection = () => {
               {/* Front sheet with code bars */}
               <div className="absolute w-28 h-28 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] transform rotate-3 flex flex-col justify-between p-2.5 shadow-xl group-hover:scale-105 transition-transform">
                 <div className="space-y-1.5 pt-1">
-                  <div className="w-12 h-1.5 rounded-full bg-lime-500" />
+                  <div className="w-12 h-1.5 rounded-full bg-lime-400" />
                   <div className="w-20 h-1 rounded-full bg-[var(--wl-line)]" />
                   <div className="w-16 h-1 rounded-full bg-[var(--wl-line)]" />
                   <div className="w-14 h-1 rounded-full bg-emerald-500/60" />
@@ -2611,17 +2611,17 @@ const SmallToolsBentoSection = () => {
           </div>
 
           {/* Card 3: Morning attendance & fee alerts */}
-          <div className="rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm group hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-all">
+          <div className="rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm group hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] transition-all">
             <div className="rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-3 text-xs space-y-2 shadow-xs">
               <div className="flex items-center justify-between text-[var(--wl-muted)] pb-1.5 border-b border-[var(--wl-line)]">
                 <span className="flex items-center gap-1.5 font-medium text-[var(--wl-fg)]">
-                  <Mail className="w-3.5 h-3.5 text-lime-500" />
+                  <Mail className="w-3.5 h-3.5 text-lime-400" />
                   Morning Dispatch
                 </span>
-                <span className="rounded-full bg-lime-500 px-2 py-0.2 text-[10px] text-white font-bold font-mono">3 alerts</span>
+                <span className="rounded-full bg-lime-400 px-2 py-0.2 text-[10px] text-white font-bold font-mono">3 alerts</span>
               </div>
               <div className="flex items-center gap-2 text-[11px] text-[var(--wl-fg)] hover:translate-x-1 transition-transform">
-                <span className="w-5 h-5 rounded-md bg-lime-500 text-zinc-950 font-bold font-bold text-[9px] flex items-center justify-center shrink-0">A</span>
+                <span className="w-5 h-5 rounded-md bg-lime-400 text-zinc-950 font-bold font-bold text-[9px] flex items-center justify-center shrink-0">A</span>
                 <span>Daily Attendance <span className="text-[var(--wl-muted)]">98.4% Present</span></span>
               </div>
               <div className="flex items-center gap-2 text-[11px] text-[var(--wl-fg)] hover:translate-x-1 transition-transform">
@@ -2642,10 +2642,10 @@ const SmallToolsBentoSection = () => {
           </div>
 
           {/* Card 4: Know when parents open reports */}
-          <div className="rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm group hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-all">
+          <div className="rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm group hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] transition-all">
             <div className="rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-3.5 text-xs text-[var(--wl-fg)] shadow-sm flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-lime-500/15 text-lime-400 flex items-center justify-center shrink-0 border border-lime-500/25">
+                <div className="w-8 h-8 rounded-full bg-lime-400/15 text-lime-400 flex items-center justify-center shrink-0 border border-lime-400/25">
                   <Eye className="w-4 h-4 text-lime-400" />
                 </div>
                 <div>
@@ -2664,7 +2664,7 @@ const SmallToolsBentoSection = () => {
           </div>
 
           {/* Card 5: Institute growth & revenue analytics */}
-          <div className="relative rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm overflow-hidden group hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-all">
+          <div className="relative rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-sm overflow-hidden group hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] transition-all">
             <div className="pointer-events-none absolute inset-0 size-full overflow-hidden z-0">
               <AsciiField hollow={0.06} opacity={0.65} />
             </div>
@@ -2672,10 +2672,10 @@ const SmallToolsBentoSection = () => {
             <div className="relative z-10 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-4 shadow-sm">
               <div className="flex items-center justify-between text-xs text-[var(--wl-muted)] mb-3">
                 <span className="font-semibold text-[var(--wl-fg)] flex items-center gap-1.5">
-                  <BarChart3 className="w-3.5 h-3.5 text-lime-500" />
+                  <BarChart3 className="w-3.5 h-3.5 text-lime-400" />
                   Monthly Fee Intake
                 </span>
-                <span className="font-mono font-bold text-lime-500 text-sm">₹14.2L</span>
+                <span className="font-mono font-bold text-lime-400 text-sm">₹14.2L</span>
               </div>
               {/* Dynamic Interactive Bar Chart */}
               <div className="h-14 flex items-end gap-2 pt-2 px-1 border-b border-[var(--wl-line)] pb-2">
@@ -2696,8 +2696,8 @@ const SmallToolsBentoSection = () => {
                       style={{ height: `${b.h}px` }}
                       className={`w-full rounded-sm transition-all duration-300 ${
                         activeBar === i
-                          ? 'bg-gradient-to-t from-lime-500 to-cyan-400 shadow-md shadow-cyan-500/40'
-                          : 'bg-[var(--wl-line)] hover:bg-lime-500/50'
+                          ? 'bg-gradient-to-t from-lime-400 to-cyan-400 shadow-md shadow-cyan-500/40'
+                          : 'bg-[var(--wl-line)] hover:bg-lime-400/50'
                       }`}
                     />
                     <span className="text-[9px] font-mono text-[var(--wl-faint)]">{b.day}</span>
@@ -2907,10 +2907,10 @@ const BatchesSection = () => {
             </div>
 
             {/* Card 2: The Solution (Intelli-X Integrated Operating System) */}
-            <div className="p-6 sm:p-8 rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] flex flex-col justify-between space-y-6 shadow-sm hover:border-lime-500/50 hover:shadow-[0_0_20px_rgba(163,230,53,0.15)] transition-colors">
+            <div className="p-6 sm:p-8 rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] flex flex-col justify-between space-y-6 shadow-sm hover:border-lime-400/50 hover:shadow-[0_0_20px_rgba(190, 242, 100,0.15)] transition-colors">
               <div className="space-y-5">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-md bg-lime-500/10 border border-lime-500/25 px-2.5 py-1 text-[11px] font-semibold text-lime-500 tracking-wide uppercase font-mono">
+                  <span className="rounded-md bg-lime-400/10 border border-lime-400/25 px-2.5 py-1 text-[11px] font-semibold text-lime-400 tracking-wide uppercase font-mono">
                     Intelli-X Engine
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-xs text-emerald-500 font-mono font-medium">
@@ -2931,8 +2931,8 @@ const BatchesSection = () => {
                 {/* Solid Iconed Feature Display */}
                 <div className="space-y-3 pt-1">
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
-                    <div className="w-8 h-8 rounded-xl bg-lime-500/10 border border-lime-500/20 flex items-center justify-center shrink-0">
-                      <Users className="w-4 h-4 text-lime-500" />
+                    <div className="w-8 h-8 rounded-xl bg-lime-400/10 border border-lime-400/20 flex items-center justify-center shrink-0">
+                      <Users className="w-4 h-4 text-lime-400" />
                     </div>
                     <div>
                       <div className="text-xs font-semibold text-[var(--wl-fg)]">1-Click Biometric Attendance</div>
@@ -2961,8 +2961,8 @@ const BatchesSection = () => {
                   </div>
 
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
-                    <div className="w-8 h-8 rounded-xl bg-lime-500/10 border border-lime-500/20 flex items-center justify-center shrink-0">
-                      <Shield className="w-4 h-4 text-lime-500" />
+                    <div className="w-8 h-8 rounded-xl bg-lime-400/10 border border-lime-400/20 flex items-center justify-center shrink-0">
+                      <Shield className="w-4 h-4 text-lime-400" />
                     </div>
                     <div>
                       <div className="text-xs font-semibold text-[var(--wl-fg)]">Verified Student Portals</div>
@@ -3068,7 +3068,7 @@ const PricingSection = () => {
             <button
               onClick={() => setBillingAnnual(false)}
               className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                !billingAnnual ? 'bg-lime-500 text-zinc-950 font-bold shadow-xs' : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
+                !billingAnnual ? 'bg-lime-400 text-zinc-950 font-bold shadow-xs' : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
               }`}
             >
               Monthly billing
@@ -3076,7 +3076,7 @@ const PricingSection = () => {
             <button
               onClick={() => setBillingAnnual(true)}
               className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all flex items-center gap-1.5 ${
-                billingAnnual ? 'bg-lime-500 text-zinc-950 font-bold shadow-xs' : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
+                billingAnnual ? 'bg-lime-400 text-zinc-950 font-bold shadow-xs' : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
               }`}
             >
               <span>Annual billing</span>
@@ -3092,12 +3092,12 @@ const PricingSection = () => {
               key={idx}
               className={`relative rounded-3xl border p-6 sm:p-8 flex flex-col justify-between transition-all ${
                 p.popular
-                  ? 'border-lime-500 bg-[var(--wl-surface)] shadow-2xl ring-1 ring-lime-500/50'
+                  ? 'border-lime-400 bg-[var(--wl-surface)] shadow-2xl ring-1 ring-lime-400/50'
                   : 'border-[var(--wl-line)] bg-[var(--wl-surface)] shadow-md'
               }`}
             >
               {p.popular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-lime-500 px-3 py-0.5 text-[11px] font-semibold text-white shadow-sm">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-lime-400 px-3 py-0.5 text-[11px] font-semibold text-white shadow-sm">
                   Most Popular
                 </div>
               )}
@@ -3107,7 +3107,7 @@ const PricingSection = () => {
                 <p className="mt-2 text-xs text-[var(--wl-muted)] leading-relaxed font-light">{p.desc}</p>
 
                 <div className="mt-6 flex items-baseline gap-1.5 px-3.5 py-2 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] w-fit shadow-xs">
-                  <span className="text-3xl sm:text-4xl font-black text-lime-500 tracking-tight font-geist">
+                  <span className="text-3xl sm:text-4xl font-black text-lime-400 tracking-tight font-geist">
                     {billingAnnual ? p.priceAnnual : p.priceMonthly}
                   </span>
                   <span className="text-xs text-[var(--wl-muted)] font-medium">/{p.period}</span>
@@ -3116,7 +3116,7 @@ const PricingSection = () => {
                 <div className="mt-6 space-y-2.5 pt-6 border-t border-[var(--wl-line)]">
                   {p.features.map((feat, fi) => (
                     <div key={fi} className="flex items-center gap-2 text-xs text-[var(--wl-muted)]">
-                      <Check className="w-3.5 h-3.5 text-lime-500 shrink-0" />
+                      <Check className="w-3.5 h-3.5 text-lime-400 shrink-0" />
                       <span>{feat}</span>
                     </div>
                   ))}
@@ -3129,7 +3129,7 @@ const PricingSection = () => {
                     type="button"
                     className={`group relative overflow-hidden w-full h-11 text-xs rounded-xl font-semibold transition-all duration-300 flex items-center justify-center cursor-pointer ${
                       p.popular
-                        ? 'bg-lime-500 hover:bg-lime-400 text-zinc-950 font-bold shadow-[0_0_18px_rgba(163,230,53,0.35)] hover:shadow-[0_0_26px_rgba(163,230,53,0.55)] border border-lime-400/40'
+                        ? 'bg-lime-400 hover:bg-lime-400 text-zinc-950 font-bold shadow-[0_0_18px_rgba(190, 242, 100,0.35)] hover:shadow-[0_0_26px_rgba(190, 242, 100,0.55)] border border-lime-400/40'
                         : 'bg-[var(--wl-surface-2)] text-[var(--wl-fg)] border border-[var(--wl-line)] hover:border-zinc-500/60 hover:shadow-[0_0_12px_rgba(255,255,255,0.05)]'
                     }`}
                   >
@@ -3190,7 +3190,7 @@ const FAQSection = () => {
             </p>
             <div className="pt-2">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] text-xs text-[var(--wl-muted)] shadow-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-lime-500 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-lime-400 animate-pulse" />
                 <span>
                   Powered by <span className="font-semibold text-[var(--wl-fg)] tracking-tight">Cadence Labs</span>
                 </span>
@@ -3211,7 +3211,7 @@ const FAQSection = () => {
                     <span className="group-hover:translate-x-0.5 transition-transform">{faq.q}</span>
                     <span
                       className={`grid size-7 place-items-center rounded-full bg-[var(--wl-surface-2)] text-[var(--wl-fg)] transition-all duration-300 shrink-0 ${
-                        isOpen ? 'rotate-45 bg-lime-500 text-zinc-950 font-bold shadow-[0_0_12px_rgba(163,230,53,0.6)]' : 'group-hover:bg-lime-500/10 group-hover:text-lime-400'
+                        isOpen ? 'rotate-45 bg-lime-400 text-zinc-950 font-bold shadow-[0_0_12px_rgba(190, 242, 100,0.6)]' : 'group-hover:bg-lime-400/10 group-hover:text-lime-400'
                       }`}
                     >
                       <Plus className="w-4 h-4" />
@@ -3252,10 +3252,10 @@ const InteractiveFooter = ({ isDark }) => {
                 tag: 'Report',
                 text: 'Did the parent open the test report?',
                 icon: CheckCircle2,
-                lightClass: 'bg-lime-50/95 border-lime-300 text-lime-950 shadow-lime-500/10',
+                lightClass: 'bg-lime-50/95 border-lime-300 text-lime-950 shadow-lime-400/10',
                 darkClass: 'bg-lime-950/60 border-lime-400/40 text-lime-100 shadow-lime-950/40',
                 badgeLight: 'bg-lime-200/80 text-lime-900 border-lime-300',
-                badgeDark: 'bg-lime-500/20 text-lime-300 border-lime-400/30'
+                badgeDark: 'bg-lime-400/20 text-lime-300 border-lime-400/30'
               },
               {
                 tag: 'Exam',
@@ -3279,10 +3279,10 @@ const InteractiveFooter = ({ isDark }) => {
                 tag: 'Academic',
                 text: 'Batch 12-A completed syllabus.',
                 icon: GraduationCap,
-                lightClass: 'bg-lime-50/95 border-lime-300 text-lime-950 shadow-lime-500/10',
+                lightClass: 'bg-lime-50/95 border-lime-300 text-lime-950 shadow-lime-400/10',
                 darkClass: 'bg-lime-950/60 border-lime-400/40 text-lime-100 shadow-lime-950/40',
                 badgeLight: 'bg-lime-200/80 text-lime-900 border-lime-300',
-                badgeDark: 'bg-lime-500/20 text-lime-300 border-lime-400/30'
+                badgeDark: 'bg-lime-400/20 text-lime-300 border-lime-400/30'
               }
             ].map((bubble, i) => {
               const IconComponent = bubble.icon;

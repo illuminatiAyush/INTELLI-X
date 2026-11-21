@@ -94,7 +94,7 @@ function AsciiBackground() {
             if (mouseInfluence > 0.06) {
               const root = canvas.closest('.landing-page-root') || document.documentElement
               const isLight = root.classList.contains('light')
-              ctx.fillStyle = isLight ? `rgba(37, 99, 235, ${alpha})` : `rgba(96, 165, 250, ${alpha})`
+              ctx.fillStyle = isLight ? `rgba(132, 204, 22, ${alpha})` : `rgba(190, 242, 100, ${alpha})`
             } else {
               ctx.fillStyle = getColor(alpha)
             }
@@ -370,11 +370,11 @@ const AuthPage = () => {
   }
 
   return (
-    <div className={`landing-page-root min-h-screen flex flex-col justify-between ${isDark ? 'dark' : 'light'} relative selection:bg-blue-500/20 selection:text-blue-500 overflow-x-hidden`}>
+    <div className={`landing-page-root min-h-screen flex flex-col justify-between ${isDark ? 'dark' : 'light'} relative selection:bg-lime-400/20 selection:text-lime-400 overflow-x-hidden`}>
       
       {/* ── Background ASCII Canvas & Gradient Aura ── */}
       <AsciiBackground />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(59,130,246,0.18),transparent_70%)] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(190, 242, 100, 0.18),transparent_70%)] pointer-events-none" />
 
       {/* ── Navigation Header (Landing Page Style) ── */}
       <header className="relative z-20 border-b border-[var(--wl-line)]/70 bg-[var(--wl-bg)]/60 backdrop-blur-md px-4 sm:px-8 py-3.5 transition-colors">
@@ -431,7 +431,7 @@ const AuthPage = () => {
             
             <div className="space-y-3">
               <h1 className="text-4xl sm:text-5xl font-light text-[var(--wl-fg)] tracking-tight leading-[1.12] font-heading">
-                The <span className="font-editorial-italic font-normal text-blue-500">intelligent</span> command center for modern institutes.
+                The <span className="font-editorial-italic font-normal text-lime-400">intelligent</span> command center for modern institutes.
               </h1>
 
               <p className="text-sm text-[var(--wl-muted)] leading-relaxed max-w-md">
@@ -446,7 +446,7 @@ const AuthPage = () => {
                 Real-time Sync
               </span>
               <span className="inline-flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-lime-400" />
                 Automated Dispatches
               </span>
               <span className="inline-flex items-center gap-2">
@@ -462,7 +462,7 @@ const AuthPage = () => {
             <div className="relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] p-6 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden transition-all">
               
               {/* Subtle Top Cyan/Blue Glow Line */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-lime-400 to-transparent" />
 
               {/* Segmented Mode Selector (Sign In vs Create Account) */}
               <div className="p-1 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] flex items-center mb-6">
@@ -521,7 +521,7 @@ const AuthPage = () => {
                             value={loginForm.email}
                             onChange={handleLoginChange}
                             placeholder="name@institute.com"
-                            className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2.5 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pl-10"
+                            className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2.5 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
                           />
                         </div>
                       </Field>
@@ -531,7 +531,7 @@ const AuthPage = () => {
                         label="Password"
                         error={loginErrors.password}
                         rightLabel={
-                          <span className="text-[11px] font-mono text-[var(--wl-muted)] hover:text-blue-500 cursor-pointer transition-colors">
+                          <span className="text-[11px] font-mono text-[var(--wl-muted)] hover:text-lime-400 cursor-pointer transition-colors">
                             Forgot?
                           </span>
                         }
@@ -545,7 +545,7 @@ const AuthPage = () => {
                             value={loginForm.password}
                             onChange={handleLoginChange}
                             placeholder="••••••••"
-                            className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2.5 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pl-10 pr-10"
+                            className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2.5 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10 pr-10"
                           />
                           <button
                             type="button"
@@ -561,7 +561,7 @@ const AuthPage = () => {
                       <button
                         type="submit"
                         disabled={loginLoading}
-                        className="w-full h-11 bg-blue-600 hover:bg-blue-500 active:scale-[0.99] text-white font-medium text-xs rounded-xl transition-all shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 group tracking-wider uppercase font-mono mt-2"
+                        className="w-full h-11 bg-lime-400 hover:bg-lime-300 active:scale-[0.99] text-zinc-950 font-bold shadow-[0_0_20px_rgba(190,242,100,0.35)] font-medium text-xs rounded-xl transition-all shadow-lg shadow-lime-400/25 flex items-center justify-center gap-2 group tracking-wider uppercase font-mono mt-2"
                       >
                         {loginLoading ? (
                           <>
@@ -607,7 +607,7 @@ const AuthPage = () => {
                       <button
                         type="button"
                         onClick={() => switchMode('register')}
-                        className="font-medium text-blue-500 hover:text-blue-400 transition-colors"
+                        className="font-medium text-lime-400 hover:text-lime-300 transition-colors"
                       >
                         Create an account
                       </button>
@@ -657,7 +657,7 @@ const AuthPage = () => {
                                 onClick={() => handleRoleSelect('student')}
                                 className={`flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-mono font-medium transition-all ${
                                   regForm.role === 'student'
-                                    ? 'bg-[var(--wl-surface)] text-blue-500 shadow-sm border border-[var(--wl-line)]'
+                                    ? 'bg-[var(--wl-surface)] text-lime-400 shadow-sm border border-[var(--wl-line)]'
                                     : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
                                 }`}
                               >
@@ -669,7 +669,7 @@ const AuthPage = () => {
                                 onClick={() => handleRoleSelect('teacher')}
                                 className={`flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-mono font-medium transition-all ${
                                   regForm.role === 'teacher'
-                                    ? 'bg-[var(--wl-surface)] text-blue-500 shadow-sm border border-[var(--wl-line)]'
+                                    ? 'bg-[var(--wl-surface)] text-lime-400 shadow-sm border border-[var(--wl-line)]'
                                     : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
                                 }`}
                               >
@@ -697,7 +697,7 @@ const AuthPage = () => {
                                 value={regForm.instituteCode}
                                 onChange={handleRegChange}
                                 placeholder="e.g. APEX01"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm font-mono tracking-widest uppercase text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pl-10"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm font-mono tracking-widest uppercase text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
                               />
                             </div>
                           </Field>
@@ -718,7 +718,7 @@ const AuthPage = () => {
                                     value={regForm.subject}
                                     onChange={handleRegChange}
                                     placeholder="e.g. Physics / Mathematics"
-                                    className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                                    className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all"
                                   />
                                 </Field>
                               </motion.div>
@@ -735,7 +735,7 @@ const AuthPage = () => {
                                 value={regForm.fullName}
                                 onChange={handleRegChange}
                                 placeholder="Aarav Sharma"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pl-10"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
                               />
                             </div>
                           </Field>
@@ -750,7 +750,7 @@ const AuthPage = () => {
                                 value={regForm.phone}
                                 onChange={handleRegChange}
                                 placeholder="+91 98765 43210"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pl-10"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
                               />
                             </div>
                           </Field>
@@ -766,7 +766,7 @@ const AuthPage = () => {
                                 value={regForm.email}
                                 onChange={handleRegChange}
                                 placeholder="name@institute.com"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pl-10"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
                               />
                             </div>
                           </Field>
@@ -782,7 +782,7 @@ const AuthPage = () => {
                                 value={regForm.password}
                                 onChange={handleRegChange}
                                 placeholder="Min 6 characters"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all pl-10 pr-10"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10 pr-10"
                               />
                               <button
                                 type="button"
@@ -798,7 +798,7 @@ const AuthPage = () => {
                           <button
                             type="submit"
                             disabled={regLoading}
-                            className="w-full h-11 bg-blue-600 hover:bg-blue-500 active:scale-[0.99] text-white font-medium text-xs rounded-xl transition-all shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 group tracking-wider uppercase font-mono mt-3"
+                            className="w-full h-11 bg-lime-400 hover:bg-lime-300 active:scale-[0.99] text-zinc-950 font-bold shadow-[0_0_20px_rgba(190,242,100,0.35)] font-medium text-xs rounded-xl transition-all shadow-lg shadow-lime-400/25 flex items-center justify-center gap-2 group tracking-wider uppercase font-mono mt-3"
                           >
                             {regLoading ? (
                               <>
@@ -820,7 +820,7 @@ const AuthPage = () => {
                           <button
                             type="button"
                             onClick={() => switchMode('login')}
-                            className="font-medium text-blue-500 hover:text-blue-400 transition-colors"
+                            className="font-medium text-lime-400 hover:text-lime-300 transition-colors"
                           >
                             Sign in here
                           </button>

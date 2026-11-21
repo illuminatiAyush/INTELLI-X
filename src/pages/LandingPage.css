@@ -25,7 +25,7 @@ html.light {
   --wl-fg: #fafafa;
   --wl-muted: #a1a1aa;
   --wl-faint: #71717a;
-  --wl-accent: #a3e635;
+  --wl-accent: #bef264;
 
   /* ASCII Field Color (White/light in dark mode) */
   --ascii: 255 255 255;
@@ -34,10 +34,10 @@ html.light {
   --wm-base: #27272a;
   --wm-ink: #bef264;
 
-  /* Button Tokens */
-  --btn-from: #a3e635;
-  --btn-to: #65a30d;
-  --btn-rim: #bef264;
+  /* Button Tokens: Luminous Light Lime */
+  --btn-from: #d9f99d;
+  --btn-to: #bef264;
+  --btn-rim: #ecfccb;
   --btn2-from: #27272a;
   --btn2-to: #18181b;
   --btn2-rim: #3f3f46;
@@ -62,19 +62,19 @@ html.light {
   --wl-fg: #09090b;
   --wl-muted: #52525b;
   --wl-faint: #71717a;
-  --wl-accent: #65a30d;
+  --wl-accent: #84cc16;
 
   /* ASCII Field Color (Dark in light mode) */
   --ascii: 30 30 35;
 
   /* Watermark Colors */
   --wm-base: #e7e5e4;
-  --wm-ink: #65a30d;
+  --wm-ink: #84cc16;
 
   /* Button Tokens */
-  --btn-from: #84cc16;
-  --btn-to: #65a30d;
-  --btn-rim: #65a30d;
+  --btn-from: #bef264;
+  --btn-to: #a3e635;
+  --btn-rim: #84cc16;
   --btn2-from: #ffffff;
   --btn2-to: #f4f4f5;
   --btn2-rim: #d4d4d8;
@@ -213,10 +213,10 @@ html.light {
 .landing-page-root .wl-btn:focus-visible {
   outline: 2px solid var(--wl-accent);
   outline-offset: 3px;
-  box-shadow: 0 0 0 4px rgba(163, 230, 53, 0.4);
+  box-shadow: 0 0 0 4px rgba(190, 242, 100, 0.45);
 }
 
-/* Lime Primary Button with Neon Glow */
+/* Light Lime Primary Button with Radiant Light Glow */
 .landing-page-root .wl-btn-primary {
   color: #09090b !important;
   font-weight: 700;
@@ -224,11 +224,11 @@ html.light {
   border-color: var(--btn-rim);
   background: linear-gradient(180deg, var(--btn-from) 0%, var(--btn-to) 100%);
   box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
-    0 1px 2px rgba(0, 0, 0, 0.15),
-    0 0 16px 2px rgba(163, 230, 53, 0.38),
-    0 4px 16px -2px rgba(132, 204, 22, 0.55);
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 0 20px 3px rgba(190, 242, 100, 0.45),
+    0 4px 16px -2px rgba(163, 230, 53, 0.55);
 }
 
 /* Secondary Surface Button */
@@ -244,12 +244,12 @@ html.light {
 @media (hover: hover) and (pointer: fine) {
   .landing-page-root .wl-btn-primary:hover {
     transform: translate3d(0, -1.5px, 0);
-    filter: brightness(1.12);
+    filter: brightness(1.08);
     box-shadow: 
-      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
       0 4px 12px rgba(0, 0, 0, 0.25),
-      0 0 26px 4px rgba(163, 230, 53, 0.58),
-      0 8px 24px -2px rgba(132, 204, 22, 0.68);
+      0 0 32px 5px rgba(190, 242, 100, 0.7),
+      0 8px 24px -2px rgba(163, 230, 53, 0.65);
   }
 
   .landing-page-root .wl-btn-secondary:hover {
