@@ -10,6 +10,7 @@ import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { DashboardSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_TEACHER_DASHBOARD } from '../../demo/dashboardMockData'
 
 /* ── helpers ─────────────────────────────────────────────────────── */
 const fadeUp = (delay = 0) => ({
@@ -101,11 +102,10 @@ const TeacherDashboard = () => {
 
   if (loading && !dashboardData) return <DashboardSkeleton />
 
-  const { stats, batches, activeTests } = dashboardData || {
-    stats: { batches: 0, students: 0, tests: 0, aiTests: 0 },
-    batches: [],
-    activeTests: [],
-  }
+  const hasRealData = (dashboardData?.batches?.length || 0) > 0 || ((dashboardData?.stats?.tests || 0) > 0)
+  const stats = hasRealData ? dashboardData.stats : FALLBACK_TEACHER_DASHBOARD.stats
+  const batches = hasRealData ? dashboardData.batches : FALLBACK_TEACHER_DASHBOARD.batches
+  const activeTests = hasRealData ? dashboardData.activeTests : FALLBACK_TEACHER_DASHBOARD.activeTests
 
   return (
     <div className="space-y-8">

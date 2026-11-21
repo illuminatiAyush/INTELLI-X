@@ -17,6 +17,7 @@ import toast from 'react-hot-toast'
 import AITestCreatorModal from '../../components/teacher/AITestCreatorModal'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { TableSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_TESTS, FALLBACK_BATCHES } from '../../demo/dashboardMockData'
 
 import ResultsPage from './ResultsPage'
 import LeaderboardPage from './LeaderboardPage'
@@ -61,8 +62,9 @@ const TestManagement = () => {
     }
   }, { enabled: !!user })
 
-  const tests = testsData?.tests || []
-  const batches = testsData?.batches || []
+  const fallbackBatches = FALLBACK_BATCHES.map(b => ({ id: b.id, name: b.name }))
+  const tests = (testsData?.tests && testsData.tests.length > 0) ? testsData.tests : FALLBACK_TESTS
+  const batches = (testsData?.batches && testsData.batches.length > 0) ? testsData.batches : fallbackBatches
   const loading = testsLoading && !testsData
 
   const [form, setForm] = useState({ title: '', batch_id: '', date: new Date().toLocaleDateString('en-CA'), total_marks: '100' })

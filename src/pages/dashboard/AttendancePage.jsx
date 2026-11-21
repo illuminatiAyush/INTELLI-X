@@ -17,6 +17,7 @@ import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { TableSkeleton, CardSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_ATTENDANCE_SUBJECTS, FALLBACK_BATCHES, FALLBACK_STUDENTS } from '../../demo/dashboardMockData'
 
 // ─── Student view: enrolled subjects + date-wise attendance ─────────────────
 const StudentAttendanceView = ({ user }) => {
@@ -59,7 +60,7 @@ const StudentAttendanceView = ({ user }) => {
     return subjectList
   }, { enabled: !!user })
 
-  const subjects = attendanceData || []
+  const subjects = (attendanceData && attendanceData.length > 0) ? attendanceData : FALLBACK_ATTENDANCE_SUBJECTS
   const loading = attendanceLoading && !attendanceData
   const [expanded, setExpanded] = useState(null)
 
@@ -240,15 +241,15 @@ const AdminAttendanceView = ({ user, role }) => {
     return { batches: data || [] }
   }, { enabled: !!user })
 
-  useEffect(() => {
-    if (initialData?.batches?.length > 0 && !selectedBatch) {
-      setSelectedBatch(initialData.batches[0].id)
-    }
-  }, [initialData])
-
-  const batches = initialData?.batches || []
+  const fallbackBatches = FALLBACK_BATCHES.map(b => ({ id: b.id, name: b.name }))
+  const batches = (initialData?.batches && initialData.batches.length > 0) ? initialData.batches : fallbackBatches
   const isInitialLoading = initialLoading && !initialData
 
+  useEffect(() => {
+    if (batches.length > 0 && !selectedBatch) {
+      setSelectedBatch(batches[0].id)
+    }
+  }, [batches, selectedBatch])
 
   useEffect(() => {
     if (!selectedBatch) return
@@ -259,12 +260,13 @@ const AdminAttendanceView = ({ user, role }) => {
           getStudentsByBatch(selectedBatch),
           getAttendanceByBatchAndDate(selectedBatch, selectedDate),
         ])
-        setStudents(studentList)
+        const effectiveStudents = (studentList && studentList.length > 0) ? studentList : FALLBACK_STUDENTS
+        setStudents(effectiveStudents)
         const map = {}
         attendanceList.forEach((a) => { map[a.student_id] = a.status })
-        studentList.forEach((s) => { 
+        effectiveStudents.forEach((s) => { 
           const sid = s.profile_id || s.id // Prefer profile_id (User UUID)
-          if (!map[sid]) map[sid] = 'present' 
+          if (!map[sid]) map[sid] = (s.id === 'stu-103' || s.id === 'stu-107') ? 'absent' : 'present' 
         })
         setAttendance(map)
         setSaved(false)

@@ -15,6 +15,7 @@ import { supabase } from '../../lib/supabase'
 import { useTheme } from '../../context/ThemeContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { DashboardSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_STUDENT_DASHBOARD } from '../../demo/dashboardMockData'
 
 /* ── tiny helpers ──────────────────────────────────────────────── */
 const fadeUp = (delay = 0) => ({
@@ -162,15 +163,22 @@ const StudentDashboard = () => {
 
   if (loading && !studentData) return <DashboardSkeleton />
 
+  const effectiveData = (studentData?.studentRecord && studentData?.hasBatches)
+    ? studentData
+    : {
+        studentRecord: studentData?.studentRecord || FALLBACK_STUDENT_DASHBOARD.studentRecord,
+        hasBatches: true,
+        stats: (studentData?.stats?.tests ? studentData.stats : FALLBACK_STUDENT_DASHBOARD.stats),
+        recentResults: (studentData?.recentResults?.length ? studentData.recentResults : FALLBACK_STUDENT_DASHBOARD.recentResults),
+        activeTests: (studentData?.activeTests?.length ? studentData.activeTests : FALLBACK_STUDENT_DASHBOARD.activeTests),
+        chartData: (studentData?.chartData?.length ? studentData.chartData : FALLBACK_STUDENT_DASHBOARD.chartData),
+        enrolledBatches: (studentData?.enrolledBatches?.length ? studentData.enrolledBatches : FALLBACK_STUDENT_DASHBOARD.enrolledBatches),
+      }
+
   const {
     studentRecord, stats, recentResults, activeTests,
     hasBatches, chartData, enrolledBatches,
-  } = studentData || {
-    studentRecord: null,
-    stats: { tests: 0, avgScore: 0, attendanceRate: 0, rank: '-' },
-    recentResults: [], activeTests: [], hasBatches: true,
-    chartData: [], enrolledBatches: [],
-  }
+  } = effectiveData
 
   /* no profile */
   if (!studentRecord) {

@@ -7,6 +7,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { createPortal } from 'react-dom'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { TableSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_TEACHERS } from '../../demo/dashboardMockData'
 
 const TeachersPage = ({ hideHeader = false }) => {
   const { isDark } = useTheme()
@@ -22,7 +23,7 @@ const TeachersPage = ({ hideHeader = false }) => {
     return data || []
   })
 
-  const teachers = teachersData || []
+  const teachers = (teachersData && teachersData.length > 0) ? teachersData : FALLBACK_TEACHERS
   const loading = teachersLoading && !teachersData
 
   const [submitting, setSubmitting] = useState(false)

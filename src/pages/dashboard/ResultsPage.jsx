@@ -12,6 +12,7 @@ import jsPDF from 'jspdf'
 import toast from 'react-hot-toast'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { TableSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_BATCHES, FALLBACK_TESTS, FALLBACK_STUDENT_RESULTS } from '../../demo/dashboardMockData'
 
 const ResultsPage = ({ hideHeader = false }) => {
   const { user, role } = useAuth()
@@ -48,9 +49,13 @@ const ResultsPage = ({ hideHeader = false }) => {
     return { batches, studentResults }
   }, { enabled: !!user })
 
-  const batches = initialData?.batches || []
+  const fallbackBatches = FALLBACK_BATCHES.map(b => ({ id: b.id, name: b.name }))
+  const batches = (initialData?.batches && initialData.batches.length > 0) ? initialData.batches : fallbackBatches
   const [tests, setTests] = useState([])
-  const [results, setResults] = useState(initialData?.studentResults || [])
+  const effectiveInitialResults = role === 'student'
+    ? ((initialData?.studentResults && initialData.studentResults.length > 0) ? initialData.studentResults : FALLBACK_STUDENT_RESULTS)
+    : []
+  const [results, setResults] = useState(effectiveInitialResults)
   const [loading, setLoading] = useState(false)
 
   const isInitialLoading = initialLoading && !initialData
@@ -129,16 +134,23 @@ const ResultsPage = ({ hideHeader = false }) => {
   }
 
   useEffect(() => {
-    if (initialData?.studentResults) {
-      setResults(initialData.studentResults)
+    if (role === 'student') {
+      const res = (initialData?.studentResults && initialData.studentResults.length > 0)
+        ? initialData.studentResults
+        : FALLBACK_STUDENT_RESULTS
+      setResults(res)
     }
-  }, [initialData])
+  }, [initialData, role])
 
   useEffect(() => {
     if (!selectedBatch) { setTests([]); setResults([]); return }
     const fetchTests = async () => {
       const { data } = await supabase.from('tests').select('*').eq('batch_id', selectedBatch).order('date', { ascending: false })
-      setTests(data || [])
+      const effectiveTests = (data && data.length > 0) ? data : FALLBACK_TESTS
+      setTests(effectiveTests)
+      if (effectiveTests.length > 0 && !selectedTest) {
+        setSelectedTest(effectiveTests[0].id)
+      }
     }
     fetchTests()
   }, [selectedBatch])
@@ -157,8 +169,15 @@ const ResultsPage = ({ hideHeader = false }) => {
         // DEBUG SAFETY
         if (data && data.length > 0) console.log('Results Sample:', data[0]);
 
-        // violation_count is auto-included with '*'
-        setResults(data || [])
+        const fallbackResults = [
+          { id: 'res-f1', marks: 98, rank: 1, violation_count: 0, students: { name: 'Diya Patel' }, tests: { title: 'Complex Numbers & Roots of Unity', total_marks: 100 } },
+          { id: 'res-f2', marks: 94, rank: 2, violation_count: 0, students: { name: 'Aarav Sharma' }, tests: { title: 'Complex Numbers & Roots of Unity', total_marks: 100 } },
+          { id: 'res-f3', marks: 92, rank: 3, violation_count: 0, students: { name: 'Ananya Iyer' }, tests: { title: 'Complex Numbers & Roots of Unity', total_marks: 100 } },
+          { id: 'res-f4', marks: 89, rank: 4, violation_count: 0, students: { name: 'Siddharth Rao' }, tests: { title: 'Complex Numbers & Roots of Unity', total_marks: 100 } },
+          { id: 'res-f5', marks: 86, rank: 5, violation_count: 1, students: { name: 'Rohan Verma' }, tests: { title: 'Complex Numbers & Roots of Unity', total_marks: 100 } },
+        ]
+
+        setResults((data && data.length > 0) ? data : fallbackResults)
       } catch (err) {
         console.error(err)
       } finally {

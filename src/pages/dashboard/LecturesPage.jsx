@@ -10,6 +10,7 @@ import { upsertLectureAttendance } from '../../services/attendanceService'
 import LectureCard from '../../components/lectures/LectureCard'
 import LiveAttendanceModal from '../../components/lectures/LiveAttendanceModal'
 import { CardSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_LECTURES } from '../../demo/dashboardMockData'
 
 const LecturesPage = ({ hideHeader = false }) => {
   const { user, role, profile } = useAuth()
@@ -254,9 +255,10 @@ const LecturesPage = ({ hideHeader = false }) => {
     }
   }
 
-  const liveLectures = (lectures || []).filter(l => l.status === 'live')
-  const scheduledLectures = (lectures || []).filter(l => l.status === 'scheduled')
-  const completedLectures = (lectures || []).filter(l => l.status === 'completed' || l.status === 'cancelled')
+  const effectiveLectures = (lectures && lectures.length > 0) ? lectures : FALLBACK_LECTURES
+  const liveLectures = effectiveLectures.filter(l => l.status === 'live')
+  const scheduledLectures = effectiveLectures.filter(l => l.status === 'scheduled')
+  const completedLectures = effectiveLectures.filter(l => l.status === 'completed' || l.status === 'cancelled')
 
   const tabs = [
     { id: 'live', label: 'Live Sessions', icon: Video, count: liveLectures.length },

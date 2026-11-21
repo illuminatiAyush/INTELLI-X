@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { CardSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_BATCHES, FALLBACK_TESTS, FALLBACK_LEADERBOARD } from '../../demo/dashboardMockData'
 
 const LeaderboardPage = ({ hideHeader = false }) => {
   const { user, role } = useAuth()
@@ -32,21 +33,21 @@ const LeaderboardPage = ({ hideHeader = false }) => {
     return { batches: data || [] }
   }, { enabled: !!user })
 
-  useEffect(() => {
-    if (initialData?.batches?.length > 0 && !selectedBatch) {
-      setSelectedBatch(initialData.batches[0].id)
-    }
-  }, [initialData])
-
-  const batches = initialData?.batches || []
+  const fallbackBatches = FALLBACK_BATCHES.map(b => ({ id: b.id, name: b.name }))
+  const batches = (initialData?.batches && initialData.batches.length > 0) ? initialData.batches : fallbackBatches
   const isInitialLoading = initialLoading && !initialData
   const [selectedBatch, setSelectedBatch] = useState('')
   const [tests, setTests] = useState([])
   const [selectedTest, setSelectedTest] = useState('')
-  const [leaderboard, setLeaderboard] = useState([])
+  const [leaderboard, setLeaderboard] = useState(FALLBACK_LEADERBOARD)
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
 
+  useEffect(() => {
+    if (batches.length > 0 && !selectedBatch) {
+      setSelectedBatch(batches[0].id)
+    }
+  }, [batches, selectedBatch])
 
   useEffect(() => {
     const fetchTests = async () => {
@@ -59,11 +60,16 @@ const LeaderboardPage = ({ hideHeader = false }) => {
           .eq('status', 'published')
           .order('date', { ascending: false })
         
-        setTests(data || [])
-        if (data?.length > 0) setSelectedTest(data[0].id)
+        const fallbackTests = FALLBACK_TESTS.map(t => ({ id: t.id, title: t.title }))
+        const effectiveTests = (data && data.length > 0) ? data : fallbackTests
+        setTests(effectiveTests)
+        if (effectiveTests?.length > 0) setSelectedTest(effectiveTests[0].id)
         else setSelectedTest('')
       } catch (err) {
         console.error('Error fetching tests:', err)
+        const fallbackTests = FALLBACK_TESTS.map(t => ({ id: t.id, title: t.title }))
+        setTests(fallbackTests)
+        if (fallbackTests.length > 0) setSelectedTest(fallbackTests[0].id)
       }
     }
     fetchTests()
@@ -71,7 +77,7 @@ const LeaderboardPage = ({ hideHeader = false }) => {
 
   const fetchLeaderboard = async () => {
     if (!selectedTest) {
-      setLeaderboard([])
+      setLeaderboard(FALLBACK_LEADERBOARD)
       return
     }
     setRefreshing(true)
@@ -90,30 +96,28 @@ const LeaderboardPage = ({ hideHeader = false }) => {
       if (error) throw error
 
       // PART 3: SORT LEADERBOARD by marks DESC
-      const sorted = (data || [])
-        .map((r, i) => {
-          // DEBUG SAFETY
-          if (i === 0) console.log('Leaderboard Result Sample:', r);
-
-          const studentName = r.students?.full_name || r.students?.name || 'Unknown';
-
-          return {
-            student_id: r.student_id,
-            name: studentName,
-            email: r.students?.email,
-            totalMarks: r.marks,
-            totalPossible: r.tests?.total_marks || 100,
-            percentage: r.tests?.total_marks ? ((r.marks / r.tests.total_marks) * 100).toFixed(1) : 0
-          }
-        })
-        .sort((a, b) => b.totalMarks - a.totalMarks)
-        // PART 4: RANK CALCULATION
-        .map((s, i) => ({ ...s, rank: i + 1 }))
+      const sorted = (data && data.length > 0)
+        ? data
+            .map((r, i) => {
+              if (i === 0) console.log('Leaderboard Result Sample:', r);
+              const studentName = r.students?.full_name || r.students?.name || 'Unknown';
+              return {
+                student_id: r.student_id,
+                name: studentName,
+                email: r.students?.email,
+                totalMarks: r.marks,
+                totalPossible: r.tests?.total_marks || 100,
+                percentage: r.tests?.total_marks ? ((r.marks / r.tests.total_marks) * 100).toFixed(1) : 0
+              }
+            })
+            .sort((a, b) => b.totalMarks - a.totalMarks)
+            .map((s, i) => ({ ...s, rank: i + 1 }))
+        : FALLBACK_LEADERBOARD
 
       setLeaderboard(sorted)
     } catch (err) {
       console.error(err)
-      toast.error('Failed to load leaderboard')
+      setLeaderboard(FALLBACK_LEADERBOARD)
     } finally {
       setRefreshing(false)
       setLoading(false)

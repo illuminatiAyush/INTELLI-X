@@ -14,6 +14,7 @@ import { supabase } from '../../lib/supabase'
 import { useTheme } from '../../context/ThemeContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { DashboardSkeleton } from '../../components/ui/Skeletons'
+import { FALLBACK_ADMIN_DASHBOARD } from '../../demo/dashboardMockData'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ChartTooltip, Filler)
 
@@ -99,10 +100,10 @@ const AdminDashboard = () => {
 
   if (loading && !dashboardData) return <DashboardSkeleton />
 
-  const { stats, performanceData } = dashboardData || {
-    stats: { students: 0, batches: 0, tests: 0, attendance: 0 },
-    performanceData: [],
-  }
+  const rawStats = dashboardData?.stats
+  const hasRealData = rawStats && (rawStats.students > 0 || rawStats.batches > 0 || rawStats.tests > 0)
+  const stats = hasRealData ? rawStats : FALLBACK_ADMIN_DASHBOARD.stats
+  const performanceData = (dashboardData?.performanceData?.length ? dashboardData.performanceData : FALLBACK_ADMIN_DASHBOARD.performanceData)
 
   return (
     <div className="space-y-6">

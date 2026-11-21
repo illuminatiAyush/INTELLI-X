@@ -11,6 +11,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useAppQuery } from '../../hooks/useAppQuery'
 import { CardSkeleton } from '../../components/ui/Skeletons'
 import toast from 'react-hot-toast'
+import { FALLBACK_BATCHES, FALLBACK_TEACHERS } from '../../demo/dashboardMockData'
 
 import StudentsPage from './StudentsPage'
 import TeachersPage from './TeachersPage'
@@ -48,8 +49,8 @@ const BatchList = () => {
     }
   }, { enabled: !!profile })
 
-  const batches = batchesData?.batches || []
-  const teachers = batchesData?.teachers || []
+  const batches = (batchesData?.batches && batchesData.batches.length > 0) ? batchesData.batches : FALLBACK_BATCHES
+  const teachers = (batchesData?.teachers && batchesData.teachers.length > 0) ? batchesData.teachers : FALLBACK_TEACHERS
   const loading = batchesLoading && !batchesData
 
   const [editing, setEditing] = useState(null)

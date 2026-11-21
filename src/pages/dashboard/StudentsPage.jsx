@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useAppQuery, clearAppCache } from '../../hooks/useAppQuery'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
+import { FALLBACK_STUDENTS } from '../../demo/dashboardMockData'
 
 // Avatar color generator
 const getAvatarColor = (name) => {
@@ -96,7 +97,7 @@ const StudentsPage = ({ hideHeader = false }) => {
     return data || []
   }, { enabled: !!profile?.institute_id })
 
-  const students = studentsData || []
+  const students = (studentsData && studentsData.length > 0) ? studentsData : FALLBACK_STUDENTS
   const loading = studentsLoading && !studentsData
 
   const [editing, setEditing] = useState(null)
