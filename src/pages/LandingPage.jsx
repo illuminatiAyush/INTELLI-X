@@ -2679,34 +2679,88 @@ const SmallToolsBentoSection = () => {
             </div>
           </div>
 
-          {/* Card 6: Yearly Academic Consistency Heatmap */}
-          <div className="md:col-span-2 lg:col-span-3 rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-wrap items-center justify-between gap-6 shadow-sm group hover:border-emerald-500/40 transition-all">
-            <div>
-              <h4 className="text-lg font-bold font-geist text-[var(--wl-fg)]">Consistent academic delivery</h4>
-              <p className="mt-1 text-xs text-[var(--wl-muted)] leading-relaxed">
-                Log daily sessions and syllabus progress. Verified academic milestones are synced to your branch portal.
-              </p>
+          {/* Card 6: Yearly Academic Consistency Heatmap (Fixed balanced layout without gaps) */}
+          <div className="md:col-span-2 lg:col-span-3 rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-6 sm:p-8 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 sm:gap-8 shadow-sm group hover:border-emerald-500/40 transition-all">
+            <div className="max-w-md shrink-0 space-y-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[11px] font-semibold text-emerald-500 mb-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Academic Tracking
+                </div>
+                <h4 className="text-xl sm:text-2xl font-bold font-geist text-[var(--wl-fg)]">Consistent academic delivery</h4>
+                <p className="mt-2 text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed">
+                  Log daily sessions, syllabus milestones, and attendance. Verified academic progress syncs instantly to student and parent dashboards.
+                </p>
+              </div>
+
+              {/* 3 Telemetry Stats to fill the space meaningfully */}
+              <div className="grid grid-cols-3 gap-3 pt-2">
+                <div className="rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-2.5 text-center">
+                  <div className="text-base sm:text-lg font-bold font-geist text-[var(--wl-fg)]">99.2%</div>
+                  <div className="text-[10px] text-[var(--wl-muted)] uppercase tracking-wider font-mono">Syllabus</div>
+                </div>
+                <div className="rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-2.5 text-center">
+                  <div className="text-base sm:text-lg font-bold font-geist text-emerald-500">3,420+</div>
+                  <div className="text-[10px] text-[var(--wl-muted)] uppercase tracking-wider font-mono">Lectures</div>
+                </div>
+                <div className="rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-2.5 text-center">
+                  <div className="text-base sm:text-lg font-bold font-geist text-[var(--wl-fg)]">142</div>
+                  <div className="text-[10px] text-[var(--wl-muted)] uppercase tracking-wider font-mono">Batches</div>
+                </div>
+              </div>
             </div>
-            <div className="rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-4 shadow-sm">
-              <div className="flex items-center justify-between text-[11px] text-[var(--wl-muted)] mb-2.5">
-                <span className="font-medium text-[var(--wl-fg)]">@apex_institute</span>
-                <span className="font-mono text-emerald-400 font-bold flex items-center gap-1">
+
+            {/* Heatmap Widget - expands to fill the right side seamlessly */}
+            <div className="flex-1 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] p-4 sm:p-5 shadow-sm flex flex-col justify-between gap-3 min-w-0">
+              <div className="flex flex-wrap items-center justify-between text-xs text-[var(--wl-muted)] gap-2 pb-2 border-b border-[var(--wl-line)]">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-[var(--wl-fg)]">@apex_institute</span>
+                  <span className="text-[11px] text-[var(--wl-faint)]">· 2026 Academic Year</span>
+                </div>
+                <span className="font-mono text-emerald-500 font-semibold flex items-center gap-1.5 text-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  3,400+ lectures conducted this year
+                  Daily Delivery Active
                 </span>
               </div>
-              <div className="grid grid-cols-12 gap-1.5">
-                {Array.from({ length: 48 }).map((_, i) => {
-                  const greenShades = [
-                    'bg-[var(--wl-surface)] border border-[var(--wl-line)]',
-                    'bg-emerald-950 border border-emerald-900/60',
-                    'bg-emerald-700 hover:scale-125 transition-transform',
-                    'bg-emerald-500 hover:scale-125 transition-transform shadow-xs shadow-emerald-500/50',
-                    'bg-emerald-300 hover:scale-125 transition-transform shadow-sm shadow-emerald-400'
-                  ];
-                  const shade = greenShades[i % 5];
-                  return <div key={i} className={`w-3 h-3 rounded-xs ${shade}`} />;
-                })}
+
+              {/* Activity grid: 28 columns x 5 rows = 140 lecture days */}
+              <div className="overflow-x-auto py-1">
+                <div className="grid grid-flow-col grid-rows-5 gap-1.5 w-max">
+                  {Array.from({ length: 140 }).map((_, i) => {
+                    const intensities = [
+                      'bg-[var(--wl-surface)] border border-[var(--wl-line)]/60',
+                      'bg-emerald-950/70 border border-emerald-900/50',
+                      'bg-emerald-700/80',
+                      'bg-emerald-500',
+                      'bg-emerald-400 shadow-xs shadow-emerald-400/50'
+                    ];
+                    const pattern = (i * 7 + (i % 3) * 5) % 5;
+                    const shade = intensities[pattern];
+                    return (
+                      <div
+                        key={i}
+                        className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-xs transition-transform hover:scale-125 cursor-pointer ${shade}`}
+                        title={`Day ${i + 1}: ${pattern * 3 + 1} classes conducted`}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Heatmap Footer Legend */}
+              <div className="flex items-center justify-between text-[10px] text-[var(--wl-faint)] pt-1">
+                <span>140 days recorded</span>
+                <div className="flex items-center gap-1.5">
+                  <span>Less</span>
+                  <div className="flex gap-1">
+                    <span className="w-2.5 h-2.5 rounded-xs bg-[var(--wl-surface)] border border-[var(--wl-line)]" />
+                    <span className="w-2.5 h-2.5 rounded-xs bg-emerald-950/70 border border-emerald-900/50" />
+                    <span className="w-2.5 h-2.5 rounded-xs bg-emerald-700/80" />
+                    <span className="w-2.5 h-2.5 rounded-xs bg-emerald-500" />
+                    <span className="w-2.5 h-2.5 rounded-xs bg-emerald-400" />
+                  </div>
+                  <span>More</span>
+                </div>
               </div>
             </div>
           </div>
@@ -2725,10 +2779,6 @@ const BatchesSection = () => {
       </div>
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--wl-line)] bg-[var(--wl-surface-2)] px-3.5 py-1 text-xs text-[var(--wl-muted)] mb-4">
-            <Users className="w-3.5 h-3.5 text-blue-500" />
-            <span>Built for Modern Institutes & Coaching Batches</span>
-          </div>
           <h2 className="text-3xl sm:text-5xl font-normal text-[var(--wl-fg)] leading-tight">
             Manage your batches,<br />
             <span className="text-[var(--wl-muted)] font-editorial-italic">without the chaos.</span>
@@ -2738,92 +2788,160 @@ const BatchesSection = () => {
           </p>
         </div>
 
-        {/* 2 Comparison Cards: Before vs After with Clear Readable Prices */}
+        {/* 2 Comparison Cards: Solid Powerful Iconed Display */}
         <div className="mx-auto">
-          <div className="mt-14 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-            {/* Card 1: The Problem (Manual Registers & Chaotic Groups) */}
-            <div className="p-6 sm:p-8 rounded-3xl border border-rose-500/25 bg-[var(--wl-surface)] flex flex-col justify-between space-y-6 shadow-sm">
-              <div className="space-y-4">
-                <span className="rounded-full bg-rose-500/10 border border-rose-500/20 px-3 py-1 text-[11px] font-semibold text-rose-500">
-                  Traditional Institute Model
-                </span>
-                <h3 className="text-lg sm:text-xl font-semibold font-geist text-[var(--wl-fg)]">
-                  Manual Registers & Chaotic Groups
-                </h3>
-                <p className="text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed font-light">
-                  Coaching centers lose 20% of their operational bandwidth managing scattered spreadsheets and unverified student notes.
-                </p>
+          <div className="mt-12 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+            {/* Card 1: The Problem (Traditional Manual Friction) */}
+            <div className="p-6 sm:p-8 rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] flex flex-col justify-between space-y-6 shadow-sm hover:border-zinc-500/40 transition-colors">
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <span className="rounded-md bg-rose-500/10 border border-rose-500/20 px-2.5 py-1 text-[11px] font-semibold text-rose-500 tracking-wide uppercase font-mono">
+                    Traditional Setup
+                  </span>
+                  <span className="text-xs text-[var(--wl-muted)] font-mono">Manual Friction</span>
+                </div>
 
-                <div className="space-y-2.5 pt-2 text-xs text-[var(--wl-muted)]">
-                  <div className="flex items-start gap-2">
-                    <X className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                    <span>Paper registers and roll-calls taking 15+ minutes every lecture</span>
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold font-geist text-[var(--wl-fg)] tracking-tight">
+                    Registers, spreadsheets & chaos
+                  </h3>
+                  <p className="mt-2 text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed">
+                    Without an integrated OS, institutes leak hours and fees across fragmented manual processes.
+                  </p>
+                </div>
+
+                {/* Solid Iconed Feature Display */}
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
+                    <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                      <Clock className="w-4 h-4 text-rose-500" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[var(--wl-fg)]">Manual Roll-Calls</div>
+                      <div className="text-[11px] text-[var(--wl-muted)] leading-snug mt-0.5">15–20 minutes lost per batch recording attendance on paper registers.</div>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <X className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                    <span>Unorganized WhatsApp groups where test circulars get buried</span>
+
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
+                    <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                      <MessageSquare className="w-4 h-4 text-rose-500" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[var(--wl-fg)]">Disorganized Chat Groups</div>
+                      <div className="text-[11px] text-[var(--wl-muted)] leading-snug mt-0.5">Test notices and homework circulars get buried under casual chit-chat.</div>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <X className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                    <span>Manual fee reminder phone calls and lost physical receipts</span>
+
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
+                    <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                      <Zap className="w-4 h-4 text-rose-500" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[var(--wl-fg)]">Scattered Fee Reminders</div>
+                      <div className="text-[11px] text-[var(--wl-muted)] leading-snug mt-0.5">Manual calling for unpaid installments and lost physical paper receipts.</div>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <X className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                    <span>Zero automated visibility for parents into daily test analytics</span>
+
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
+                    <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                      <Eye className="w-4 h-4 text-rose-500" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[var(--wl-fg)]">Zero Parent Visibility</div>
+                      <div className="text-[11px] text-[var(--wl-muted)] leading-snug mt-0.5">Parents remain uninformed on daily attendance and percentile trends.</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
+              {/* Solid Metric Footprint */}
               <div className="pt-4 border-t border-[var(--wl-line)] flex items-center justify-between">
-                <span className="text-xs text-[var(--wl-muted)] font-medium">Estimated administrative loss:</span>
-                <div className="flex items-baseline gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/25">
-                  <span className="text-rose-500 font-black text-xl sm:text-2xl font-geist">₹15,000+</span>
-                  <span className="text-xs text-[var(--wl-muted)] font-medium">/mo overhead</span>
+                <div>
+                  <div className="text-[11px] text-[var(--wl-muted)] uppercase tracking-wider font-mono">Administrative Loss</div>
+                  <div className="text-xs text-[var(--wl-faint)]">Wasted hours & delayed collections</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xl sm:text-2xl font-bold font-geist text-rose-500">₹15,000+</div>
+                  <div className="text-[10px] text-[var(--wl-muted)] font-mono">monthly drain</div>
                 </div>
               </div>
             </div>
 
-            {/* Card 2: The Solution (Intelli-X Automation Engine) */}
-            <div className="p-6 sm:p-8 rounded-3xl border border-blue-500/50 bg-[var(--wl-surface)] flex flex-col justify-between space-y-6 shadow-xl ring-1 ring-blue-500/30">
-              <div className="space-y-4">
-                <span className="rounded-full bg-blue-500/15 border border-blue-500/30 px-3 py-1 text-[11px] font-semibold text-blue-500 inline-flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                  Intelli-X Automated Batch Engine
-                </span>
-                <h3 className="text-lg sm:text-xl font-semibold font-geist text-[var(--wl-fg)]">
-                  Automated Batches & Real-Time Portals
-                </h3>
-                <p className="text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed font-light">
-                  Replace chaos with precision. One-click attendance, automated parent alerts on WhatsApp, and verified proof dossiers.
-                </p>
+            {/* Card 2: The Solution (Intelli-X Integrated Operating System) */}
+            <div className="p-6 sm:p-8 rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] flex flex-col justify-between space-y-6 shadow-sm hover:border-blue-500/50 transition-colors">
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <span className="rounded-md bg-blue-500/10 border border-blue-500/25 px-2.5 py-1 text-[11px] font-semibold text-blue-500 tracking-wide uppercase font-mono">
+                    Intelli-X Engine
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-xs text-emerald-500 font-mono font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Automated
+                  </span>
+                </div>
 
-                <div className="space-y-2.5 pt-2 text-xs text-[var(--wl-muted)]">
-                  <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>1-Click biometric & app attendance synced immediately to parents</span>
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold font-geist text-[var(--wl-fg)] tracking-tight">
+                    Automated batches & live portals
+                  </h3>
+                  <p className="mt-2 text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed">
+                    Everything coordinated in one solid command system with instant sync to faculty and parents.
+                  </p>
+                </div>
+
+                {/* Solid Iconed Feature Display */}
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                      <Users className="w-4 h-4 text-blue-500" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[var(--wl-fg)]">1-Click Biometric Attendance</div>
+                      <div className="text-[11px] text-[var(--wl-muted)] leading-snug mt-0.5">Biometrics and app check-ins auto-notify parents on WhatsApp in real time.</div>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>Automated test evaluation, percentile scoring & diagnostic cards</span>
+
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                      <BarChart3 className="w-4 h-4 text-emerald-500" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[var(--wl-fg)]">Diagnostic Exam Scorecards</div>
+                      <div className="text-[11px] text-[var(--wl-muted)] leading-snug mt-0.5">Automated test evaluation, percentile scoring, and subject weakness mapping.</div>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>Smart fee management with digital receipts & automatic reminders</span>
+
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                      <Zap className="w-4 h-4 text-amber-500" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[var(--wl-fg)]">Auto-Reconciled UPI Fees</div>
+                      <div className="text-[11px] text-[var(--wl-muted)] leading-snug mt-0.5">Instant payment links, automated digital receipts, and real-time ledger settlement.</div>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>Verified public student proof profiles with progress badges</span>
+
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
+                    <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                      <Shield className="w-4 h-4 text-purple-500" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[var(--wl-fg)]">Verified Student Portals</div>
+                      <div className="text-[11px] text-[var(--wl-muted)] leading-snug mt-0.5">Public progress proof dossiers with attendance badges and test records.</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* High Contrast Ultra-Readable Price */}
+              {/* Solid Metric Footprint */}
               <div className="pt-4 border-t border-[var(--wl-line)] flex items-center justify-between">
-                <span className="text-xs font-semibold text-[var(--wl-fg)]">Complete institute tier:</span>
-                <div className="flex items-baseline gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/30 shadow-xs">
-                  <span className="text-blue-500 font-bold text-xl sm:text-2xl font-geist">₹</span>
-                  <span className="text-2xl sm:text-3xl font-black text-[var(--wl-fg)] tracking-tight font-geist">4,999</span>
-                  <span className="text-xs text-[var(--wl-muted)] font-medium">/month</span>
+                <div>
+                  <div className="text-[11px] text-[var(--wl-muted)] uppercase tracking-wider font-mono">Institute License</div>
+                  <div className="text-xs text-[var(--wl-faint)]">All batches, biometrics & faculty</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xl sm:text-2xl font-bold font-geist text-[var(--wl-fg)]">₹4,999<span className="text-xs font-normal text-[var(--wl-muted)]">/mo</span></div>
+                  <div className="text-[10px] text-emerald-500 font-mono">100% ROI from month one</div>
                 </div>
               </div>
             </div>
