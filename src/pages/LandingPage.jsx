@@ -617,8 +617,8 @@ function DotWordmark({ text = "INTELLI-X" }) {
         const mouseDist = pointer ? Math.max(0, 1 - Math.hypot(p.x - pointer.x, p.y - pointer.y) / 160) : 0;
 
         if (mouseDist > 0 && p.b < 1.3 * mouseDist) {
-          const hue = Math.round(76 + (p.x / width) * 24 + (pointer ? (pointer.x + pointer.y) * 0.05 : 0)) % 360;
-          ctx.fillStyle = `hsl(${hue}, 95%, 58%)`;
+          const hue = Math.round((p.x / width) * 280 + (pointer ? (pointer.x + pointer.y) * 0.35 : 0)) % 360;
+          ctx.fillStyle = `hsl(${hue}, 95%, 62%)`;
           ctx.fillRect(p.x, p.y, 4, 4);
         } else if (p.b < threshold) {
           ctx.fillStyle = baseColor;
