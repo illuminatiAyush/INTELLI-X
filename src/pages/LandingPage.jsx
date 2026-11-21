@@ -756,9 +756,7 @@ const Hero = ({ isDark: propDark }) => {
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-[var(--wl-fg)] leading-[1.08] max-w-3xl mx-auto">
           Don't just run classes.<br />
           <span className="text-[var(--wl-muted)]">Show the </span>
-          <DitherWord>
-            <span className="font-editorial-italic">results.</span>
-          </DitherWord>
+          <span className="font-editorial-italic">results.</span>
         </h1>
 
         {/* Light Montserrat 300 Subtext */}
