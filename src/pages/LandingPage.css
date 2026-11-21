@@ -25,19 +25,19 @@ html.light {
   --wl-fg: #fafafa;
   --wl-muted: #a1a1aa;
   --wl-faint: #71717a;
-  --wl-accent: #3b82f6;
+  --wl-accent: #84cc16;
 
   /* ASCII Field Color (White/light in dark mode) */
   --ascii: 255 255 255;
 
   /* Watermark Colors */
   --wm-base: #27272a;
-  --wm-ink: #60a5fa;
+  --wm-ink: #a3e635;
 
   /* Button Tokens */
-  --btn-from: #3b82f6;
-  --btn-to: #1d4ed8;
-  --btn-rim: #2563eb;
+  --btn-from: #84cc16;
+  --btn-to: #65a30d;
+  --btn-rim: #a3e635;
   --btn2-from: #27272a;
   --btn2-to: #18181b;
   --btn2-rim: #3f3f46;
@@ -62,19 +62,19 @@ html.light {
   --wl-fg: #09090b;
   --wl-muted: #52525b;
   --wl-faint: #71717a;
-  --wl-accent: #2563eb;
+  --wl-accent: #65a30d;
 
   /* ASCII Field Color (Dark in light mode) */
   --ascii: 30 30 35;
 
   /* Watermark Colors */
   --wm-base: #e7e5e4;
-  --wm-ink: #2563eb;
+  --wm-ink: #65a30d;
 
   /* Button Tokens */
-  --btn-from: #3b82f6;
-  --btn-to: #1d4ed8;
-  --btn-rim: #1d4ed8;
+  --btn-from: #84cc16;
+  --btn-to: #65a30d;
+  --btn-rim: #65a30d;
   --btn2-from: #ffffff;
   --btn2-to: #f4f4f5;
   --btn2-rim: #d4d4d8;
@@ -213,19 +213,20 @@ html.light {
 .landing-page-root .wl-btn:focus-visible {
   outline: 2px solid var(--wl-accent);
   outline-offset: 3px;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 0 0 4px rgba(132, 204, 22, 0.35);
 }
 
-/* Blue Primary Button */
+/* Lime Primary Button */
 .landing-page-root .wl-btn-primary {
-  color: #ffffff !important;
+  color: #09090b !important;
+  font-weight: 600;
   border-color: var(--btn-rim);
   background: linear-gradient(180deg, var(--btn-from) 0%, var(--btn-to) 100%);
   box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2),
     0 1px 2px rgba(0, 0, 0, 0.15),
-    0 4px 16px -2px rgba(59, 130, 246, 0.45);
+    0 4px 16px -2px rgba(132, 204, 22, 0.45);
 }
 
 /* Secondary Surface Button */
@@ -243,9 +244,9 @@ html.light {
     transform: translate3d(0, -1.5px, 0);
     filter: brightness(1.08);
     box-shadow: 
-      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
       0 4px 12px rgba(0, 0, 0, 0.25),
-      0 8px 24px -2px rgba(59, 130, 246, 0.6);
+      0 8px 24px -2px rgba(132, 204, 22, 0.6);
   }
 
   .landing-page-root .wl-btn-secondary:hover {

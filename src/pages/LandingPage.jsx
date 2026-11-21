@@ -143,8 +143,8 @@ function AsciiField({ hollow = 0.2, opacity = 1, isButtonHovered = false }) {
             if (mouseInfluence > 0.05 && !isHoveredRef.current) {
               const root = canvas.closest('.landing-page-root') || document.documentElement;
               const isLight = root.classList.contains('light');
-              const hue = Math.round(215 + mouseInfluence * 40 + (x / width) * 25) % 360;
-              ctx.fillStyle = `hsl(${hue}, 48%, ${isLight ? 46 : 64}%)`;
+              const hue = Math.round(84 + mouseInfluence * 20 + (x / width) * 15) % 360;
+              ctx.fillStyle = `hsl(${hue}, 68%, ${isLight ? 42 : 54}%)`;
             } else {
               ctx.fillStyle = getColor(alpha);
             }
@@ -317,10 +317,10 @@ function PixelMatrixField({ hollow = 0.12, opacity = 0.8, gridStep = 16 }) {
             }
 
             if (mouseInfluence > 0.04) {
-              // Subtle dynamic hover aura: soft ambient violet-blue
-              const hue = Math.round(215 + mouseInfluence * 45 + (x / width) * 30) % 360;
-              ctx.fillStyle = `hsl(${hue}, 48%, ${isLight ? 46 : 64}%)`;
-              ctx.shadowColor = `hsl(${hue}, 45%, ${isLight ? 46 : 64}%)`;
+              // Subtle dynamic hover aura: soft ambient lime green
+              const hue = Math.round(84 + mouseInfluence * 20 + (x / width) * 15) % 360;
+              ctx.fillStyle = `hsl(${hue}, 68%, ${isLight ? 42 : 54}%)`;
+              ctx.shadowColor = `hsl(${hue}, 65%, ${isLight ? 42 : 54}%)`;
               ctx.shadowBlur = Math.min(2.5, 2.5 * mouseInfluence);
             } else {
               ctx.shadowBlur = 0;
