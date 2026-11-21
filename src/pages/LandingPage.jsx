@@ -1550,13 +1550,13 @@ const ProofRoleAndSplitComparison = () => {
           ))}
         </div>
 
-        {/* Middle Header for Split Report */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-5xl font-normal text-[var(--wl-fg)] leading-tight">
-            Parents ignore fifty generic SMS blasts a month.<br />
-            <span className="text-[var(--wl-muted)]">One clear report card wins their trust.</span>
+        {/* Middle Header for Split Report (Balanced 2-line layout) */}
+        <div className="text-center max-w-3xl sm:max-w-4xl mx-auto mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-normal text-[var(--wl-fg)] leading-tight tracking-tight">
+            Parents ignore fifty generic SMS blasts.<br />
+            <span className="text-[var(--wl-muted)] font-editorial-italic">One clear scorecard wins their trust.</span>
           </h2>
-          <p className="mt-4 text-[var(--wl-muted)] text-sm sm:text-base leading-relaxed">
+          <p className="mt-4 text-[var(--wl-muted)] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-light">
             Institutes blast hundreds of vague messages that get ignored. An interactive report showing exact chapter accuracy, attendance, and rank gets read and shared.
           </p>
         </div>
