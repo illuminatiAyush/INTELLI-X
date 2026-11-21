@@ -2999,15 +2999,12 @@ const FAQSection = () => {
         <PixelMatrixField hollow={0.16} opacity={0.75} gridStep={16} />
       </div>
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-10 md:gap-16 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-10 md:gap-14 items-start">
           {/* Left Sticky Header (stays pinned while right accordion scrolls) */}
-          <div className="md:sticky md:top-28 md:self-start space-y-4">
-            <span className="rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-1 text-[11px] font-semibold text-blue-500 inline-block">
-              Knowledge Base
-            </span>
+          <div className="md:sticky md:top-28 md:self-start space-y-4 md:pl-6 lg:pl-10">
             <h2 className="text-3xl sm:text-5xl font-normal text-[var(--wl-fg)] leading-tight">
               Questions,<br />
-              <span className="text-[var(--wl-muted)]">answered.</span>
+              <span className="text-[var(--wl-muted)] font-editorial-italic">answered.</span>
             </h2>
             <p className="text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed max-w-xs">
               Everything you need to know about switching your coaching institute or school to Intelli-X.
@@ -3070,23 +3067,68 @@ const InteractiveFooter = ({ isDark }) => {
       {/* Top Crowd Drawing Section with Speech Bubbles */}
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative pt-12 pb-2">
-          {/* 4 Interactive Speech Bubbles Floating Above Character Heads */}
+          {/* 4 Interactive Speech Bubbles Floating Above Character Heads with distinct observable colors */}
           <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-2 max-w-4xl mx-auto items-stretch">
             {[
-              "Did the parent open the test report?",
-              "JEE Mock Test this Sunday 9am.",
-              "Fee installment received via UPI!",
-              "Batch 12-A completed syllabus."
-            ].map((text, i) => (
-              <div
-                key={i}
-                className="speech-bubble relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] px-3.5 py-2.5 text-center shadow-lg flex items-center justify-center min-h-[52px]"
-              >
-                <span className="text-[11px] sm:text-xs text-[var(--wl-fg)] font-medium leading-tight">
-                  {text}
-                </span>
-              </div>
-            ))}
+              {
+                tag: 'Report',
+                text: 'Did the parent open the test report?',
+                icon: CheckCircle2,
+                lightClass: 'bg-sky-50/95 border-sky-300 text-sky-950 shadow-sky-500/10',
+                darkClass: 'bg-sky-950/60 border-sky-400/40 text-sky-100 shadow-sky-950/40',
+                badgeLight: 'bg-sky-200/80 text-sky-900 border-sky-300',
+                badgeDark: 'bg-sky-500/20 text-sky-300 border-sky-400/30'
+              },
+              {
+                tag: 'Exam',
+                text: 'JEE Mock Test this Sunday 9am.',
+                icon: Calendar,
+                lightClass: 'bg-amber-50/95 border-amber-300 text-amber-950 shadow-amber-500/10',
+                darkClass: 'bg-amber-950/60 border-amber-400/40 text-amber-100 shadow-amber-950/40',
+                badgeLight: 'bg-amber-200/80 text-amber-900 border-amber-300',
+                badgeDark: 'bg-amber-500/20 text-amber-300 border-amber-400/30'
+              },
+              {
+                tag: 'Payment',
+                text: 'Fee installment received via UPI!',
+                icon: Zap,
+                lightClass: 'bg-emerald-50/95 border-emerald-300 text-emerald-950 shadow-emerald-500/10',
+                darkClass: 'bg-emerald-950/60 border-emerald-400/40 text-emerald-100 shadow-emerald-950/40',
+                badgeLight: 'bg-emerald-200/80 text-emerald-900 border-emerald-300',
+                badgeDark: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+              },
+              {
+                tag: 'Academic',
+                text: 'Batch 12-A completed syllabus.',
+                icon: GraduationCap,
+                lightClass: 'bg-purple-50/95 border-purple-300 text-purple-950 shadow-purple-500/10',
+                darkClass: 'bg-purple-950/60 border-purple-400/40 text-purple-100 shadow-purple-950/40',
+                badgeLight: 'bg-purple-200/80 text-purple-900 border-purple-300',
+                badgeDark: 'bg-purple-500/20 text-purple-300 border-purple-400/30'
+              }
+            ].map((bubble, i) => {
+              const IconComponent = bubble.icon;
+              return (
+                <div
+                  key={i}
+                  className={`relative rounded-2xl border px-3.5 py-2.5 text-center shadow-md flex flex-col justify-center items-center gap-1.5 transition-all duration-200 hover:-translate-y-0.5 ${
+                    isDark ? bubble.darkClass : bubble.lightClass
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                      isDark ? bubble.badgeDark : bubble.badgeLight
+                    }`}>
+                      <IconComponent className="w-2.5 h-2.5" />
+                      {bubble.tag}
+                    </span>
+                  </div>
+                  <span className="text-[11px] sm:text-xs font-medium leading-tight">
+                    {bubble.text}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           {/* Crowd Illustration Image (dynamically adapts invert filter to dark/light mode!) */}
