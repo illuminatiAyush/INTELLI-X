@@ -151,11 +151,12 @@ const RegisterPage = () => {
       <div className="flex-1 flex flex-col">
         {/* top bar */}
         <div className="flex items-center justify-between px-8 py-5">
-          <Link to="/" className="lg:hidden flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-md overflow-hidden flex-shrink-0" style={{ background: 'var(--text-primary)' }}>
-              <img src={isDark ? '/intellix-icon-black.svg' : '/intellix-icon-white.svg'} alt="IntelliX" className="w-full h-full object-cover" />
-            </div>
-            <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>IntelliX</span>
+          <Link to="/" className="lg:hidden flex items-center py-1" aria-label="IntelliX">
+            <img
+              src={isDark ? '/intellix-wordmark-white.png' : '/intellix-wordmark-black.png'}
+              alt="IntelliX"
+              className="h-6 w-auto object-contain"
+            />
           </Link>
           <div className="hidden lg:block" />
 

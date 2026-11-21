@@ -219,7 +219,11 @@ const AuthPage = () => {
 
           {/* INTELLIX wordmark */}
           <div className="flex flex-col items-center">
-            <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-10 w-auto object-contain" />
+            <img
+              src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+              alt="IntelliX"
+              className="h-10 w-auto object-contain"
+            />
             <div className="w-8 h-0.5 bg-gray-400 mx-auto mt-4 mb-4 rounded-full" />
             <p className="text-sm text-gray-500 leading-relaxed max-w-[200px]">
               The <strong className="text-gray-800">Intelligent</strong> Operating System<br />
@@ -240,9 +244,13 @@ const AuthPage = () => {
         className="flex-1 flex items-center justify-center px-8 py-12 bg-white relative"
         style={{ clipPath: 'polygon(5% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
       >
-        {/* Mobile logo: Official IntelliX wordmark for white mode */}
+        {/* Mobile logo: Official IntelliX wordmark */}
         <div className="absolute top-6 left-10 lg:hidden flex items-center">
-          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-6 w-auto object-contain" />
+          <img
+            src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
+            alt="IntelliX"
+            className="h-6 w-auto object-contain"
+          />
         </div>
 
         <AnimatePresence mode="wait">
