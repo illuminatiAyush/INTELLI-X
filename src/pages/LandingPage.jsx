@@ -143,9 +143,12 @@ function AsciiField({ hollow = 0.2, opacity = 1, isButtonHovered = false }) {
             if (mouseInfluence > 0.05 && !isHoveredRef.current) {
               const root = canvas.closest('.landing-page-root') || document.documentElement;
               const isLight = root.classList.contains('light');
-              const hue = Math.round(84 + mouseInfluence * 20 + (x / width) * 15) % 360;
-              ctx.fillStyle = `hsl(${hue}, 68%, ${isLight ? 42 : 54}%)`;
+              const hue = Math.round(82 + mouseInfluence * 18 + (x / width) * 12) % 360;
+              ctx.fillStyle = `hsl(${hue}, 88%, ${isLight ? 42 : 56}%)`;
+              ctx.shadowColor = `hsl(${hue}, 95%, ${isLight ? 40 : 58}%)`;
+              ctx.shadowBlur = Math.min(8, mouseInfluence * 12);
             } else {
+              ctx.shadowBlur = 0;
               ctx.fillStyle = getColor(alpha);
             }
 
@@ -317,11 +320,11 @@ function PixelMatrixField({ hollow = 0.12, opacity = 0.8, gridStep = 16 }) {
             }
 
             if (mouseInfluence > 0.04) {
-              // Subtle dynamic hover aura: soft ambient lime green
-              const hue = Math.round(84 + mouseInfluence * 20 + (x / width) * 15) % 360;
-              ctx.fillStyle = `hsl(${hue}, 68%, ${isLight ? 42 : 54}%)`;
-              ctx.shadowColor = `hsl(${hue}, 65%, ${isLight ? 42 : 54}%)`;
-              ctx.shadowBlur = Math.min(2.5, 2.5 * mouseInfluence);
+              // Vibrant dynamic hover aura: glowing neon lime green
+              const hue = Math.round(82 + mouseInfluence * 18 + (x / width) * 12) % 360;
+              ctx.fillStyle = `hsl(${hue}, 88%, ${isLight ? 42 : 56}%)`;
+              ctx.shadowColor = `hsl(${hue}, 95%, ${isLight ? 40 : 58}%)`;
+              ctx.shadowBlur = Math.min(8, 6 * mouseInfluence);
             } else {
               ctx.shadowBlur = 0;
               if (isLight) {
@@ -718,13 +721,17 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
       }`}
     >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 flex h-16 items-center justify-between gap-4">
-        {/* Brand: Official IntelliX Wordmark */}
-        <Link to="/" className="flex items-center group py-1" aria-label="IntelliX">
+        {/* Brand: Official IntelliX Wordmark + Cadence Labs */}
+        <Link to="/" className="flex items-center gap-2.5 group py-1" aria-label="IntelliX">
           <img
             src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
             alt="IntelliX"
             className="h-6 sm:h-7 w-auto object-contain transition-opacity duration-200"
           />
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-[var(--wl-faint)] border-l border-[var(--wl-line)] pl-2.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_8px_rgba(163,230,53,0.8)] animate-pulse" />
+            by Cadence Labs
+          </span>
         </Link>
 
         {/* Center Pill Menu (Exact Worklist 5-Item Pill) */}
@@ -807,7 +814,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
           <Link to="/register">
             <button
               type="button"
-              className="group relative overflow-hidden wl-btn wl-btn-primary h-8 sm:h-9 rounded-[10px] px-3 sm:px-4 text-xs sm:text-[13px] inline-flex items-center justify-center shadow-[0_0_12px_rgba(59,130,246,0.18)] hover:shadow-[0_0_16px_rgba(59,130,246,0.28)] transition-all cursor-pointer shrink-0"
+              className="group relative overflow-hidden wl-btn wl-btn-primary h-8 sm:h-9 rounded-[10px] px-3 sm:px-4 text-xs sm:text-[13px] inline-flex items-center justify-center shadow-[0_0_14px_rgba(163,230,53,0.32)] hover:shadow-[0_0_22px_rgba(163,230,53,0.5)] transition-all cursor-pointer shrink-0"
             >
               <RollText icon={ArrowRight}>Get started</RollText>
             </button>
@@ -931,16 +938,6 @@ const Hero = ({ isDark: propDark }) => {
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-center">
-        {/* Powered by Cadence Labs (Minimal without rounded rectangle) */}
-        <div className="flex items-center justify-center gap-2.5 mb-6 sm:mb-7 text-[11px] sm:text-xs font-mono tracking-[0.18em] uppercase text-[var(--wl-muted)]">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-          <span>
-            Powered by{' '}
-            <span className="font-semibold text-[var(--wl-fg)]">
-              Cadence Labs
-            </span>
-          </span>
-        </div>
 
         {/* Display H1 - Cormorant upright with Newsreader italic accent */}
         <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-[var(--wl-fg)] leading-[1.1] max-w-3xl mx-auto">
@@ -965,7 +962,7 @@ const Hero = ({ isDark: propDark }) => {
               type="button"
               onMouseEnter={() => setButtonHovered(true)}
               onMouseLeave={() => setButtonHovered(false)}
-              className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_14px_rgba(59,130,246,0.2)] hover:shadow-[0_0_20px_rgba(59,130,246,0.32)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
+              className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_18px_rgba(163,230,53,0.3)] hover:shadow-[0_0_26px_rgba(163,230,53,0.48)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
             >
               <RollText icon={ArrowRight}>Get started</RollText>
             </button>
@@ -982,9 +979,16 @@ const Hero = ({ isDark: propDark }) => {
           </a>
         </div>
 
-        {/* Microcopy reassurance */}
-        <p className="mt-4 text-[11px] sm:text-[12px] text-[var(--wl-faint)]">
-          Free to start · Instant setup for schools, coaching batches & academies
+        {/* Microcopy reassurance with Powered by Cadence Labs */}
+        <p className="mt-4 text-[11px] sm:text-[12px] text-[var(--wl-faint)] flex items-center justify-center gap-2 flex-wrap">
+          <span>Free to start</span>
+          <span>·</span>
+          <span>Instant setup for schools, coaching batches & academies</span>
+          <span>·</span>
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--wl-muted)] font-medium inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_6px_rgba(163,230,53,0.8)] animate-pulse" />
+            Powered by Cadence Labs
+          </span>
         </p>
 
         {/* Hero Interactive Preview Card */}
@@ -3116,7 +3120,7 @@ const PricingSection = () => {
                     type="button"
                     className={`group relative overflow-hidden w-full h-11 text-xs rounded-xl font-semibold transition-all duration-300 flex items-center justify-center cursor-pointer ${
                       p.popular
-                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_14px_rgba(59,130,246,0.18)] hover:shadow-[0_0_18px_rgba(59,130,246,0.3)] border border-blue-400/30'
+                        ? 'bg-lime-500 hover:bg-lime-400 text-zinc-950 font-bold shadow-[0_0_18px_rgba(163,230,53,0.35)] hover:shadow-[0_0_26px_rgba(163,230,53,0.55)] border border-lime-400/40'
                         : 'bg-[var(--wl-surface-2)] text-[var(--wl-fg)] border border-[var(--wl-line)] hover:border-zinc-500/60 hover:shadow-[0_0_12px_rgba(255,255,255,0.05)]'
                     }`}
                   >
