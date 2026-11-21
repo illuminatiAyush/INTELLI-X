@@ -125,26 +125,26 @@ function AsciiField({ hollow = 0.2, opacity = 1, isButtonHovered = false }) {
           }
           const distToMouse = Math.hypot(x - mouse.x, y - mouse.y);
           // When button is hovered, shrink and calm the background influence radius so focus is purely on button
-          const effectiveRadius = isHoveredRef.current ? 70 : 180;
+          const effectiveRadius = isHoveredRef.current ? 60 : 120;
           const mouseInfluence = distToMouse < effectiveRadius
-            ? Math.pow(1 - distToMouse / effectiveRadius, 1.1) * (isHoveredRef.current ? 0.2 : 1)
+            ? Math.pow(1 - distToMouse / effectiveRadius, 1.35) * (isHoveredRef.current ? 0.15 : 0.6)
             : 0;
 
           // Intensity combines ambient wave, hollow layout, and hover illumination (calmed when button is hovered)
-          const intensity = (((wave + 1) / 2) * hollowFactor * rowFade + 0.85 * mouseInfluence) * (isHoveredRef.current ? 0.4 : 1);
+          const intensity = (((wave + 1) / 2) * hollowFactor * rowFade + 0.35 * mouseInfluence) * (isHoveredRef.current ? 0.3 : 1);
           const charIndex = Math.min(ASCII_CHARS.length - 1, Math.floor(intensity * ASCII_CHARS.length));
 
           if (charIndex !== 0 || mouseInfluence > 0.04) {
-            const finalCharIdx = Math.max(charIndex, mouseInfluence > 0.35 ? 6 : (mouseInfluence > 0.1 ? 3 : 1));
+            const finalCharIdx = Math.max(charIndex, mouseInfluence > 0.35 ? 5 : (mouseInfluence > 0.1 ? 2 : 1));
             const baseAlpha = (0.15 + (finalCharIdx / ASCII_CHARS.length) * 0.45) * (isHoveredRef.current ? 0.45 : 1);
-            const hoverAlpha = (0.58 * mouseInfluence) * (isHoveredRef.current ? 0.25 : 1);
-            const alpha = Math.min(0.98, baseAlpha + hoverAlpha);
+            const hoverAlpha = (0.22 * mouseInfluence) * (isHoveredRef.current ? 0.2 : 1);
+            const alpha = Math.min(0.95, baseAlpha + hoverAlpha);
 
             if (mouseInfluence > 0.05 && !isHoveredRef.current) {
               const root = canvas.closest('.landing-page-root') || document.documentElement;
               const isLight = root.classList.contains('light');
-              const hue = Math.round(210 + mouseInfluence * 70 + (x / width) * 40) % 360;
-              ctx.fillStyle = `hsl(${hue}, 90%, ${isLight ? 42 : 68}%)`;
+              const hue = Math.round(215 + mouseInfluence * 40 + (x / width) * 25) % 360;
+              ctx.fillStyle = `hsl(${hue}, 48%, ${isLight ? 46 : 64}%)`;
             } else {
               ctx.fillStyle = getColor(alpha);
             }
@@ -154,7 +154,7 @@ function AsciiField({ hollow = 0.2, opacity = 1, isButtonHovered = false }) {
             let posY = y;
             if (mouseInfluence > 0) {
               const angle = Math.atan2(y - mouse.y, x - mouse.x);
-              const push = Math.sin(mouseInfluence * Math.PI) * (isHoveredRef.current ? 1.2 : 3.5);
+              const push = Math.sin(mouseInfluence * Math.PI) * (isHoveredRef.current ? 0.8 : 1.5);
               posX += Math.cos(angle) * push;
               posY += Math.sin(angle) * push;
             }
@@ -302,26 +302,26 @@ function PixelMatrixField({ hollow = 0.12, opacity = 0.8, gridStep = 16 }) {
 
           const hollowFactor = Math.min(1, Math.max(0, (Math.abs(x - midX) / midX - hollow) / 0.38));
           const dist = Math.hypot(x - mouse.x, y - mouse.y);
-          const mouseInfluence = dist < 220 ? Math.pow(1 - dist / 220, 1.2) : 0;
+          const mouseInfluence = dist < 130 ? Math.pow(1 - dist / 130, 1.35) * 0.55 : 0;
 
-          const rawIntensity = ((wave + 1) * 0.5) * hollowFactor * rowFade + mouseInfluence * 1.35;
+          const rawIntensity = ((wave + 1) * 0.5) * hollowFactor * rowFade + mouseInfluence * 0.45;
 
           if (rawIntensity > 0.16 || mouseInfluence > 0.02) {
             let pxSize = 2;
-            let alpha = Math.min(0.95, rawIntensity * 0.65 + mouseInfluence * 0.55);
+            let alpha = Math.min(0.85, rawIntensity * 0.55 + mouseInfluence * 0.25);
 
-            if (mouseInfluence > 0.4) {
-              pxSize = 3.5;
-            } else if (rawIntensity > 0.68) {
+            if (mouseInfluence > 0.45) {
               pxSize = 2.5;
+            } else if (rawIntensity > 0.7) {
+              pxSize = 2;
             }
 
             if (mouseInfluence > 0.04) {
-              // Dynamic Chromatic hover aura: electric violet -> cyan -> sapphire
-              const hue = Math.round(210 + mouseInfluence * 90 + (x / width) * 60) % 360;
-              ctx.fillStyle = `hsl(${hue}, 95%, ${isLight ? 42 : 68}%)`;
-              ctx.shadowColor = `hsl(${hue}, 95%, ${isLight ? 45 : 68}%)`;
-              ctx.shadowBlur = 8 * mouseInfluence;
+              // Subtle dynamic hover aura: soft ambient violet-blue
+              const hue = Math.round(215 + mouseInfluence * 45 + (x / width) * 30) % 360;
+              ctx.fillStyle = `hsl(${hue}, 48%, ${isLight ? 46 : 64}%)`;
+              ctx.shadowColor = `hsl(${hue}, 45%, ${isLight ? 46 : 64}%)`;
+              ctx.shadowBlur = Math.min(2.5, 2.5 * mouseInfluence);
             } else {
               ctx.shadowBlur = 0;
               if (isLight) {
@@ -332,8 +332,8 @@ function PixelMatrixField({ hollow = 0.12, opacity = 0.8, gridStep = 16 }) {
             }
 
             // High-intensity crosshair pixel vs solid micro-pixel
-            if (rawIntensity > 0.72 && mouseInfluence > 0.18) {
-              const arm = pxSize + 1.5;
+            if (rawIntensity > 0.85 && mouseInfluence > 0.35) {
+              const arm = pxSize + 1;
               ctx.fillRect(x - arm, y, arm * 2 + 1, 1);
               ctx.fillRect(x, y - arm, 1, arm * 2 + 1);
             } else {
@@ -807,7 +807,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
           <Link to="/register">
             <button
               type="button"
-              className="group relative overflow-hidden wl-btn wl-btn-primary h-9 rounded-[10px] px-4 text-[13px] inline-flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_22px_rgba(59,130,246,0.5)] transition-all cursor-pointer"
+              className="group relative overflow-hidden wl-btn wl-btn-primary h-9 rounded-[10px] px-4 text-[13px] inline-flex items-center justify-center shadow-[0_0_12px_rgba(59,130,246,0.18)] hover:shadow-[0_0_16px_rgba(59,130,246,0.28)] transition-all cursor-pointer"
             >
               <RollText icon={ArrowRight}>Get started</RollText>
             </button>
@@ -945,7 +945,7 @@ const Hero = ({ isDark: propDark }) => {
               type="button"
               onMouseEnter={() => setButtonHovered(true)}
               onMouseLeave={() => setButtonHovered(false)}
-              className="group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_32px_rgba(59,130,246,0.65)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_14px_rgba(59,130,246,0.2)] hover:shadow-[0_0_20px_rgba(59,130,246,0.32)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <RollText icon={ArrowRight}>Get started</RollText>
             </button>
@@ -955,7 +955,7 @@ const Hero = ({ isDark: propDark }) => {
               type="button"
               onMouseEnter={() => setButtonHovered(true)}
               onMouseLeave={() => setButtonHovered(false)}
-              className="group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_18px_rgba(255,255,255,0.08)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_12px_rgba(255,255,255,0.05)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <RollText>Try the live demo</RollText>
             </button>
@@ -2497,7 +2497,7 @@ const SmallToolsBentoSection = () => {
 
           {/* High-tech coaching engine emblem */}
           <div className="relative group shrink-0">
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-500/25 via-indigo-500/20 to-purple-500/25 blur-xl opacity-75 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-blue-500/15 via-indigo-500/12 to-purple-500/15 blur-lg opacity-40 group-hover:opacity-70 transition-opacity" />
             <div className="relative rounded-2xl border border-[var(--wl-line)] bg-[var(--wl-surface-2)]/90 backdrop-blur-md p-4 sm:p-5 flex flex-col items-center justify-center gap-2.5 shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/25">
                 <GraduationCap className="w-6 h-6 text-white" />
@@ -3090,8 +3090,8 @@ const PricingSection = () => {
                     type="button"
                     className={`group relative overflow-hidden w-full h-11 text-xs rounded-xl font-semibold transition-all duration-300 flex items-center justify-center cursor-pointer ${
                       p.popular
-                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.25)] hover:shadow-[0_0_28px_rgba(59,130,246,0.5)] border border-blue-400/30'
-                        : 'bg-[var(--wl-surface-2)] text-[var(--wl-fg)] border border-[var(--wl-line)] hover:border-zinc-500/60 hover:shadow-[0_0_15px_rgba(255,255,255,0.06)]'
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_14px_rgba(59,130,246,0.18)] hover:shadow-[0_0_18px_rgba(59,130,246,0.3)] border border-blue-400/30'
+                        : 'bg-[var(--wl-surface-2)] text-[var(--wl-fg)] border border-[var(--wl-line)] hover:border-zinc-500/60 hover:shadow-[0_0_12px_rgba(255,255,255,0.05)]'
                     }`}
                   >
                     <RollText icon={ArrowRight}>{p.cta}</RollText>
