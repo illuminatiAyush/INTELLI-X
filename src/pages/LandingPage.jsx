@@ -918,7 +918,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
 };
 
 // ── HERO SECTION: Dynamic Interactive AsciiField + Preview Card ──
-const Hero = ({ isDark: propDark }) => {
+const Hero = ({ isDark: propDark, heroMounted = true, siteRevealed = true }) => {
   let themeContext = null;
   try {
     themeContext = useTheme();
@@ -929,70 +929,79 @@ const Hero = ({ isDark: propDark }) => {
   const [buttonHovered, setButtonHovered] = useState(false);
 
   return (
-    <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28">
+    <section className={`relative overflow-hidden transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      siteRevealed ? 'pt-12 pb-20 sm:pt-20 sm:pb-28' : 'min-h-[85vh] sm:min-h-screen flex flex-col justify-center py-16'
+    }`}>
       {/* Interactive AsciiField Background Layer - smoothly quiets, dims, and scales down when hovering on buttons */}
-      <div className={`pointer-events-none absolute inset-0 size-full overflow-hidden z-0 transition-all duration-500 ease-out ${
-        buttonHovered ? 'opacity-25 scale-[0.98]' : 'opacity-95 scale-100'
+      <div className={`pointer-events-none absolute inset-0 size-full overflow-hidden z-0 transition-all duration-700 ease-out ${
+        buttonHovered ? 'opacity-25 scale-[0.98]' : (heroMounted ? 'opacity-95 scale-100' : 'opacity-0 scale-95')
       }`}>
         <AsciiField hollow={0.16} opacity={buttonHovered ? 0.25 : 0.95} isButtonHovered={buttonHovered} />
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-center">
 
-        {/* Display H1 - Cormorant upright with Newsreader italic accent */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-[var(--wl-fg)] leading-[1.1] max-w-3xl mx-auto">
-          Don't just run classes.<br />
-          <span className="text-[var(--wl-muted)]">Show the </span>
-          <span className="font-editorial-italic">results.</span>
-        </h1>
+        {/* Display H1, Subtext & Action Buttons - Initial Stage Hero Entrance */}
+        <div className={`transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          heroMounted ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-[0.98]'
+        }`}>
+          {/* Display H1 - Cormorant upright with Newsreader italic accent */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-[var(--wl-fg)] leading-[1.1] max-w-3xl mx-auto">
+            Don't just run classes.<br />
+            <span className="text-[var(--wl-muted)]">Show the </span>
+            <span className="font-editorial-italic">results.</span>
+          </h1>
 
-        {/* Light Montserrat 300 Subtext */}
-        <p className="mt-5 sm:mt-6 text-sm sm:text-base md:text-lg text-[var(--wl-muted)] max-w-2xl mx-auto leading-relaxed">
-          Intelli-X searches 90,000+ sessions, evaluates tests, logs attendance, and sends verifiable proof of progress to parents and management.
-        </p>
+          {/* Light Montserrat 300 Subtext */}
+          <p className="mt-5 sm:mt-6 text-sm sm:text-base md:text-lg text-[var(--wl-muted)] max-w-2xl mx-auto leading-relaxed">
+            Intelli-X searches 90,000+ sessions, evaluates tests, logs attendance, and sends verifiable proof of progress to parents and management.
+          </p>
 
-        {/* Action Buttons - triggering focus highlight and quiet background */}
-        <div
-          className="mt-7 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto sm:max-w-none"
-          onMouseEnter={() => setButtonHovered(true)}
-          onMouseLeave={() => setButtonHovered(false)}
-        >
-          <Link to="/register" className="w-full sm:w-auto">
-            <button
-              type="button"
-              onMouseEnter={() => setButtonHovered(true)}
-              onMouseLeave={() => setButtonHovered(false)}
-              className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_18px_rgba(163,230,53,0.3)] hover:shadow-[0_0_26px_rgba(163,230,53,0.48)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
-            >
-              <RollText icon={ArrowRight}>Get started</RollText>
-            </button>
-          </Link>
-          <a href="#proof-demo" className="w-full sm:w-auto">
-            <button
-              type="button"
-              onMouseEnter={() => setButtonHovered(true)}
-              onMouseLeave={() => setButtonHovered(false)}
-              className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_12px_rgba(255,255,255,0.05)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
-            >
-              <RollText>Try the live demo</RollText>
-            </button>
-          </a>
+          {/* Action Buttons - triggering focus highlight and quiet background */}
+          <div
+            className="mt-7 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto sm:max-w-none"
+            onMouseEnter={() => setButtonHovered(true)}
+            onMouseLeave={() => setButtonHovered(false)}
+          >
+            <Link to="/register" className="w-full sm:w-auto">
+              <button
+                type="button"
+                onMouseEnter={() => setButtonHovered(true)}
+                onMouseLeave={() => setButtonHovered(false)}
+                className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_18px_rgba(163,230,53,0.3)] hover:shadow-[0_0_26px_rgba(163,230,53,0.48)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
+              >
+                <RollText icon={ArrowRight}>Get started</RollText>
+              </button>
+            </Link>
+            <a href="#proof-demo" className="w-full sm:w-auto">
+              <button
+                type="button"
+                onMouseEnter={() => setButtonHovered(true)}
+                onMouseLeave={() => setButtonHovered(false)}
+                className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_12px_rgba(255,255,255,0.05)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
+              >
+                <RollText>Try the live demo</RollText>
+              </button>
+            </a>
+          </div>
+
+          {/* Microcopy reassurance with Powered by Cadence Labs */}
+          <p className="mt-4 text-[11px] sm:text-[12px] text-[var(--wl-faint)] flex items-center justify-center gap-2 flex-wrap">
+            <span>Free to start</span>
+            <span>·</span>
+            <span>Instant setup for schools, coaching batches & academies</span>
+            <span>·</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--wl-muted)] font-medium inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_6px_rgba(163,230,53,0.8)] animate-pulse" />
+              Powered by Cadence Labs
+            </span>
+          </p>
         </div>
 
-        {/* Microcopy reassurance with Powered by Cadence Labs */}
-        <p className="mt-4 text-[11px] sm:text-[12px] text-[var(--wl-faint)] flex items-center justify-center gap-2 flex-wrap">
-          <span>Free to start</span>
-          <span>·</span>
-          <span>Instant setup for schools, coaching batches & academies</span>
-          <span>·</span>
-          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--wl-muted)] font-medium inline-flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-lime-400 shadow-[0_0_6px_rgba(163,230,53,0.8)] animate-pulse" />
-            Powered by Cadence Labs
-          </span>
-        </p>
-
-        {/* Hero Interactive Preview Card */}
-        <div className="mt-10 sm:mt-14 mx-auto max-w-4xl text-left">
+        {/* Hero Interactive Preview Card - revealed with the rest of the website */}
+        <div className={`mt-10 sm:mt-14 mx-auto max-w-4xl text-left transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          siteRevealed ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-[0.98] pointer-events-none'
+        }`}>
           <div className="rounded-2xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-3 sm:p-5 shadow-2xl relative overflow-hidden">
             {/* Header row */}
             <div className="flex flex-wrap items-center justify-between border-b border-[var(--wl-line)] pb-3 sm:pb-4 mb-4 gap-2 sm:gap-3">
@@ -3408,23 +3417,77 @@ export default function LandingPage() {
   const isDark = themeContext ? themeContext.isDark : localDark;
   const toggleTheme = themeContext ? themeContext.toggleTheme : () => setLocalDark((p) => !p);
 
+  // Staged entrance choreography: Hero loads and fades in first, then entire site reveals
+  const [heroMounted, setHeroMounted] = useState(false);
+  const [siteRevealed, setSiteRevealed] = useState(false);
+
+  useEffect(() => {
+    // 1. Initial Hero fade-in on mount
+    const heroTimer = setTimeout(() => {
+      setHeroMounted(true);
+    }, 60);
+
+    // 2. Reveal the rest of the website smoothly after hero settles
+    const revealTimer = setTimeout(() => {
+      setSiteRevealed(true);
+    }, 1250);
+
+    // Immediate reveal if user starts scrolling or interacting
+    const onUserInteract = () => {
+      setSiteRevealed(true);
+    };
+
+    window.addEventListener('scroll', onUserInteract, { passive: true, once: true });
+    window.addEventListener('wheel', onUserInteract, { passive: true, once: true });
+    window.addEventListener('touchmove', onUserInteract, { passive: true, once: true });
+    window.addEventListener('keydown', onUserInteract, { passive: true, once: true });
+
+    return () => {
+      clearTimeout(heroTimer);
+      clearTimeout(revealTimer);
+      window.removeEventListener('scroll', onUserInteract);
+      window.removeEventListener('wheel', onUserInteract);
+      window.removeEventListener('touchmove', onUserInteract);
+      window.removeEventListener('keydown', onUserInteract);
+    };
+  }, []);
+
   return (
     <div className={`landing-page-root ${isDark ? 'dark' : 'light'} min-h-screen bg-[var(--wl-bg)] text-[var(--wl-fg)]`}>
-      <Navbar isDark={isDark} toggleTheme={toggleTheme} />
+      {/* Top Navigation: reveals cleanly with the rest of the website */}
+      <div className={`transition-all duration-700 ease-out ${
+        siteRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-3 pointer-events-none'
+      }`}>
+        <Navbar isDark={isDark} toggleTheme={toggleTheme} />
+      </div>
+
       <main>
-        <Hero isDark={isDark} />
-        <SearchDirectorySection />
-        <KanbanPipelineSection />
-        <ProofRoleAndSplitComparison />
-        <ProofWindowSection />
-        <AlternatingFeaturesSection />
-        <TabbedToolSection />
-        <SmallToolsBentoSection />
-        <BatchesSection />
-        <PricingSection />
-        <FAQSection />
+        {/* At first, only this hero section loads & fades in */}
+        <Hero isDark={isDark} heroMounted={heroMounted} siteRevealed={siteRevealed} />
+
+        {/* The entire website below is revealed smoothly */}
+        <div className={`transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          siteRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12 pointer-events-none'
+        }`}>
+          <SearchDirectorySection />
+          <KanbanPipelineSection />
+          <ProofRoleAndSplitComparison />
+          <ProofWindowSection />
+          <AlternatingFeaturesSection />
+          <TabbedToolSection />
+          <SmallToolsBentoSection />
+          <BatchesSection />
+          <PricingSection />
+          <FAQSection />
+        </div>
       </main>
-      <InteractiveFooter isDark={isDark} />
+
+      {/* Footer reveals with the rest of the website */}
+      <div className={`transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        siteRevealed ? 'opacity-100 translate-y-0' : 'opacity-0 pointer-events-none'
+      }`}>
+        <InteractiveFooter isDark={isDark} />
+      </div>
     </div>
   );
 }
