@@ -481,21 +481,21 @@ const TestManagement = () => {
         {/* Results table */}
         <div className="bg-dashboard-card border border-dashboard-border rounded-2xl overflow-hidden">
           {adminSelTest && adminResults.length > 0 && (
-            <div className="p-5 border-b border-dashboard-border flex justify-between items-center bg-dashboard-border-light/40">
+            <div className="p-4 sm:p-5 border-b border-dashboard-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-dashboard-border-light/40">
               <div>
                 <p className="font-semibold text-dashboard-text">{adminTestObj?.title}</p>
                 <p className="text-xs text-dashboard-text-secondary mt-0.5">{adminResults.length} students &bull; Total: {adminTestObj?.total_marks} marks</p>
               </div>
               <button
                 onClick={downloadAdminResultsPDF}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-white hover:bg-white/10 border border-white/10 transition-all text-sm font-semibold active:scale-95"
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-white hover:bg-white/10 border border-white/10 transition-all text-sm font-semibold active:scale-95 w-full sm:w-auto"
               >
                 <FileDown className="w-4 h-4" /> Download PDF
               </button>
             </div>
           )}
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full min-w-[520px] text-left">
               <thead className="bg-gray-50/50 text-gray-600 text-xs uppercase tracking-wider">
                 <tr>
                   <th className="px-6 py-5 font-bold">Student</th>
@@ -579,15 +579,15 @@ const TestManagement = () => {
             <p className="text-dashboard-text-secondary text-sm mt-1 font-medium">{tests.length} tests conducted</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dashboard-text-muted" />
             <input
               type="text"
               placeholder="Search tests..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 pr-4 py-2.5 rounded-xl bg-dashboard-card border border-dashboard-border text-dashboard-text text-sm placeholder-dashboard-text-muted outline-none focus:border-dashboard-primary w-64 transition-all"
+              className="pl-10 pr-4 py-2.5 rounded-xl bg-dashboard-card border border-dashboard-border text-dashboard-text text-sm placeholder-dashboard-text-muted outline-none focus:border-dashboard-primary w-full sm:w-64 transition-all"
             />
           </div>
           {canManage && (

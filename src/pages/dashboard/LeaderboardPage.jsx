@@ -244,27 +244,30 @@ const LeaderboardPage = ({ hideHeader = false }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className={`flex items-center justify-between px-6 py-5 rounded-2xl border transition-all hover:scale-[1.01] ${getRankStyle(entry.rank, isCurrentUser)}`}
+                className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:px-6 sm:py-5 rounded-2xl border transition-all hover:scale-[1.01] ${getRankStyle(entry.rank, isCurrentUser)}`}
               >
-                <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
                     {getRankIcon(entry.rank)}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-base font-bold text-gray-900">{entry.name}</p>
+                      <p className="text-sm sm:text-base font-bold text-gray-900 truncate">{entry.name}</p>
                       {isCurrentUser && (
-                        <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-bold text-black uppercase tracking-wider">You</span>
+                        <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-bold text-black uppercase tracking-wider shrink-0">You</span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-600 font-medium mt-0.5">
+                    <p className="text-xs text-gray-600 font-medium mt-0.5 truncate">
                       Scored {entry.totalMarks} out of {entry.totalPossible}
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-black text-gray-900">{entry.percentage}%</p>
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-gray-600">score</p>
+                <div className="flex items-center justify-between sm:justify-end sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-gray-200/50">
+                  <span className="sm:hidden text-xs text-gray-600 font-bold uppercase tracking-wider">Score</span>
+                  <div>
+                    <p className="text-xl sm:text-2xl font-black text-gray-900">{entry.percentage}%</p>
+                    <p className="hidden sm:block text-[10px] uppercase tracking-widest font-bold text-gray-600">score</p>
+                  </div>
                 </div>
               </motion.div>
             )

@@ -159,13 +159,14 @@ const AIChatbot = () => {
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => { setIsOpen(true); setIsMinimized(false); }}
-        className={`fixed bottom-6 right-6 w-16 h-16 rounded-full bg-[var(--text-primary)] text-[var(--bg-app)] z-50 flex items-center justify-center border-2 ${isDark ? 'border-white/20' : 'border-black/10'} transition-all ${isOpen ? 'scale-0 opacity-0 pointer-events-none' : ''}`}
+        className={`fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[var(--text-primary)] text-[var(--bg-app)] z-50 flex items-center justify-center border-2 ${isDark ? 'border-white/20' : 'border-black/10'} shadow-xl transition-all ${isOpen ? 'scale-0 opacity-0 pointer-events-none' : ''}`}
+        aria-label="Open AI Assistant"
       >
-        <Sparkles className="w-8 h-8" />
-        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 border-2 border-[var(--bg-app)] rounded-full" />
+        <Sparkles className="w-5 h-5 sm:w-8 sm:h-8" />
+        <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 border-2 border-[var(--bg-app)] rounded-full" />
       </motion.button>
 
       {/* Chat Window */}
@@ -178,11 +179,11 @@ const AIChatbot = () => {
               y: 0, 
               scale: 1, 
               x: 0,
-              height: isMinimized ? '64px' : '550px',
-              width: isMinimized ? '300px' : '400px'
+              height: isMinimized ? '60px' : 'min(560px, calc(100dvh - 72px))',
+              width: isMinimized ? '260px' : 'min(400px, calc(100vw - 24px))'
             }}
             exit={{ opacity: 0, y: 100, scale: 0.9 }}
-            className="fixed bottom-6 right-6 border rounded-[2.5rem]$1 z-[60] flex flex-col overflow-hidden backdrop-blur-xl transition-all duration-300"
+            className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 border rounded-3xl sm:rounded-[2.5rem] z-[60] flex flex-col overflow-hidden backdrop-blur-xl shadow-2xl transition-all duration-300 max-w-[calc(100vw-24px)]"
             style={{
               background: 'var(--bg-surface)',
               borderColor: 'var(--border-subtle)'

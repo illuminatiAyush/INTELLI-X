@@ -897,12 +897,12 @@ const BatchesPage = () => {
     <div className="space-y-6">
       {/* Tab Navigation with Action Button */}
       <div className="flex items-center justify-between">
-        <div className="flex border-b border-gray-200 gap-8">
+        <div className="flex border-b border-gray-200 gap-4 sm:gap-8 overflow-x-auto no-scrollbar w-full">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`pb-4 text-sm font-bold transition-all relative ${
+              className={`pb-4 text-xs sm:text-sm font-bold transition-all relative shrink-0 ${
                 activeTab === tab.id 
                   ? 'text-gray-900' 
                   : 'text-gray-600 hover:text-gray-900'

@@ -316,22 +316,22 @@ const StudentsPage = ({ hideHeader = false }) => {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between"
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
         >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-              <GraduationCap size={24} className="text-blue-600" strokeWidth={2} />
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+              <GraduationCap size={22} className="text-blue-600" strokeWidth={2} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-dashboard-text">Students</h1>
-              <p className="text-sm text-dashboard-text-secondary">Manage enrolled students for your institute</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-dashboard-text">Students</h1>
+              <p className="text-xs sm:text-sm text-dashboard-text-secondary">Manage enrolled students for your institute</p>
             </div>
           </div>
           
           {role !== 'student' && (
             <button
               onClick={openAdd}
-              className="dashboard-btn-primary"
+              className="dashboard-btn-primary w-full sm:w-auto flex items-center justify-center"
             >
               <Plus size={18} strokeWidth={2} />
               Add Student

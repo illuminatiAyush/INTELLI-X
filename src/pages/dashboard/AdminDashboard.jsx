@@ -140,7 +140,7 @@ const AdminDashboard = () => {
         <h2 className="text-xs font-bold uppercase tracking-wider text-dashboard-text-secondary mb-4">
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <div
             onClick={() => navigate('/dashboard/students')}
             className="quick-action-card"

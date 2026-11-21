@@ -747,9 +747,9 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
         </nav>
 
         {/* Auth Actions: Language Selector, Theme Switcher, Sign in, CTA */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Language Selector Dropdown */}
-          <div className="relative" ref={langRef}>
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          {/* Language Selector Dropdown (Desktop/Tablet) */}
+          <div className="relative hidden sm:block" ref={langRef}>
             <button
               onClick={() => setLangOpen(!langOpen)}
               className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--wl-muted)] hover:text-[var(--wl-fg)] hover:bg-[var(--wl-surface-2)] transition-colors"
@@ -787,7 +787,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
           <button
             onClick={handleToggle}
             aria-label="Switch between light and dark theme"
-            className="grid size-8 place-items-center rounded-lg text-[var(--wl-muted)] transition-colors hover:bg-[var(--wl-surface-2)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]"
+            className="grid size-8 place-items-center rounded-lg text-[var(--wl-muted)] transition-colors hover:bg-[var(--wl-surface-2)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)] shrink-0"
             title={isDark ? "Switch to light mode" : "Switch to dark mode"}
           >
             {isDark ? (
@@ -807,7 +807,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
           <Link to="/register">
             <button
               type="button"
-              className="group relative overflow-hidden wl-btn wl-btn-primary h-9 rounded-[10px] px-4 text-[13px] inline-flex items-center justify-center shadow-[0_0_12px_rgba(59,130,246,0.18)] hover:shadow-[0_0_16px_rgba(59,130,246,0.28)] transition-all cursor-pointer"
+              className="group relative overflow-hidden wl-btn wl-btn-primary h-8 sm:h-9 rounded-[10px] px-3 sm:px-4 text-xs sm:text-[13px] inline-flex items-center justify-center shadow-[0_0_12px_rgba(59,130,246,0.18)] hover:shadow-[0_0_16px_rgba(59,130,246,0.28)] transition-all cursor-pointer shrink-0"
             >
               <RollText icon={ArrowRight}>Get started</RollText>
             </button>
@@ -816,7 +816,7 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
           {/* Mobile hamburger menu toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden grid size-8 place-items-center rounded-lg text-[var(--wl-muted)] hover:bg-[var(--wl-surface-2)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)]"
+            className="md:hidden grid size-8 place-items-center rounded-lg text-[var(--wl-muted)] hover:bg-[var(--wl-surface-2)] hover:text-[var(--wl-fg)] border border-[var(--wl-line)] shrink-0"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Layers className="w-4 h-4" />}
@@ -833,6 +833,22 @@ const Navbar = ({ isDark, setIsDark, toggleTheme }) => {
               alt="IntelliX"
               className="h-5.5 w-auto object-contain"
             />
+            {/* Mobile language selector pills */}
+            <div className="flex items-center gap-1">
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => setSelectedLang(l.code)}
+                  className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+                    selectedLang === l.code
+                      ? 'bg-blue-600 text-white'
+                      : 'text-[var(--wl-muted)] hover:bg-[var(--wl-surface-2)]'
+                  }`}
+                >
+                  {l.code}
+                </button>
+              ))}
+            </div>
           </div>
           <a
             href="#search-dir"
@@ -923,39 +939,39 @@ const Hero = ({ isDark: propDark }) => {
         </div>
 
         {/* Display H1 - Cormorant upright with Newsreader italic accent */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-[var(--wl-fg)] leading-[1.08] max-w-3xl mx-auto">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-normal tracking-tight text-[var(--wl-fg)] leading-[1.1] max-w-3xl mx-auto">
           Don't just run classes.<br />
           <span className="text-[var(--wl-muted)]">Show the </span>
           <span className="font-editorial-italic">results.</span>
         </h1>
 
         {/* Light Montserrat 300 Subtext */}
-        <p className="mt-6 text-base sm:text-lg text-[var(--wl-muted)] max-w-2xl mx-auto leading-relaxed">
+        <p className="mt-5 sm:mt-6 text-sm sm:text-base md:text-lg text-[var(--wl-muted)] max-w-2xl mx-auto leading-relaxed">
           Intelli-X searches 90,000+ sessions, evaluates tests, logs attendance, and sends verifiable proof of progress to parents and management.
         </p>
 
         {/* Action Buttons - triggering focus highlight and quiet background */}
         <div
-          className="mt-8 flex flex-wrap items-center justify-center gap-3"
+          className="mt-7 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto sm:max-w-none"
           onMouseEnter={() => setButtonHovered(true)}
           onMouseLeave={() => setButtonHovered(false)}
         >
-          <Link to="/register">
+          <Link to="/register" className="w-full sm:w-auto">
             <button
               type="button"
               onMouseEnter={() => setButtonHovered(true)}
               onMouseLeave={() => setButtonHovered(false)}
-              className="group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_14px_rgba(59,130,246,0.2)] hover:shadow-[0_0_20px_rgba(59,130,246,0.32)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-primary h-11 rounded-[11px] px-6 text-[14px] shadow-[0_0_14px_rgba(59,130,246,0.2)] hover:shadow-[0_0_20px_rgba(59,130,246,0.32)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
             >
               <RollText icon={ArrowRight}>Get started</RollText>
             </button>
           </Link>
-          <a href="#proof-demo">
+          <a href="#proof-demo" className="w-full sm:w-auto">
             <button
               type="button"
               onMouseEnter={() => setButtonHovered(true)}
               onMouseLeave={() => setButtonHovered(false)}
-              className="group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_12px_rgba(255,255,255,0.05)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="w-full sm:w-auto group relative overflow-hidden wl-btn wl-btn-secondary h-11 rounded-[11px] px-6 text-[14px] hover:border-zinc-500/60 hover:shadow-[0_0_12px_rgba(255,255,255,0.05)] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer inline-flex items-center justify-center"
             >
               <RollText>Try the live demo</RollText>
             </button>
@@ -963,28 +979,28 @@ const Hero = ({ isDark: propDark }) => {
         </div>
 
         {/* Microcopy reassurance */}
-        <p className="mt-4 text-[12px] text-[var(--wl-faint)]">
+        <p className="mt-4 text-[11px] sm:text-[12px] text-[var(--wl-faint)]">
           Free to start · Instant setup for schools, coaching batches & academies
         </p>
 
         {/* Hero Interactive Preview Card */}
-        <div className="mt-14 mx-auto max-w-4xl text-left">
+        <div className="mt-10 sm:mt-14 mx-auto max-w-4xl text-left">
           <div className="rounded-2xl border border-[var(--wl-line)] bg-[var(--wl-surface)] p-3 sm:p-5 shadow-2xl relative overflow-hidden">
             {/* Header row */}
-            <div className="flex flex-wrap items-center justify-between border-b border-[var(--wl-line)] pb-4 mb-4 gap-3">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between border-b border-[var(--wl-line)] pb-3 sm:pb-4 mb-4 gap-2 sm:gap-3">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <img
                   src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
                   alt="IntelliX"
                   className="h-4 sm:h-5 w-auto object-contain"
                 />
-                <span className="rounded-md bg-[var(--wl-surface-2)] px-2 py-0.5 text-[11px] text-[var(--wl-muted)] font-medium">Workspace</span>
-                <span className="text-[12px] text-[var(--wl-faint)]">Sessions</span>
-                <span className="text-[12px] text-[var(--wl-faint)]">Attendance</span>
-                <span className="text-[12px] text-[var(--wl-faint)]">Proofs <span className="rounded-full bg-blue-500/20 px-1.5 py-0.2 text-blue-500 text-[10px]">6</span></span>
+                <span className="rounded-md bg-[var(--wl-surface-2)] px-2 py-0.5 text-[10px] sm:text-[11px] text-[var(--wl-muted)] font-medium">Workspace</span>
+                <span className="hidden sm:inline text-[12px] text-[var(--wl-faint)]">Sessions</span>
+                <span className="hidden sm:inline text-[12px] text-[var(--wl-faint)]">Attendance</span>
+                <span className="text-[11px] sm:text-[12px] text-[var(--wl-faint)]">Proofs <span className="rounded-full bg-blue-500/20 px-1.5 py-0.2 text-blue-500 text-[10px]">6</span></span>
               </div>
               <div className="flex items-center gap-2">
-                <button className="wl-btn wl-btn-primary h-7 px-3 text-[12px] rounded-lg">
+                <button className="wl-btn wl-btn-primary h-7 px-2.5 sm:px-3 text-[11px] sm:text-[12px] rounded-lg">
                   <Sparkles className="w-3 h-3" />
                   <span>Sync batches</span>
                 </button>
@@ -1575,13 +1591,13 @@ const ProofRoleAndSplitComparison = () => {
             className="relative h-[420px] rounded-3xl border border-[var(--wl-line)] bg-[var(--wl-surface)] overflow-hidden select-none shadow-2xl"
           >
             {/* Left Side: Before Report */}
-            <div className="absolute inset-0 p-6 sm:p-10 bg-[var(--wl-surface)] flex flex-col justify-between">
+            <div className="absolute inset-0 p-4 sm:p-10 bg-[var(--wl-surface)] flex flex-col justify-between">
               <div>
                 <span className="text-[11px] font-mono text-rose-400 font-semibold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">The usual generic SMS</span>
-                <div className="mt-4 text-base sm:text-xl font-medium text-[var(--wl-muted)]">
+                <div className="mt-3 sm:mt-4 text-sm sm:text-xl font-medium text-[var(--wl-muted)]">
                   Notice: Monthly Test Attendance & Marks
                 </div>
-                <div className="mt-4 text-xs sm:text-sm text-[var(--wl-faint)] leading-relaxed max-w-sm">
+                <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-[var(--wl-faint)] leading-relaxed max-w-sm">
                   Dear Parent,<br /><br />
                   Your ward was present in class and scored 62/100 in Physics test. Please deposit the outstanding fee balance of ₹12,000 at the counter soon...
                 </div>
@@ -1596,40 +1612,41 @@ const ProofRoleAndSplitComparison = () => {
 
             {/* Right Side: Clipped Overlaid Intelli-X Student Proof */}
             <div
-              className="absolute inset-0 p-6 sm:p-10 bg-[var(--wl-surface-2)] flex flex-col justify-between border-l border-blue-500/60"
+              className="absolute inset-0 p-4 sm:p-10 bg-[var(--wl-surface-2)] flex flex-col justify-between border-l border-blue-500/60"
               style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
             >
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-mono text-emerald-400 font-bold flex items-center gap-1.5">
+                  <span className="text-[10px] sm:text-[11px] font-mono text-emerald-400 font-bold flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    Read by parent · 98% open rate
+                    Read by parent · 98% open
                   </span>
-                  <span className="rounded-full bg-blue-500/20 border border-blue-500/30 px-2.5 py-0.5 text-[10px] text-blue-400 font-bold">Rank #3 in Batch</span>
+                  <span className="rounded-full bg-blue-500/20 border border-blue-500/30 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] text-blue-400 font-bold">Rank #3</span>
                 </div>
-                <div className="mt-4 text-base sm:text-xl font-medium text-[var(--wl-fg)]">
+                <div className="mt-3 sm:mt-4 text-sm sm:text-xl font-medium text-[var(--wl-fg)]">
                   Subject: Aarav scored 92% in Thermodynamics (+18% growth)
                 </div>
-                <div className="mt-4 text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed max-w-sm">
+                <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-[var(--wl-muted)] leading-relaxed max-w-sm">
                   Dear Mr. Sharma,<br /><br />
                   Aarav solved 45/50 questions correctly today. His accuracy in numerical problems reached 94%. Tap below to view full test scorecard & teacher remarks.
                 </div>
               </div>
               <div>
-                <div className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3.5 py-1.5 text-xs text-white font-medium shadow-md hover:bg-blue-700 transition-colors">
+                <div className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 sm:px-3.5 py-1.5 text-xs text-white font-medium shadow-md hover:bg-blue-700 transition-colors">
                   <ExternalLink className="w-3.5 h-3.5 text-white shrink-0" />
-                  <span>intelli-x.in/r/aarav-12a · Live scorecard</span>
+                  <span className="truncate">intelli-x.in/r/aarav-12a</span>
                 </div>
               </div>
             </div>
 
             {/* Draggable Vertical Slider Handle */}
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-blue-500 cursor-ew-resize z-20 flex items-center justify-center"
+              className="absolute top-0 bottom-0 w-8 -ml-4 z-20 flex items-center justify-center cursor-ew-resize touch-none select-none"
               style={{ left: `${sliderPos}%` }}
               onPointerDown={handlePointerDown}
             >
-              <div className="w-8 h-8 rounded-full bg-blue-600 border-2 border-white flex items-center justify-center shadow-xl text-white text-xs font-mono font-bold">
+              <div className="w-0.5 h-full bg-blue-500" />
+              <div className="absolute w-8 h-8 rounded-full bg-blue-600 border-2 border-white flex items-center justify-center shadow-xl text-white text-xs font-mono font-bold">
                 |||
               </div>
             </div>
@@ -2121,7 +2138,7 @@ const TabbedToolSection = () => {
           </div>
 
           {/* Window Header Control Bar with Embedded Tab Switcher */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between border-b border-[var(--wl-line)] bg-[var(--wl-surface-2)]/80 px-6 py-4 gap-4 backdrop-blur-md">
+          <div className="relative z-10 flex flex-wrap items-center justify-between border-b border-[var(--wl-line)] bg-[var(--wl-surface-2)]/80 px-4 sm:px-6 py-3 sm:py-4 gap-3 sm:gap-4 backdrop-blur-md">
             {/* Left: Window dots + breadcrumb */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
@@ -2134,8 +2151,8 @@ const TabbedToolSection = () => {
               </span>
             </div>
 
-            {/* Center: Integrated 4-Tab Switcher */}
-            <div className="inline-flex items-center gap-1 rounded-full bg-[var(--wl-surface)] p-1 border border-[var(--wl-line)] shadow-xs">
+            {/* Center: Integrated 4-Tab Switcher with horizontal scroll on mobile */}
+            <div className="flex items-center gap-1 rounded-2xl sm:rounded-full bg-[var(--wl-surface)] p-1 border border-[var(--wl-line)] shadow-xs max-w-full overflow-x-auto no-scrollbar">
               {[
                 { id: 'Syllabus coverage', icon: Maximize2, label: 'Syllabus' },
                 { id: 'Report card tone', icon: Mail, label: 'Reports' },
@@ -2145,7 +2162,7 @@ const TabbedToolSection = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`rounded-full px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
                     activeTab === tab
                       ? 'bg-[var(--wl-fg)] text-[var(--wl-bg)] shadow-xs'
                       : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)] hover:bg-[var(--wl-surface-2)]'
@@ -2308,10 +2325,14 @@ const TabbedToolSection = () => {
               {/* Tab 2: Report card tone */}
               {activeTab === 'Report card tone' && (
                 <div className="space-y-5">
-                  <div className="flex items-center justify-between pb-3 border-b border-[var(--wl-line)]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-[var(--wl-line)]">
                     <span className="text-xs font-mono font-semibold text-[var(--wl-muted)] uppercase">Notification Mode</span>
-                    <div className="flex gap-1.5">
-                      {['detailed', 'sms', 'visual'].map((tone) => (
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { id: 'detailed', full: 'Detailed Analysis', short: 'Detailed' },
+                        { id: 'sms', full: 'Compact SMS', short: 'SMS' },
+                        { id: 'visual', full: 'Visual Scorecard', short: 'Visual' }
+                      ].map(({ id: tone, full, short }) => (
                         <button
                           key={tone}
                           onClick={() => setReportTone(tone)}
@@ -2321,7 +2342,8 @@ const TabbedToolSection = () => {
                               : 'bg-[var(--wl-surface)] text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
                           }`}
                         >
-                          {tone === 'detailed' ? 'Detailed Analysis' : tone === 'sms' ? 'Compact SMS' : 'Visual Scorecard'}
+                          <span className="hidden sm:inline">{full}</span>
+                          <span className="sm:hidden">{short}</span>
                         </button>
                       ))}
                     </div>
@@ -3207,7 +3229,7 @@ const InteractiveFooter = ({ isDark }) => {
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative pt-12 pb-2">
           {/* 4 Interactive Speech Bubbles Floating Above Character Heads with distinct observable colors */}
-          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-2 max-w-4xl mx-auto items-stretch">
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-2 max-w-4xl mx-auto items-stretch">
             {[
               {
                 tag: 'Report',

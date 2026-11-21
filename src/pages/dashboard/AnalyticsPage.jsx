@@ -352,11 +352,11 @@ const AnalyticsPage = () => {
           <motion.h1
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-bold text-dashboard-text tracking-tight"
+            className="text-2xl sm:text-3xl font-bold text-dashboard-text tracking-tight"
           >
             Performance Analytics
           </motion.h1>
-          <p className="text-dashboard-text-secondary text-sm mt-1 font-medium">
+          <p className="text-dashboard-text-secondary text-xs sm:text-sm mt-1 font-medium">
             Comprehensive insights into your academic journey and learning progress
           </p>
         </div>
@@ -382,19 +382,19 @@ const AnalyticsPage = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/40 bg-gradient-to-br from-white via-white to-indigo-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-indigo-950/20 p-6 shadow-xs"
+          className="rounded-2xl border border-indigo-200/60 dark:border-indigo-900/40 bg-gradient-to-br from-white via-white to-indigo-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-indigo-950/20 p-4 sm:p-6 shadow-xs"
         >
           <div className="flex items-center gap-2 mb-6">
             <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-700'}`}>
               <Users className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Batch Performance Breakdown</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Batch Performance Breakdown</h2>
           </div>
           {batchStats.length === 0 ? (
             <p className="text-gray-600 text-sm py-4 text-center">No batches joined yet</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[500px] text-sm">
                 <thead>
                   <tr className="border-b border-gray-200 text-gray-600">
                     <th className="text-left py-3 px-4 font-semibold uppercase tracking-wider">Batch</th>
@@ -511,11 +511,11 @@ const AnalyticsPage = () => {
         <motion.h1
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          className="text-3xl font-bold text-dashboard-text tracking-tight"
+          className="text-2xl sm:text-3xl font-bold text-dashboard-text tracking-tight"
         >
           {role === 'master_admin' ? 'System Analytics' : role === 'teacher' ? 'My Batch Analytics' : 'Institute Analytics'}
         </motion.h1>
-        <p className="text-dashboard-text-secondary text-sm mt-1 font-medium">
+        <p className="text-dashboard-text-secondary text-xs sm:text-sm mt-1 font-medium">
           {role === 'teacher' 
             ? 'Performance analytics for your assigned batches' 
             : 'Comprehensive performance and engagement metrics'
@@ -536,19 +536,19 @@ const AnalyticsPage = () => {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="rounded-2xl border border-blue-200/60 dark:border-blue-900/40 bg-gradient-to-br from-white via-white to-blue-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/20 p-6 shadow-xs"
+        className="rounded-2xl border border-blue-200/60 dark:border-blue-900/40 bg-gradient-to-br from-white via-white to-blue-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/20 p-4 sm:p-6 shadow-xs"
       >
         <div className="flex items-center gap-2 mb-6">
           <div className={`p-2 rounded-lg ${isDark ? 'bg-white/10 text-white border border-white/20' : 'bg-slate-100 text-slate-700 border border-slate-200'} shadow-sm`}>
             <BarChart3 className="w-5 h-5" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900">Batch Performance</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Batch Performance</h2>
         </div>
         {batchStats.length === 0 ? (
           <p className="text-gray-600 text-sm py-4 text-center">No batches found</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 font-semibold text-gray-600">Batch</th>

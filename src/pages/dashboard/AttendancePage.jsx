@@ -421,28 +421,28 @@ const AdminAttendanceView = ({ user, role }) => {
       ) : (
         <>
           {/* Summary Bar */}
-          <div className="flex items-center justify-between px-6 py-4 rounded-2xl bg-gray-50/50 border border-gray-200">
-            <div className="flex items-center gap-6 text-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:px-6 sm:py-4 rounded-2xl bg-gray-50/50 border border-gray-200">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-sm">
               <span className="text-gray-600 font-medium uppercase tracking-wider text-xs">Overview</span>
-              <div className="h-4 w-px bg-[var(--border-subtle)]" />
+              <div className="hidden sm:block h-4 w-px bg-[var(--border-subtle)]" />
               <span className="text-gray-600">Total: <span className="text-gray-900 font-bold">{students.length}</span></span>
               <span className="text-emerald-500">Present: <span className="font-bold">{presentCount}</span></span>
               <span className="text-red-500">Absent: <span className="font-bold">{absentCount}</span></span>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {(role === 'teacher' || role === 'admin' || role === 'master_admin') && (
                 <>
-                  <button onClick={() => markAll('present')} className="text-xs px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-all font-semibold active:scale-95">
+                  <button onClick={() => markAll('present')} className="text-xs px-3 sm:px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-all font-semibold active:scale-95">
                     Mark All Present
                   </button>
-                  <button onClick={() => markAll('absent')} className="text-xs px-4 py-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all font-semibold active:scale-95">
+                  <button onClick={() => markAll('absent')} className="text-xs px-3 sm:px-4 py-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all font-semibold active:scale-95">
                     Mark All Absent
                   </button>
                 </>
               )}
               <button
                 onClick={downloadPDF}
-                className="flex items-center gap-2 text-xs px-4 py-2 rounded-xl bg-gray-50 text-gray-900 hover:bg-gray-100 border border-gray-200 transition-all font-semibold active:scale-95"
+                className="flex items-center gap-2 text-xs px-3 sm:px-4 py-2 rounded-xl bg-gray-50 text-gray-900 hover:bg-gray-100 border border-gray-200 transition-all font-semibold active:scale-95"
               >
                 <FileDown className="w-3.5 h-3.5" />
                 Download PDF
@@ -462,24 +462,24 @@ const AdminAttendanceView = ({ user, role }) => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.02 }}
-                  className={`flex items-center justify-between px-6 py-4 rounded-2xl border transition-all ${ isPresent ? 'bg-emerald-500/5 border-emerald-500/20 shadow-emerald-500/5'
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:px-6 sm:py-4 rounded-2xl border transition-all ${ isPresent ? 'bg-emerald-500/5 border-emerald-500/20 shadow-emerald-500/5'
                       : 'bg-red-500/5 border-red-500/20 shadow-red-500/5'
                   }`}
                 >
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-inner ${ isPresent ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                  <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-inner shrink-0 ${ isPresent ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'
                   }`}>
                     {student.name.charAt(0).toUpperCase()}
                   </div>
-                   <div>
-                    <p className="text-base font-bold text-gray-900">{student.full_name || student.name || "Unknown"}</p>
-                    <p className="text-xs text-gray-600 font-medium">{student.email || 'No email provided'}</p>
+                   <div className="min-w-0">
+                    <p className="text-sm sm:text-base font-bold text-gray-900 truncate">{student.full_name || student.name || "Unknown"}</p>
+                    <p className="text-xs text-gray-600 font-medium truncate">{student.email || 'No email provided'}</p>
                   </div>
                 </div>
                 {(role === 'teacher' || role === 'admin' || role === 'master_admin') ? (
                   <button
                     onClick={() => toggleStatus(sid)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${ isPresent ? 'bg-emerald-500 text-white shadow-emerald-500/20'
+                    className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 w-full sm:w-auto ${ isPresent ? 'bg-emerald-500 text-white shadow-emerald-500/20'
                         : 'bg-red-500 text-white shadow-red-500/20'
                     }`}
                   >
@@ -487,7 +487,7 @@ const AdminAttendanceView = ({ user, role }) => {
                     {isPresent ? 'Present' : 'Absent'}
                   </button>
                 ) : (
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold ${ isPresent ? 'bg-emerald-500/15 text-emerald-500'
+                  <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold w-full sm:w-auto ${ isPresent ? 'bg-emerald-500/15 text-emerald-500'
                       : 'bg-red-500/15 text-red-500'
                   }`}>
                     {isPresent ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}

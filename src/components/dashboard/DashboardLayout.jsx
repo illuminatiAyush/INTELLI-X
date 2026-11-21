@@ -228,7 +228,7 @@ const DashboardLayout = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 p-3.5 sm:p-6 overflow-y-auto">
           <div className="max-w-[1400px] mx-auto">
             {loading ? <DashboardSkeleton /> : <Outlet />}
           </div>
@@ -236,34 +236,35 @@ const DashboardLayout = () => {
       </motion.div>
 
       {/* ── Mobile Content Area ── */}
-      <div className="flex-1 flex flex-col lg:hidden">
+      <div className="flex-1 flex flex-col lg:hidden min-w-0">
         {/* Top Header */}
-        <header className="dashboard-header">
+        <header className="dashboard-header px-3 sm:px-6">
           {/* Left: mobile hamburger + breadcrumb */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
               onClick={() => setMobileOpen(true)}
-              className="lg:hidden p-2 text-dashboard-text-secondary hover:text-dashboard-text rounded-lg hover:bg-dashboard-border-light transition-colors"
+              className="lg:hidden p-2 text-dashboard-text-secondary hover:text-dashboard-text rounded-lg hover:bg-dashboard-border-light transition-colors shrink-0"
+              aria-label="Open navigation menu"
             >
               <Menu size={20} />
             </button>
 
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-dashboard-text-secondary">IntelliX</span>
-              <ChevronRight size={16} className="text-dashboard-text-muted" />
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm min-w-0 truncate">
+              <span className="text-dashboard-text-secondary hidden sm:inline">IntelliX</span>
+              <ChevronRight size={14} className="text-dashboard-text-muted hidden sm:inline shrink-0" />
               <span className="text-dashboard-text-secondary">Dashboard</span>
               {currentItem && currentItem.path !== '/dashboard' && (
                 <>
-                  <ChevronRight size={16} className="text-dashboard-text-muted" />
-                  <span className="text-dashboard-text font-semibold">{currentItem.label}</span>
+                  <ChevronRight size={14} className="text-dashboard-text-muted shrink-0" />
+                  <span className="text-dashboard-text font-semibold truncate">{currentItem.label}</span>
                 </>
               )}
             </div>
           </div>
 
           {/* Right: notifications + theme + user */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <NotificationsMenu />
             <button
               onClick={toggleTheme}
@@ -277,7 +278,7 @@ const DashboardLayout = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 p-3.5 sm:p-6 overflow-y-auto">
           <div className="max-w-[1400px] mx-auto">
             {loading ? <DashboardSkeleton /> : <Outlet />}
           </div>

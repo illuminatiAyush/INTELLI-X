@@ -15,7 +15,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4">
           {/* Backdrop, explicitly sized to avoid browser blur edge bugs */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -30,11 +30,11 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={`relative w-full ${sizes[size]} bg-dashboard-card text-dashboard-text border border-dashboard-border rounded-2xl overflow-hidden shadow-xl`}
+            className={`relative w-full ${sizes[size]} bg-dashboard-card text-dashboard-text border border-dashboard-border rounded-2xl overflow-hidden shadow-xl max-h-[90vh] flex flex-col`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-dashboard-border bg-dashboard-border-light/40">
-              <h2 className="text-lg font-bold text-dashboard-text">{title}</h2>
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-dashboard-border bg-dashboard-border-light/40 shrink-0">
+              <h2 className="text-base sm:text-lg font-bold text-dashboard-text">{title}</h2>
               <button
                 onClick={onClose}
                 className="p-1.5 rounded-lg hover:bg-dashboard-border-light text-dashboard-text-secondary hover:text-dashboard-text transition-all"
@@ -43,7 +43,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
               </button>
             </div>
             {/* Body */}
-            <div className="px-6 py-5 max-h-[70vh] overflow-y-auto">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 overflow-y-auto max-h-[calc(90vh-70px)]">
               {children}
             </div>
           </motion.div>
