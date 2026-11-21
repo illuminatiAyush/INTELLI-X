@@ -78,7 +78,7 @@
 html, body {
   background-color: #2C2C2C;
   color: #E4E4E4;
-  font-family: 'Montserrat', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -420,54 +420,8 @@ input:-webkit-autofill:active {
 
 
 /* ═══════════════════════════════════════════════
-   DASHBOARD SKYLEARN STYLES & UNIFIED TYPOGRAPHY
-   Replicating the elevated aesthetic from the Landing Page
+   DASHBOARD STYLES
    ═══════════════════════════════════════════════ */
-
-/* Global Inputs, Buttons, Tables & Dashboard Containers */
-.dashboard-layout,
-.dashboard-sidebar,
-.dashboard-header,
-.dashboard-card,
-.card,
-.glass-card,
-button, input, select, textarea {
-  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-/* Elegant Upright Display Headings inside Dashboard (like outside) */
-.dashboard-layout h1,
-.dashboard-header-title,
-.dashboard-hero-title,
-.page-title {
-  font-family: 'Cormorant', 'Cormorant Garamond', 'Playfair Display', serif;
-  font-weight: 500;
-  letter-spacing: -0.015em;
-}
-
-/* Section Subheadings */
-.dashboard-layout h2,
-.dashboard-layout h3 {
-  font-family: 'Montserrat', sans-serif;
-  letter-spacing: -0.01em;
-}
-
-/* Clean Editorial Italic Accents inside Dashboard */
-.font-editorial-italic,
-.dashboard-layout em,
-.dashboard-italic-accent {
-  font-family: 'Newsreader', 'Cormorant Garamond', Georgia, serif;
-  font-style: italic;
-  font-weight: 400;
-}
-
-/* Monospace for Numbers, Stats, Badges, Tokens, and Data */
-.dashboard-metric,
-.stat-number,
-.font-mono,
-code, pre {
-  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
 
 /* Dashboard-specific card styles */
 .dashboard-card {
