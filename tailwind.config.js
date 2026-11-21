@@ -30,8 +30,16 @@ export default {
         },
       },
       fontFamily: {
-        'inter': ['Inter', 'sans-serif'],
-        'satoshi': ['Satoshi', 'Inter', 'sans-serif'],
+        sans: ['Montserrat', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+        satoshi: ['Satoshi', 'Inter', 'sans-serif'],
+        cormorant: ['Cormorant', 'Cormorant Garamond', 'Playfair Display', 'serif'],
+        editorial: ['Cormorant', 'Cormorant Garamond', 'Playfair Display', 'serif'],
+        'editorial-italic': ['Newsreader', 'Cormorant Garamond', 'Georgia', 'serif'],
+        newsreader: ['Newsreader', 'Georgia', 'serif'],
+        mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        geist: ['Geist', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
