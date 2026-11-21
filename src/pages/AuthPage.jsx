@@ -240,10 +240,9 @@ const AuthPage = () => {
         className="flex-1 flex items-center justify-center px-8 py-12 bg-white relative"
         style={{ clipPath: 'polygon(5% 0%, 100% 0%, 100% 100%, 0% 100%)' }}
       >
-        {/* Mobile logo: Official iX icon + wordmark for white mode */}
-        <div className="absolute top-6 left-10 lg:hidden flex items-center gap-2">
-          <img src="/intellix-icon-black.svg" alt="iX" className="w-6 h-6 object-contain" />
-          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-5 w-auto object-contain" />
+        {/* Mobile logo: Official IntelliX wordmark for white mode */}
+        <div className="absolute top-6 left-10 lg:hidden flex items-center">
+          <img src="/intellix-wordmark-black.png" alt="IntelliX" className="h-6 w-auto object-contain" />
         </div>
 
         <AnimatePresence mode="wait">

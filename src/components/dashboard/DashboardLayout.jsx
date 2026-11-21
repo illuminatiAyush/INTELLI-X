@@ -45,18 +45,19 @@ const DashboardLayout = () => {
     <div className="dashboard-sidebar h-full flex flex-col">
       {/* Logo row */}
       <div className="flex items-center gap-2.5 px-4 py-4 border-b border-dashboard-border">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-          <img
-            src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"}
-            alt="iX"
-            className="w-7 h-7 object-contain"
-          />
-        </div>
-        {!collapsed && (
+        {collapsed ? (
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden mx-auto">
+            <img
+              src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"}
+              alt="iX"
+              className="w-7 h-7 object-contain"
+            />
+          </div>
+        ) : (
           <img
             src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
             alt="IntelliX"
-            className="h-5 w-auto object-contain"
+            className="h-6 w-auto object-contain"
           />
         )}
       </div>

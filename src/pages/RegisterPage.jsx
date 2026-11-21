@@ -112,16 +112,11 @@ const RegisterPage = () => {
           }}
         />
 
-        <Link to="/" className="flex items-center gap-3 group w-fit">
-          <img
-            src={isDark ? '/intellix-icon-white.svg' : '/intellix-icon-black.svg'}
-            alt="IntelliX"
-            className="w-8 h-8 object-contain"
-          />
+        <Link to="/" className="inline-block group w-fit py-1" aria-label="IntelliX">
           <img
             src={isDark ? '/intellix-wordmark-white.png' : '/intellix-wordmark-black.png'}
             alt="IntelliX"
-            className="h-5 w-auto object-contain"
+            className="h-7 w-auto object-contain"
           />
         </Link>
 

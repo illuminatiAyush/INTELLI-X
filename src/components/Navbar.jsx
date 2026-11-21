@@ -83,22 +83,17 @@ const Navbar = () => {
           : 'bg-transparent py-5 border-transparent'
       }`}
     >
-      {/* Brand: Official iX Icon + Wordmark */}
+      {/* Brand: Official IntelliX Wordmark */}
       <motion.div
         initial={{ opacity: 0.85 }}
         whileHover={{ opacity: 1 }}
         transition={{ duration: 0.16 }}
       >
-        <Link to="/" className="inline-flex items-center gap-2 py-1" aria-label="IntelliX">
-          <img
-            src={isDark ? "/intellix-icon-white.svg" : "/intellix-icon-black.svg"}
-            alt="iX"
-            className="w-6 h-6 object-contain"
-          />
+        <Link to="/" className="inline-block py-1" aria-label="IntelliX">
           <img
             src={isDark ? "/intellix-wordmark-white.png" : "/intellix-wordmark-black.png"}
             alt="IntelliX"
-            className="h-5 w-auto object-contain"
+            className="h-6 w-auto object-contain"
           />
         </Link>
       </motion.div>
