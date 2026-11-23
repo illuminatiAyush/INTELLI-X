@@ -620,17 +620,6 @@ const AuthPage = () => {
               </span>
             </div>
 
-            {/* Security Notice Card */}
-            <div className="p-4 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] max-w-md text-xs text-[var(--wl-muted)] space-y-2">
-              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[var(--wl-fg)] font-medium">
-                <KeyRound className="w-3.5 h-3.5 text-lime-400" />
-                Admin Provisioned Access
-              </div>
-              <p className="leading-relaxed">
-                To protect student data integrity and institute privacy, accounts cannot be registered publicly. Enter the activation code supplied in your onboarding invitation.
-              </p>
-            </div>
-
           </div>
 
           {/* ══ RIGHT: Auth Terminal Card ══ */}
