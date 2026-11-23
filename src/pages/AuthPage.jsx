@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   Check,
   AlertCircle,
-  Sparkles,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import './LandingPage.css'
@@ -176,7 +175,7 @@ const Field = ({ label, error, rightLabel, children }) => (
   <div className="space-y-1.5">
     <div className="flex items-center justify-between">
       {label && (
-        <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--wl-muted)] font-medium">
+        <label className="text-[12.5px] font-medium text-[var(--wl-fg)] tracking-tight select-none">
           {label}
         </label>
       )}
@@ -596,13 +595,8 @@ const AuthPage = () => {
           <div className="hidden lg:flex lg:col-span-6 flex-col justify-center space-y-6 pr-6">
             
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-400/10 border border-lime-400/25 text-[11px] font-mono uppercase tracking-wider text-lime-400">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Invite-Only Architecture</span>
-              </div>
-
               <h1 className="text-4xl sm:text-5xl font-light text-[var(--wl-fg)] tracking-tight leading-[1.12] font-heading">
-                The <span className="font-editorial-italic font-normal text-lime-400">intelligent</span> command center for modern institutes.
+                The <span className="font-editorial-italic font-normal text-lime-600 dark:text-lime-300">intelligent</span> command center for modern institutes.
               </h1>
 
               <p className="text-sm text-[var(--wl-muted)] leading-relaxed max-w-md">
@@ -731,7 +725,7 @@ const AuthPage = () => {
                         label="Password"
                         error={loginErrors.password}
                         rightLabel={
-                          <span className="text-[11px] font-mono text-[var(--wl-muted)] hover:text-lime-400 cursor-pointer transition-colors">
+                          <span className="text-[11px] font-medium text-[var(--wl-muted)] hover:text-lime-600 dark:hover:text-lime-400 cursor-pointer transition-colors">
                             Forgot?
                           </span>
                         }
@@ -841,10 +835,6 @@ const AuthPage = () => {
                     ) : (
                       <>
                         <div className="mb-5">
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-lime-400/10 border border-lime-400/25 text-[10px] font-mono uppercase tracking-widest text-lime-400 mb-2">
-                            <Sparkles className="w-3 h-3" />
-                            <span>Invite-Only Onboarding</span>
-                          </div>
                           <h2 className="text-2xl font-bold text-[var(--wl-fg)] tracking-tight font-heading">
                             Activate Account
                           </h2>
@@ -859,7 +849,7 @@ const AuthPage = () => {
                             label="Invite / Activation Code"
                             error={actErrors.inviteCode}
                             rightLabel={
-                              <span className="text-[10px] font-mono text-[var(--wl-faint)]">
+                              <span className="text-[11px] font-medium text-[var(--wl-faint)]">
                                 6-Digit / Token
                               </span>
                             }
@@ -883,7 +873,7 @@ const AuthPage = () => {
                             error={actErrors.email}
                             rightLabel={
                               initialEmail ? (
-                                <span className="text-[10px] font-mono text-lime-400">
+                                <span className="text-[11px] font-medium text-lime-600 dark:text-lime-400">
                                   Pre-filled
                                 </span>
                               ) : null
@@ -932,11 +922,11 @@ const AuthPage = () => {
                             error={actErrors.confirmPassword}
                             rightLabel={
                               isPasswordMatch ? (
-                                <span className="text-[10px] font-mono text-lime-400 flex items-center gap-1">
+                                <span className="text-[11px] font-medium text-lime-600 dark:text-lime-400 flex items-center gap-1">
                                   <Check className="w-3 h-3" /> Match
                                 </span>
                               ) : isPasswordMismatch ? (
-                                <span className="text-[10px] font-mono text-rose-400 flex items-center gap-1">
+                                <span className="text-[11px] font-medium text-rose-500 flex items-center gap-1">
                                   Mismatch
                                 </span>
                               ) : null
