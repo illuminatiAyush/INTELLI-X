@@ -40,6 +40,7 @@ import JoinBatch from './pages/dashboard/JoinBatch'
 import ActiveTestsPage from './pages/dashboard/ActiveTestsPage'
 import TestAttemptPage from './pages/dashboard/TestAttemptPage'
 import LecturesPage from './pages/dashboard/LecturesPage'
+import NoticesPage from './pages/dashboard/NoticesPage'
 import IntelliXDemo from './demo/IntelliXDemo'
 
 const Preloader = ({ onComplete }) => {
@@ -151,18 +152,21 @@ const AppContent = () => {
         <Route path="institutes" element={<ProtectedRoute allowedRoles={['master_admin']}><InstitutesPage /></ProtectedRoute>} />
         <Route path="teachers" element={<ProtectedRoute allowedRoles={['admin', 'master_admin']}><TeachersPage /></ProtectedRoute>} />
         <Route path="subscriptions" element={<ProtectedRoute allowedRoles={['admin', 'master_admin']}><SubscriptionsPage /></ProtectedRoute>} />
-        <Route path="logs" element={<ProtectedRoute allowedRoles={['master_admin']}><LogsPage /></ProtectedRoute>} />
+        <Route path="logs" element={<ProtectedRoute allowedRoles={['admin', 'master_admin']}><LogsPage /></ProtectedRoute>} />
         
         {/* Common Dashboard Routes */}
         <Route path="students" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'master_admin']}><StudentsPage /></ProtectedRoute>} />
         <Route path="batches" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><BatchesPage /></ProtectedRoute>} />
-        <Route path="attendance" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><AttendancePage /></ProtectedRoute>} />
+        <Route path="schedule" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><LecturesPage /></ProtectedRoute>} />
         <Route path="lectures" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><LecturesPage /></ProtectedRoute>} />
+        <Route path="attendance" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><AttendancePage /></ProtectedRoute>} />
+        <Route path="notices" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><NoticesPage /></ProtectedRoute>} />
+        <Route path="resources" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><MaterialsPage /></ProtectedRoute>} />
+        <Route path="materials" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><MaterialsPage /></ProtectedRoute>} />
+        <Route path="analytics" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><AnalyticsPage /></ProtectedRoute>} />
         <Route path="tests" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student']}><TestsPage /></ProtectedRoute>} />
         <Route path="results" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><ResultsPage /></ProtectedRoute>} />
         <Route path="leaderboard" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><LeaderboardPage /></ProtectedRoute>} />
-        <Route path="materials" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><MaterialsPage /></ProtectedRoute>} />
-        <Route path="analytics" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><AnalyticsPage /></ProtectedRoute>} />
         <Route path="settings" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><SettingsPage /></ProtectedRoute>} />
         <Route path="profile" element={<ProtectedRoute allowedRoles={['admin', 'teacher', 'student', 'master_admin']}><ProfilePage /></ProtectedRoute>} />
         

@@ -1,60 +1,58 @@
 import {
   LayoutDashboard,
-  Users,
-  FileText,
+  Layers,
+  Calendar,
+  ClipboardCheck,
+  Megaphone,
   BookOpen,
   PieChart,
+  Activity,
   Settings,
-  Layers,
-  HelpCircle,
   Video,
-  ClipboardCheck
+  FileText,
+  Users,
 } from 'lucide-react'
 
 const navConfig = {
   master_admin: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { label: 'Batches', path: '/dashboard/batches', icon: Layers }, // Includes Institutes, Teachers, Students
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers },
+    { label: 'Schedule', path: '/dashboard/schedule', icon: Calendar },
     { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck },
-    { label: 'Lectures', path: '/dashboard/lectures', icon: Video },
-    { label: 'Tests', path: '/dashboard/tests', icon: FileText },
+    { label: 'Notices', path: '/dashboard/notices', icon: Megaphone },
+    { label: 'Resources', path: '/dashboard/resources', icon: BookOpen },
     { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart },
-    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
-
-    { label: 'Settings', path: '/dashboard/settings', icon: Settings }, // Includes Logs, Subscriptions
+    { label: 'Activity Log', path: '/dashboard/logs', icon: Activity },
   ],
   admin: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { label: 'Batches', path: '/dashboard/batches', icon: Layers }, // Hub for Students, Teachers
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers },
+    { label: 'Schedule', path: '/dashboard/schedule', icon: Calendar },
     { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck },
-    { label: 'Lectures', path: '/dashboard/lectures', icon: Video },
-    { label: 'Tests', path: '/dashboard/tests', icon: FileText }, // Hub for Results, Leaderboard
+    { label: 'Notices', path: '/dashboard/notices', icon: Megaphone },
+    { label: 'Resources', path: '/dashboard/resources', icon: BookOpen },
     { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart },
-    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
-
-    { label: 'Settings', path: '/dashboard/settings', icon: Settings },
+    { label: 'Activity Log', path: '/dashboard/logs', icon: Activity },
   ],
   teacher: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Batches', path: '/dashboard/batches', icon: Layers },
+    { label: 'Schedule', path: '/dashboard/schedule', icon: Calendar },
     { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck },
-    { label: 'Lectures', path: '/dashboard/lectures', icon: Video },
-    { label: 'Tests', path: '/dashboard/tests', icon: FileText },
+    { label: 'Notices', path: '/dashboard/notices', icon: Megaphone },
+    { label: 'Resources', path: '/dashboard/resources', icon: BookOpen },
     { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart },
-    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
-
-    { label: 'Settings', path: '/dashboard/profile', icon: Settings },
+    { label: 'Tests', path: '/dashboard/tests', icon: FileText },
   ],
   student: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { label: 'Batches', path: '/dashboard/batches', icon: Layers }, // Hub for "Join Batch" & My Batches
+    { label: 'Batches', path: '/dashboard/batches', icon: Layers },
+    { label: 'Schedule', path: '/dashboard/schedule', icon: Calendar },
     { label: 'Attendance', path: '/dashboard/attendance', icon: ClipboardCheck },
-    { label: 'Lectures', path: '/dashboard/lectures', icon: Video },
-    { label: 'Tests', path: '/dashboard/tests', icon: FileText }, // Hub for "Active Tests", Results, Leaderboard
+    { label: 'Notices', path: '/dashboard/notices', icon: Megaphone },
+    { label: 'Resources', path: '/dashboard/resources', icon: BookOpen },
     { label: 'Analytics', path: '/dashboard/analytics', icon: PieChart },
-    { label: 'Materials', path: '/dashboard/materials', icon: BookOpen },
-
-    { label: 'Settings', path: '/dashboard/profile', icon: Settings },
+    { label: 'Tests', path: '/dashboard/tests', icon: FileText },
   ],
 }
 

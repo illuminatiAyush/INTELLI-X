@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import navConfig from '../../config/navConfig'
-import { LogOut, Menu, Bell, Sun, Moon, ChevronRight } from 'lucide-react'
+import { LogOut, Menu, Bell, Sun, Moon, ChevronRight, Settings } from 'lucide-react'
 import NotificationsMenu from '../NotificationsMenu'
 import AIChatbot from './AIChatbot'
 import { DashboardSkeleton } from '../ui/Skeletons'
@@ -88,6 +88,20 @@ const DashboardLayout = () => {
           })}
         </div>
       </nav>
+
+      {/* Pinned Settings Item */}
+      <div className="p-2 border-t border-dashboard-border">
+        <NavLink
+          to="/dashboard/settings"
+          onClick={() => setMobileOpen(false)}
+          title={collapsed && isDesktop ? 'Settings' : ''}
+        >
+          <div className={`dashboard-nav-item ${currentPath.startsWith('/dashboard/settings') ? 'active' : ''} ${collapsed && isDesktop ? 'justify-center !mx-2 !px-2' : ''}`}>
+            <Settings size={18} strokeWidth={2} className="shrink-0" />
+            {!collapsed && <span className="truncate">Settings</span>}
+          </div>
+        </NavLink>
+      </div>
 
       {/* User footer */}
       <div className="p-3 border-t border-dashboard-border">
