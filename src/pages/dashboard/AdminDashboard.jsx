@@ -124,44 +124,60 @@ const AdminDashboard = () => {
           Quick Actions
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {/* 1. Add Student — Emerald Accent */}
           <div
             onClick={() => navigate('/dashboard/students')}
-            className="quick-action-card"
+            className="quick-action-card group hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/5 dark:hover:shadow-[0_8px_24px_rgba(16,185,129,0.12)]"
           >
-            <div className="quick-action-icon">
-              <UserPlus size={24} strokeWidth={2} />
+            <div className="quick-action-icon bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-500/25 group-hover:scale-105 transition-all">
+              <UserPlus size={22} strokeWidth={2.2} />
             </div>
-            <h3 className="text-base font-semibold text-dashboard-text">Add Student</h3>
+            <h3 className="text-sm font-semibold text-dashboard-text tracking-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+              Add Student
+            </h3>
+            <p className="text-[11px] text-dashboard-text-secondary mt-0.5">Enroll new candidate</p>
           </div>
 
+          {/* 2. Add Teachers — Violet Accent */}
           <div
             onClick={() => navigate('/dashboard/teachers')}
-            className="quick-action-card"
+            className="quick-action-card group hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-500/5 dark:hover:shadow-[0_8px_24px_rgba(139,92,246,0.12)]"
           >
-            <div className="quick-action-icon">
-              <Users size={24} strokeWidth={2} />
+            <div className="quick-action-icon bg-violet-50 dark:bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-200/70 dark:border-violet-500/25 group-hover:scale-105 transition-all">
+              <Users size={22} strokeWidth={2.2} />
             </div>
-            <h3 className="text-base font-semibold text-dashboard-text">Add Teachers</h3>
+            <h3 className="text-sm font-semibold text-dashboard-text tracking-tight group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+              Add Teachers
+            </h3>
+            <p className="text-[11px] text-dashboard-text-secondary mt-0.5">Onboard faculty</p>
           </div>
 
+          {/* 3. Create Batch — Signature Theme Lime Accent */}
           <div
             onClick={() => navigate('/dashboard/batches')}
-            className="quick-action-card"
+            className="quick-action-card group hover:border-lime-500/50 dark:hover:border-lime-400/50 hover:shadow-lg hover:shadow-lime-500/10 dark:hover:shadow-[0_8px_24px_rgba(190,242,100,0.15)]"
           >
-            <div className="quick-action-icon">
-              <FolderPlus size={24} strokeWidth={2} />
+            <div className="quick-action-icon bg-lime-100/70 dark:bg-lime-400/15 text-lime-700 dark:text-lime-300 border border-lime-300 dark:border-lime-400/30 group-hover:scale-105 transition-all shadow-[0_0_12px_rgba(190,242,100,0.20)]">
+              <FolderPlus size={22} strokeWidth={2.2} />
             </div>
-            <h3 className="text-base font-semibold text-dashboard-text">Create Batch</h3>
+            <h3 className="text-sm font-semibold text-dashboard-text tracking-tight group-hover:text-lime-700 dark:group-hover:text-lime-300 transition-colors">
+              Create Batch
+            </h3>
+            <p className="text-[11px] text-dashboard-text-secondary mt-0.5">Cohort & schedule</p>
           </div>
 
+          {/* 4. Record Test — Amber Accent */}
           <div
             onClick={() => navigate('/dashboard/tests')}
-            className="quick-action-card"
+            className="quick-action-card group hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-500/5 dark:hover:shadow-[0_8px_24px_rgba(245,158,11,0.12)]"
           >
-            <div className="quick-action-icon">
-              <FileCheck size={24} strokeWidth={2} />
+            <div className="quick-action-icon bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-200/70 dark:border-amber-500/25 group-hover:scale-105 transition-all">
+              <FileCheck size={22} strokeWidth={2.2} />
             </div>
-            <h3 className="text-base font-semibold text-dashboard-text">Record Test</h3>
+            <h3 className="text-sm font-semibold text-dashboard-text tracking-tight group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+              Record Test
+            </h3>
+            <p className="text-[11px] text-dashboard-text-secondary mt-0.5">Publish test scores</p>
           </div>
         </div>
       </motion.div>
@@ -173,40 +189,55 @@ const AdminDashboard = () => {
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           
-          {/* Student Growth */}
-          <div className="dashboard-card">
+          {/* Student Growth — Sky Blue / Indigo Accent */}
+          <div className="dashboard-card hover:border-sky-500/40 transition-all">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-dashboard-text">Student Growth</h3>
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                <Users size={20} className="text-blue-600" strokeWidth={2} />
+              <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-200/70 dark:border-sky-500/20 flex items-center justify-center">
+                <Users size={19} strokeWidth={2.2} />
               </div>
             </div>
-            <div className="text-3xl font-bold text-dashboard-text mb-1">{stats.students}</div>
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold text-dashboard-text tracking-tight mb-1">{stats.students}</div>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300">
+                Enrolled
+              </span>
+            </div>
             <p className="text-xs text-dashboard-text-secondary">Total enrolled students</p>
           </div>
 
-          {/* Attendance Rate */}
-          <div className="dashboard-card">
+          {/* Attendance Rate — Theme Lime Accent */}
+          <div className="dashboard-card hover:border-lime-400/40 transition-all">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-dashboard-text">Attendance Rate</h3>
-              <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
-                <ClipboardCheck size={20} className="text-green-600" strokeWidth={2} />
+              <div className="w-10 h-10 rounded-xl bg-lime-100/70 dark:bg-lime-400/15 text-lime-700 dark:text-lime-300 border border-lime-300/70 dark:border-lime-400/25 flex items-center justify-center shadow-[0_0_10px_rgba(190,242,100,0.15)]">
+                <ClipboardCheck size={19} strokeWidth={2.2} />
               </div>
             </div>
-            <div className="text-3xl font-bold text-dashboard-text mb-1">{stats.attendance}%</div>
-            <p className="text-xs text-dashboard-text-secondary">Overall attendance</p>
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold text-dashboard-text tracking-tight mb-1">{stats.attendance}%</div>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-lime-100 dark:bg-lime-400/20 text-lime-800 dark:text-lime-300">
+                Target: 85%
+              </span>
+            </div>
+            <p className="text-xs text-dashboard-text-secondary">Overall session attendance</p>
           </div>
 
-          {/* Active Batches */}
-          <div className="dashboard-card">
+          {/* Active Batches — Fuchsia Accent */}
+          <div className="dashboard-card hover:border-fuchsia-500/40 transition-all">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-dashboard-text">Active Batches</h3>
-              <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                <Layers size={20} className="text-purple-600" strokeWidth={2} />
+              <div className="w-10 h-10 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-500/15 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-200/70 dark:border-fuchsia-500/20 flex items-center justify-center">
+                <Layers size={19} strokeWidth={2.2} />
               </div>
             </div>
-            <div className="text-3xl font-bold text-dashboard-text mb-1">{stats.batches}</div>
-            <p className="text-xs text-dashboard-text-secondary">Currently active</p>
+            <div className="flex items-baseline justify-between">
+              <div className="text-3xl font-bold text-dashboard-text tracking-tight mb-1">{stats.batches}</div>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-fuchsia-100 dark:bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300">
+                In Session
+              </span>
+            </div>
+            <p className="text-xs text-dashboard-text-secondary">Running academic cohorts</p>
           </div>
         </div>
       </motion.div>
@@ -214,7 +245,17 @@ const AdminDashboard = () => {
       {/* ── Performance Chart ── */}
       {performanceData.length > 0 && (
         <motion.div {...fadeUp(0.15)} className="dashboard-card">
-          <h3 className="text-sm font-semibold text-dashboard-text mb-6">Recent Performance Trend</h3>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-sm font-semibold text-dashboard-text">Recent Performance Trend</h3>
+              <p className="text-xs text-dashboard-text-secondary mt-0.5">Average score per examination cohort</p>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-medium text-dashboard-text-secondary">
+              <span className="w-2.5 h-2.5 rounded-full bg-lime-500 dark:bg-lime-400 shadow-[0_0_8px_rgba(190,242,100,0.5)]" />
+              <span>Score %</span>
+            </div>
+          </div>
+
           <div style={{ height: 250 }}>
             <Line
               data={{
@@ -222,14 +263,16 @@ const AdminDashboard = () => {
                 datasets: [{
                   label: 'Average Score',
                   data: performanceData.map(d => d.avg),
-                  borderColor: '#2563EB',
-                  backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                  borderWidth: 2,
-                  tension: 0.4,
+                  borderColor: isDark ? '#bef264' : '#65a30d',
+                  backgroundColor: isDark ? 'rgba(190, 242, 100, 0.12)' : 'rgba(101, 163, 13, 0.08)',
+                  borderWidth: 2.5,
+                  tension: 0.35,
                   fill: true,
-                  pointBackgroundColor: '#2563EB',
-                  pointRadius: 4,
-                  pointHoverRadius: 6,
+                  pointBackgroundColor: isDark ? '#bef264' : '#65a30d',
+                  pointBorderColor: isDark ? '#121215' : '#ffffff',
+                  pointBorderWidth: 2,
+                  pointRadius: 4.5,
+                  pointHoverRadius: 7,
                 }],
               }}
               options={{
@@ -238,10 +281,10 @@ const AdminDashboard = () => {
                 plugins: {
                   legend: { display: false },
                   tooltip: {
-                    backgroundColor: '#FFFFFF',
-                    titleColor: '#111827',
-                    bodyColor: '#6B7280',
-                    borderColor: '#E5E7EB',
+                    backgroundColor: isDark ? '#121215' : '#FFFFFF',
+                    titleColor: isDark ? '#FAFAFA' : '#111827',
+                    bodyColor: isDark ? '#A1A1AA' : '#6B7280',
+                    borderColor: isDark ? '#27272A' : '#E5E7EB',
                     borderWidth: 1,
                     padding: 12,
                     cornerRadius: 8,
@@ -255,14 +298,14 @@ const AdminDashboard = () => {
                 scales: {
                   x: { 
                     grid: { display: false }, 
-                    ticks: { color: '#6B7280', font: { size: 11, weight: '500' } },
+                    ticks: { color: isDark ? '#A1A1AA' : '#6B7280', font: { size: 11, weight: '500' } },
                     border: { display: false }
                   },
                   y: { 
                     min: 0, 
                     max: 100, 
-                    grid: { color: '#F3F4F6' }, 
-                    ticks: { color: '#6B7280', font: { size: 11, weight: '500' }, stepSize: 25 },
+                    grid: { color: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F3F4F6' }, 
+                    ticks: { color: isDark ? '#A1A1AA' : '#6B7280', font: { size: 11, weight: '500' }, stepSize: 25 },
                     border: { display: false }
                   },
                 },
