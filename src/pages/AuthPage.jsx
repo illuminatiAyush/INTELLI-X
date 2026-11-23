@@ -827,21 +827,13 @@ const AuthPage = () => {
                           <h2 className="text-2xl font-bold text-[var(--wl-fg)] tracking-tight font-heading">
                             Activate Account
                           </h2>
-                          <p className="text-xs text-[var(--wl-muted)] mt-1">
-                            Enter the code provided by your institute administrator and set your secure password.
-                          </p>
                         </div>
 
                         <form onSubmit={handleActivateSubmit} noValidate className="space-y-3.5">
                           {/* Invite Code */}
                           <Field
-                            label="Invite / Activation Code"
+                            label="Code"
                             error={actErrors.inviteCode}
-                            rightLabel={
-                              <span className="text-[11px] font-medium text-[var(--wl-faint)]">
-                                6-Digit / Token
-                              </span>
-                            }
                           >
                             <div className="relative">
                               <KeyRound className="w-4 h-4 text-[var(--wl-faint)] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
