@@ -247,12 +247,9 @@ const AdminDashboard = () => {
       {/* ── Page Header & Greeting ── */}
       <motion.div {...fadeUp()} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-dashboard-text tracking-tight mb-1 font-heading">
+          <h1 className="text-2xl sm:text-3xl font-bold text-dashboard-text tracking-tight font-heading">
             {getGreeting()}, {displayName.toLowerCase()}.
           </h1>
-          <p className="text-dashboard-text-secondary text-xs sm:text-sm font-medium">
-            Academic operations, lecture schedules & student monitoring overview.
-          </p>
         </div>
 
         {/* Header Quick Links */}
@@ -403,7 +400,6 @@ const AdminDashboard = () => {
                   <div className="w-full h-1.5 rounded-full bg-dashboard-border-light overflow-hidden">
                     <div className="h-full bg-lime-500 dark:bg-lime-400 rounded-full" style={{ width: '88.4%' }} />
                   </div>
-                  <p className="text-[10px] text-dashboard-text-muted mt-1.5">Across all scheduled sessions</p>
                 </div>
               </div>
 
@@ -421,7 +417,6 @@ const AdminDashboard = () => {
                   <div className="w-full h-1.5 rounded-full bg-dashboard-border-light overflow-hidden">
                     <div className="h-full bg-sky-500 rounded-full" style={{ width: '50%' }} />
                   </div>
-                  <p className="text-[10px] text-dashboard-text-muted mt-1.5">50% roll-calls finished</p>
                 </div>
               </div>
             </div>
@@ -470,14 +465,9 @@ const AdminDashboard = () => {
                   <div className="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-500 flex items-center justify-center">
                     <AlertCircle className="w-4 h-4" />
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-dashboard-text tracking-tight">
-                      Low Attendance Watchlist (Sub-75%)
-                    </h3>
-                    <p className="text-[11px] text-dashboard-text-secondary">
-                      Students flagged for academic risk and mandatory parent intervention.
-                    </p>
-                  </div>
+                  <h3 className="text-sm font-bold text-dashboard-text tracking-tight">
+                    Low Attendance Watchlist (Sub-75%)
+                  </h3>
                 </div>
 
                 <span className="text-xs font-mono font-semibold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-md">
@@ -537,8 +527,7 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            <div className="pt-3 mt-3 border-t border-dashboard-border flex items-center justify-between text-xs text-dashboard-text-muted">
-              <span>Threshold: Sub-75% triggers regulatory notification</span>
+            <div className="pt-3 mt-3 border-t border-dashboard-border flex items-center justify-end text-xs">
               <Link to="/dashboard/attendance" className="text-lime-600 dark:text-lime-400 font-medium hover:underline">
                 View All Roster →
               </Link>
@@ -619,8 +608,7 @@ const AdminDashboard = () => {
               })}
             </div>
 
-            <div className="pt-4 mt-4 border-t border-dashboard-border flex items-center justify-between text-xs text-dashboard-text-muted">
-              <span>Automated audit trail active</span>
+            <div className="pt-4 mt-4 border-t border-dashboard-border flex items-center justify-end text-xs">
               <Link to="/dashboard/logs" className="text-lime-600 dark:text-lime-400 font-medium hover:underline">
                 View 30-day activity →
               </Link>
