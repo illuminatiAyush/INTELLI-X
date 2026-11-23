@@ -641,46 +641,64 @@ const AuthPage = () => {
 
           {/* ══ RIGHT: Auth Terminal Card ══ */}
           <div className="w-full lg:col-span-6 max-w-md mx-auto">
-            <div className="relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] p-6 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden transition-all">
+            <motion.div
+              layout
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] p-6 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden transition-all"
+            >
               
               {/* Subtle Top Cyan/Lime Glow Line */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-lime-400 to-transparent" />
 
               {/* Segmented Mode Selector (Sign In vs Activate Account) */}
-              <div className="p-1 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] flex items-center mb-6">
+              <div className="relative p-1 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] flex items-center mb-6">
                 <button
                   type="button"
                   onClick={() => switchMode('login')}
-                  className={`flex-1 py-2 rounded-lg text-xs font-mono font-medium uppercase tracking-wider transition-all ${
+                  className={`relative flex-1 py-2.5 px-3 rounded-lg text-[13px] sm:text-sm font-semibold tracking-[-0.01em] transition-colors duration-200 z-10 flex items-center justify-center cursor-pointer select-none ${
                     mode === 'login'
-                      ? 'bg-[var(--wl-surface)] text-[var(--wl-fg)] shadow-sm border border-[var(--wl-line)]'
+                      ? 'text-[var(--wl-fg)]'
                       : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
                   }`}
                 >
-                  Sign In
+                  {mode === 'login' && (
+                    <motion.div
+                      layoutId="activeAuthTab"
+                      transition={{ type: 'spring', stiffness: 500, damping: 36 }}
+                      className="absolute inset-0 rounded-lg bg-[var(--wl-surface)] border border-[var(--wl-line)] shadow-sm"
+                    />
+                  )}
+                  <span className="relative z-10">Sign In</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => switchMode('activate')}
-                  className={`flex-1 py-2 rounded-lg text-xs font-mono font-medium uppercase tracking-wider transition-all ${
+                  className={`relative flex-1 py-2.5 px-3 rounded-lg text-[13px] sm:text-sm font-semibold tracking-[-0.01em] transition-colors duration-200 z-10 flex items-center justify-center cursor-pointer select-none ${
                     mode === 'activate'
-                      ? 'bg-[var(--wl-surface)] text-[var(--wl-fg)] shadow-sm border border-[var(--wl-line)]'
+                      ? 'text-[var(--wl-fg)]'
                       : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
                   }`}
                 >
-                  Activate Account
+                  {mode === 'activate' && (
+                    <motion.div
+                      layoutId="activeAuthTab"
+                      transition={{ type: 'spring', stiffness: 500, damping: 36 }}
+                      className="absolute inset-0 rounded-lg bg-[var(--wl-surface)] border border-[var(--wl-line)] shadow-sm"
+                    />
+                  )}
+                  <span className="relative z-10">Activate Account</span>
                 </button>
               </div>
 
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait" initial={false}>
                 {mode === 'login' ? (
                   /* ─── LOGIN VIEW ─── */
                   <motion.div
                     key="login"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
+                    initial={{ opacity: 0, x: -14, filter: 'blur(4px)' }}
+                    animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, x: 14, filter: 'blur(4px)' }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                   >
                     <div className="mb-6">
                       <h2 className="text-2xl font-bold text-[var(--wl-fg)] tracking-tight font-heading">
@@ -799,10 +817,10 @@ const AuthPage = () => {
                   /* ─── ACTIVATE ACCOUNT VIEW ─── */
                   <motion.div
                     key="activate"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
+                    initial={{ opacity: 0, x: 14, filter: 'blur(4px)' }}
+                    animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, x: -14, filter: 'blur(4px)' }}
+                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                   >
                     {actSubmitted ? (
                       <div className="py-10 flex flex-col items-center text-center space-y-3.5">
@@ -982,7 +1000,7 @@ const AuthPage = () => {
                 )}
               </AnimatePresence>
 
-            </div>
+            </motion.div>
           </div>
 
         </div>
