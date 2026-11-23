@@ -136,6 +136,7 @@ const AppContent = () => {
       <Route path="/demo" element={<IntelliXDemo />} />
       <Route path="/login" element={<AuthPage />} />
       <Route path="/register" element={<AuthPage />} />
+      <Route path="/activate" element={<AuthPage />} />
       <Route
         path="/dashboard"
         element={

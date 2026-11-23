@@ -9,15 +9,15 @@ import {
   ArrowRight,
   Sun,
   Moon,
-  GraduationCap,
-  Briefcase,
   Mail,
   Lock,
-  User,
-  Phone,
   CheckCircle2,
   ArrowLeft,
   KeyRound,
+  ShieldCheck,
+  Check,
+  AlertCircle,
+  Sparkles,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import './LandingPage.css'
@@ -66,7 +66,6 @@ function AsciiBackground() {
       ctx.clearRect(0, 0, width, height)
       ctx.font = '11px ui-monospace, "Geist Mono", monospace'
       ctx.textBaseline = 'top'
-      const midX = width / 2
 
       for (let y = 0; y < height; y += 14) {
         const rowFade = Math.max(0, 1 - y / (0.95 * height))
@@ -203,37 +202,66 @@ const AuthPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [mode, setMode] = useState(location.pathname === '/register' ? 'register' : 'login')
+  // Extract query parameters for invite link / pre-filling
+  const searchParams = new URLSearchParams(location.search)
+  const initialCode = (searchParams.get('code') || searchParams.get('invite') || '').trim()
+  const initialEmail = (searchParams.get('email') || '').trim()
+
+  const [mode, setMode] = useState(
+    location.pathname === '/register' || location.pathname === '/activate' || initialCode
+      ? 'activate'
+      : 'login'
+  )
 
   /* ── Login state ── */
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' })
+  const [loginForm, setLoginForm] = useState({ email: initialEmail, password: '' })
   const [loginLoading, setLoginLoading] = useState(false)
   const [loginSubmitted, setLoginSubmitted] = useState(false)
   const [loginErrors, setLoginErrors] = useState({})
 
-  /* ── Register state ── */
-  const [regForm, setRegForm] = useState({
-    fullName: '',
-    email: '',
+  /* ── Account Activation state ── */
+  const [actForm, setActForm] = useState({
+    inviteCode: initialCode,
+    email: initialEmail,
     password: '',
-    phone: '',
-    role: 'student',
-    instituteCode: '',
-    subject: '',
+    confirmPassword: '',
   })
-  const [regLoading, setRegLoading] = useState(false)
-  const [regSubmitted, setRegSubmitted] = useState(false)
-  const [regErrors, setRegErrors] = useState({})
+  const [actLoading, setActLoading] = useState(false)
+  const [actSubmitted, setActSubmitted] = useState(false)
+  const [actSuccessMsg, setActSuccessMsg] = useState('')
+  const [actErrors, setActErrors] = useState({})
 
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  /* sync URL */
+  /* Listen to query params changes */
   useEffect(() => {
-    const target = mode === 'login' ? '/login' : '/register'
-    if (location.pathname !== target) window.history.replaceState(null, '', target)
+    const params = new URLSearchParams(location.search)
+    const code = params.get('code') || params.get('invite')
+    const email = params.get('email')
+    if (code || email) {
+      setActForm((prev) => ({
+        ...prev,
+        inviteCode: code ? code.trim() : prev.inviteCode,
+        email: email ? email.trim() : prev.email,
+      }))
+      if (code) {
+        setMode('activate')
+      }
+    }
+  }, [location.search])
+
+  /* sync URL path */
+  useEffect(() => {
+    const currentPath = location.pathname
+    if (mode === 'login' && currentPath !== '/login') {
+      window.history.replaceState(null, '', '/login')
+    } else if (mode === 'activate' && currentPath !== '/activate' && currentPath !== '/register') {
+      window.history.replaceState(null, '', '/activate')
+    }
   }, [mode, location.pathname])
 
-  /* redirect after login */
+  /* redirect after login or activation */
   useEffect(() => {
     if (loginSubmitted && role && user) {
       const code = sessionStorage.getItem('pendingJoinCode')
@@ -248,8 +276,9 @@ const AuthPage = () => {
 
   const switchMode = (m) => {
     setShowPassword(false)
+    setShowConfirmPassword(false)
     setLoginErrors({})
-    setRegErrors({})
+    setActErrors({})
     setMode(m)
   }
 
@@ -278,7 +307,7 @@ const AuthPage = () => {
     setLoginLoading(true)
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: loginForm.email,
+        email: loginForm.email.trim(),
         password: loginForm.password,
       })
       if (error) {
@@ -294,80 +323,217 @@ const AuthPage = () => {
     }
   }
 
-  /* ── Register handlers ── */
-  const validateRegister = () => {
+  /* ── Activate handlers ── */
+  const validateActivate = () => {
     const e = {}
-    if (!regForm.fullName.trim()) e.fullName = 'Full name is required'
-    if (!regForm.email.trim()) e.email = 'Email is required'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(regForm.email)) e.email = 'Enter a valid email address'
-    if (!regForm.password) e.password = 'Password is required'
-    else if (regForm.password.length < 6) e.password = 'Minimum 6 characters'
-    if (!regForm.phone.trim()) e.phone = 'Phone number is required'
-    else if (!/^\+?[\d\s\-]{10,15}$/.test(regForm.phone.trim())) e.phone = 'Enter a valid phone number'
-    if (!regForm.instituteCode.trim()) e.instituteCode = 'Institute code is required'
-    if (regForm.role === 'teacher' && !regForm.subject.trim()) e.subject = 'Subject is required'
+    const code = actForm.inviteCode.trim()
+    if (!code) {
+      e.inviteCode = 'Invite code or link token is required'
+    } else if (code.length < 4) {
+      e.inviteCode = 'Invite code must be at least 4 characters'
+    }
+
+    if (!actForm.email.trim()) {
+      e.email = 'Email address is required'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(actForm.email)) {
+      e.email = 'Enter a valid email address'
+    }
+
+    if (!actForm.password) {
+      e.password = 'Password is required'
+    } else if (actForm.password.length < 6) {
+      e.password = 'Minimum 6 characters required'
+    }
+
+    if (!actForm.confirmPassword) {
+      e.confirmPassword = 'Confirm your password'
+    } else if (actForm.password !== actForm.confirmPassword) {
+      e.confirmPassword = 'Passwords do not match'
+    }
+
     return e
   }
 
-  const handleRegChange = (e) => {
-    setRegForm((p) => ({ ...p, [e.target.name]: e.target.value }))
-    if (regErrors[e.target.name]) setRegErrors((p) => ({ ...p, [e.target.name]: '' }))
+  const handleActChange = (e) => {
+    const { name, value } = e.target
+    setActForm((p) => ({ ...p, [name]: value }))
+    if (actErrors[name]) setActErrors((p) => ({ ...p, [name]: '' }))
   }
 
-  const handleRoleSelect = (r) => {
-    setRegForm((p) => ({ ...p, role: r, subject: r === 'student' ? '' : p.subject }))
-  }
-
-  const handleRegSubmit = async (e) => {
+  const handleActivateSubmit = async (e) => {
     e.preventDefault()
-    const errs = validateRegister()
+    const errs = validateActivate()
     if (Object.keys(errs).length) {
-      setRegErrors(errs)
+      setActErrors(errs)
       return
     }
-    setRegLoading(true)
+
+    setActLoading(true)
+    const cleanCode = actForm.inviteCode.trim().toUpperCase()
+    const cleanEmail = actForm.email.trim().toLowerCase()
+
     try {
-      const { data: institute, error: instError } = await supabase
-        .rpc('get_institute_by_code', { code: regForm.instituteCode.toUpperCase() })
-        .single()
-      if (instError || !institute) {
-        setRegErrors({ instituteCode: 'Invalid institute code. Check with your administrator.' })
-        setRegLoading(false)
+      let instituteId = null
+      let batchId = null
+      let assignedRole = 'student'
+
+      // Check institute join code RPC
+      const { data: instData } = await supabase
+        .rpc('get_institute_by_code', { code: cleanCode })
+        .maybeSingle()
+
+      if (instData?.id) {
+        instituteId = instData.id
+      } else {
+        // Check batch join code
+        const { data: batchData } = await supabase
+          .from('batches')
+          .select('id, name, institute_id')
+          .eq('join_code', cleanCode)
+          .maybeSingle()
+
+        if (batchData?.id) {
+          batchId = batchData.id
+          instituteId = batchData.institute_id
+        } else {
+          // Check institutes table directly
+          const { data: instDirect } = await supabase
+            .from('institutes')
+            .select('id, name')
+            .eq('join_code', cleanCode)
+            .maybeSingle()
+
+          if (instDirect?.id) {
+            instituteId = instDirect.id
+          }
+        }
+      }
+
+      // Check pre-registered student/teacher rosters
+      if (!instituteId) {
+        const { data: existingStudent } = await supabase
+          .from('students')
+          .select('id, institute_id')
+          .eq('email', cleanEmail)
+          .maybeSingle()
+
+        if (existingStudent?.institute_id) {
+          instituteId = existingStudent.institute_id
+          assignedRole = 'student'
+        } else {
+          const { data: existingTeacher } = await supabase
+            .from('teachers')
+            .select('id, institute_id')
+            .eq('email', cleanEmail)
+            .maybeSingle()
+
+          if (existingTeacher?.institute_id) {
+            instituteId = existingTeacher.institute_id
+            assignedRole = 'teacher'
+          }
+        }
+      }
+
+      // If code verification failed
+      if (!instituteId) {
+        setActErrors({
+          inviteCode: 'Invalid or unverified invite code. Please contact your institute administrator.',
+        })
+        setActLoading(false)
         return
       }
-      const { error: authError } = await supabase.auth.signUp({
-        email: regForm.email,
-        password: regForm.password,
+
+      // Perform user activation / sign up
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: cleanEmail,
+        password: actForm.password,
         options: {
           data: {
-            role: regForm.role,
-            first_name: regForm.fullName,
-            institute_id: institute.id,
-            phone: regForm.phone.trim(),
-            ...(regForm.role === 'teacher' && { subject: regForm.subject.trim() }),
+            role: assignedRole,
+            institute_id: instituteId,
+            invite_code: cleanCode,
+            activated: true,
+            activated_at: new Date().toISOString(),
           },
         },
       })
+
       if (authError) {
-        setRegErrors({ email: authError.message })
-        setRegLoading(false)
-        return
+        if (
+          authError.message.includes('already registered') ||
+          authError.message.includes('User already registered')
+        ) {
+          // Check if user credentials authenticate
+          const { error: signInErr } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password: actForm.password,
+          })
+          if (!signInErr) {
+            setActSuccessMsg('Account already activated! Establishing session…')
+            setActSubmitted(true)
+            setTimeout(() => {
+              navigate('/dashboard')
+            }, 1200)
+            return
+          } else {
+            setActErrors({
+              email:
+                'This account is already registered. Please Sign In, or use password reset if forgotten.',
+            })
+            setActLoading(false)
+            return
+          }
+        } else {
+          setActErrors({ email: authError.message })
+          setActLoading(false)
+          return
+        }
       }
-      setRegSubmitted(true)
+
+      if (batchId) {
+        sessionStorage.setItem('pendingJoinCode', cleanCode)
+      }
+
+      setActSuccessMsg('Account activated! Establishing workspace session…')
+      setActSubmitted(true)
+
+      // Auto sign-in if session was not automatically populated
+      if (!authData.session) {
+        await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: actForm.password,
+        })
+      }
+
       setTimeout(() => {
-        switchMode('login')
-        setRegSubmitted(false)
-        setRegLoading(false)
-      }, 2500)
+        const pendingCode = sessionStorage.getItem('pendingJoinCode')
+        if (pendingCode) {
+          sessionStorage.removeItem('pendingJoinCode')
+          navigate(`/dashboard/join/${pendingCode}`)
+        } else {
+          navigate('/dashboard')
+        }
+      }, 1600)
     } catch {
-      setRegErrors({ email: 'An unexpected error occurred during account creation.' })
-      setRegLoading(false)
+      setActErrors({
+        inviteCode: 'An unexpected error occurred during account activation.',
+      })
+      setActLoading(false)
     }
   }
 
   const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({ provider: 'google' })
   }
+
+  const isPasswordMatch =
+    actForm.confirmPassword.length > 0 &&
+    actForm.password.length >= 6 &&
+    actForm.password === actForm.confirmPassword
+
+  const isPasswordMismatch =
+    actForm.confirmPassword.length > 0 &&
+    actForm.password !== actForm.confirmPassword
 
   return (
     <div className={`landing-page-root min-h-screen flex flex-col justify-between ${isDark ? 'dark' : 'light'} relative selection:bg-lime-400/20 selection:text-lime-400 overflow-x-hidden`}>
@@ -430,12 +596,17 @@ const AuthPage = () => {
           <div className="hidden lg:flex lg:col-span-6 flex-col justify-center space-y-6 pr-6">
             
             <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-400/10 border border-lime-400/25 text-[11px] font-mono uppercase tracking-wider text-lime-400">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Invite-Only Architecture</span>
+              </div>
+
               <h1 className="text-4xl sm:text-5xl font-light text-[var(--wl-fg)] tracking-tight leading-[1.12] font-heading">
                 The <span className="font-editorial-italic font-normal text-lime-400">intelligent</span> command center for modern institutes.
               </h1>
 
               <p className="text-sm text-[var(--wl-muted)] leading-relaxed max-w-md">
-                Autonomous attendance tracking, algorithmic marksheet generation, and automated parent communication in one unified, real-time interface.
+                Autonomous attendance tracking, algorithmic marksheet generation, and automated parent communication in one unified, single-institute interface.
               </p>
             </div>
 
@@ -447,12 +618,23 @@ const AuthPage = () => {
               </span>
               <span className="inline-flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-lime-400" />
-                Automated Dispatches
+                Zero Public Signups
               </span>
               <span className="inline-flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
                 Encrypted Gradebooks
               </span>
+            </div>
+
+            {/* Security Notice Card */}
+            <div className="p-4 rounded-xl bg-[var(--wl-surface)] border border-[var(--wl-line)] max-w-md text-xs text-[var(--wl-muted)] space-y-2">
+              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-[var(--wl-fg)] font-medium">
+                <KeyRound className="w-3.5 h-3.5 text-lime-400" />
+                Admin Provisioned Access
+              </div>
+              <p className="leading-relaxed">
+                To protect student data integrity and institute privacy, accounts cannot be registered publicly. Enter the activation code supplied in your onboarding invitation.
+              </p>
             </div>
 
           </div>
@@ -461,10 +643,10 @@ const AuthPage = () => {
           <div className="w-full lg:col-span-6 max-w-md mx-auto">
             <div className="relative rounded-2xl bg-[var(--wl-surface)] border border-[var(--wl-line)] p-6 sm:p-8 shadow-2xl backdrop-blur-xl overflow-hidden transition-all">
               
-              {/* Subtle Top Cyan/Blue Glow Line */}
+              {/* Subtle Top Cyan/Lime Glow Line */}
               <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-lime-400 to-transparent" />
 
-              {/* Segmented Mode Selector (Sign In vs Create Account) */}
+              {/* Segmented Mode Selector (Sign In vs Activate Account) */}
               <div className="p-1 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)] flex items-center mb-6">
                 <button
                   type="button"
@@ -479,14 +661,14 @@ const AuthPage = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => switchMode('register')}
+                  onClick={() => switchMode('activate')}
                   className={`flex-1 py-2 rounded-lg text-xs font-mono font-medium uppercase tracking-wider transition-all ${
-                    mode === 'register'
+                    mode === 'activate'
                       ? 'bg-[var(--wl-surface)] text-[var(--wl-fg)] shadow-sm border border-[var(--wl-line)]'
                       : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
                   }`}
                 >
-                  Create Account
+                  Activate Account
                 </button>
               </div>
 
@@ -561,11 +743,11 @@ const AuthPage = () => {
                       <button
                         type="submit"
                         disabled={loginLoading}
-                        className="w-full h-11 bg-lime-400 hover:bg-lime-300 active:scale-[0.99] text-zinc-950 font-bold shadow-[0_0_20px_rgba(190,242,100,0.35)] font-medium text-xs rounded-xl transition-all shadow-lg shadow-lime-400/25 flex items-center justify-center gap-2 group tracking-wider uppercase font-mono mt-2"
+                        className="w-full h-11 bg-lime-400 hover:bg-lime-300 active:scale-[0.99] text-zinc-950 font-bold shadow-[0_0_20px_rgba(190,242,100,0.35)] text-xs rounded-xl transition-all shadow-lg shadow-lime-400/25 flex items-center justify-center gap-2 group tracking-wider uppercase font-mono mt-2"
                       >
                         {loginLoading ? (
                           <>
-                            <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin shrink-0" />
+                            <span className="w-4 h-4 rounded-full border-2 border-zinc-950/30 border-t-zinc-950 animate-spin shrink-0" />
                             <span>Authenticating…</span>
                           </>
                         ) : (
@@ -601,188 +783,120 @@ const AuthPage = () => {
                       <span>Continue with Google</span>
                     </button>
 
-                    {/* Bottom Helper */}
+                    {/* Bottom Switch to Activate */}
                     <p className="mt-5 text-center text-xs text-[var(--wl-muted)]">
-                      New to the platform?{' '}
+                      Received an invitation code?{' '}
                       <button
                         type="button"
-                        onClick={() => switchMode('register')}
+                        onClick={() => switchMode('activate')}
                         className="font-medium text-lime-400 hover:text-lime-300 transition-colors"
                       >
-                        Create an account
+                        Activate your account
                       </button>
                     </p>
                   </motion.div>
                 ) : (
-                  /* ─── REGISTER VIEW ─── */
+                  /* ─── ACTIVATE ACCOUNT VIEW ─── */
                   <motion.div
-                    key="register"
+                    key="activate"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {regSubmitted ? (
-                      <div className="py-12 flex flex-col items-center text-center space-y-3">
-                        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center justify-center">
-                          <CheckCircle2 className="w-6 h-6" />
+                    {actSubmitted ? (
+                      <div className="py-10 flex flex-col items-center text-center space-y-3.5">
+                        <div className="w-14 h-14 rounded-full bg-lime-400/15 border border-lime-400/30 text-lime-400 flex items-center justify-center shadow-lg shadow-lime-400/10">
+                          <CheckCircle2 className="w-7 h-7" />
                         </div>
                         <h3 className="text-xl font-bold text-[var(--wl-fg)] font-heading">
-                          Account Created
+                          Account Activated!
                         </h3>
-                        <p className="text-xs text-[var(--wl-muted)] max-w-xs">
-                          Your profile has been verified and synced with your institute. Redirecting to terminal…
+                        <p className="text-xs text-[var(--wl-muted)] max-w-xs leading-relaxed">
+                          {actSuccessMsg || 'Your profile has been authenticated and linked with your institute.'}
                         </p>
+                        <div className="pt-2 flex items-center gap-2 text-[11px] font-mono text-lime-400">
+                          <span className="w-2 h-2 rounded-full bg-lime-400 animate-ping" />
+                          <span>Routing to workspace…</span>
+                        </div>
                       </div>
                     ) : (
                       <>
                         <div className="mb-5">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-lime-400/10 border border-lime-400/25 text-[10px] font-mono uppercase tracking-widest text-lime-400 mb-2">
+                            <Sparkles className="w-3 h-3" />
+                            <span>Invite-Only Onboarding</span>
+                          </div>
                           <h2 className="text-2xl font-bold text-[var(--wl-fg)] tracking-tight font-heading">
-                            Initialize Sync
+                            Activate Account
                           </h2>
                           <p className="text-xs text-[var(--wl-muted)] mt-1">
-                            Link your profile with your institute code to join your cohort.
+                            Enter the code provided by your institute administrator and set your secure password.
                           </p>
                         </div>
 
-                        <form onSubmit={handleRegSubmit} noValidate className="space-y-3.5">
-                          {/* Role Selector Pill */}
-                          <div className="space-y-1.5">
-                            <label className="text-[11px] font-mono uppercase tracking-wider text-[var(--wl-muted)] font-medium">
-                              Select Role
-                            </label>
-                            <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-[var(--wl-surface-2)] border border-[var(--wl-line)]">
-                              <button
-                                type="button"
-                                onClick={() => handleRoleSelect('student')}
-                                className={`flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-mono font-medium transition-all ${
-                                  regForm.role === 'student'
-                                    ? 'bg-[var(--wl-surface)] text-lime-400 shadow-sm border border-[var(--wl-line)]'
-                                    : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
-                                }`}
-                              >
-                                <GraduationCap className="w-3.5 h-3.5" />
-                                Student
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleRoleSelect('teacher')}
-                                className={`flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-mono font-medium transition-all ${
-                                  regForm.role === 'teacher'
-                                    ? 'bg-[var(--wl-surface)] text-lime-400 shadow-sm border border-[var(--wl-line)]'
-                                    : 'text-[var(--wl-muted)] hover:text-[var(--wl-fg)]'
-                                }`}
-                              >
-                                <Briefcase className="w-3.5 h-3.5" />
-                                Teacher
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Institute Code */}
+                        <form onSubmit={handleActivateSubmit} noValidate className="space-y-3.5">
+                          {/* Invite Code */}
                           <Field
-                            label="Institute Code"
-                            error={regErrors.instituteCode}
+                            label="Invite / Activation Code"
+                            error={actErrors.inviteCode}
                             rightLabel={
                               <span className="text-[10px] font-mono text-[var(--wl-faint)]">
-                                Provided by Admin
+                                6-Digit / Token
                               </span>
                             }
                           >
                             <div className="relative">
                               <KeyRound className="w-4 h-4 text-[var(--wl-faint)] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                               <input
-                                name="instituteCode"
+                                name="inviteCode"
                                 type="text"
-                                value={regForm.instituteCode}
-                                onChange={handleRegChange}
-                                placeholder="e.g. APEX01"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm font-mono tracking-widest uppercase text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
+                                value={actForm.inviteCode}
+                                onChange={handleActChange}
+                                placeholder="e.g. 7X92KL or INVITE-CODE"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2.5 text-sm font-mono tracking-widest uppercase text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
                               />
                             </div>
                           </Field>
 
-                          {/* Teacher Subject (Conditional) */}
-                          <AnimatePresence>
-                            {regForm.role === 'teacher' && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="overflow-hidden"
-                              >
-                                <Field label="Subject You Teach" error={regErrors.subject}>
-                                  <input
-                                    name="subject"
-                                    type="text"
-                                    value={regForm.subject}
-                                    onChange={handleRegChange}
-                                    placeholder="e.g. Physics / Mathematics"
-                                    className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all"
-                                  />
-                                </Field>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-
-                          {/* Full Name */}
-                          <Field label="Full Name" error={regErrors.fullName}>
-                            <div className="relative">
-                              <User className="w-4 h-4 text-[var(--wl-faint)] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                              <input
-                                name="fullName"
-                                type="text"
-                                value={regForm.fullName}
-                                onChange={handleRegChange}
-                                placeholder="Aarav Sharma"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
-                              />
-                            </div>
-                          </Field>
-
-                          {/* Phone Number */}
-                          <Field label="Phone (WhatsApp Alerts)" error={regErrors.phone}>
-                            <div className="relative">
-                              <Phone className="w-4 h-4 text-[var(--wl-faint)] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                              <input
-                                name="phone"
-                                type="tel"
-                                value={regForm.phone}
-                                onChange={handleRegChange}
-                                placeholder="+91 98765 43210"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
-                              />
-                            </div>
-                          </Field>
-
-                          {/* Email */}
-                          <Field label="Email Address" error={regErrors.email}>
+                          {/* Email Address */}
+                          <Field
+                            label="Registered Email"
+                            error={actErrors.email}
+                            rightLabel={
+                              initialEmail ? (
+                                <span className="text-[10px] font-mono text-lime-400">
+                                  Pre-filled
+                                </span>
+                              ) : null
+                            }
+                          >
                             <div className="relative">
                               <Mail className="w-4 h-4 text-[var(--wl-faint)] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                               <input
                                 name="email"
                                 type="email"
                                 autoComplete="email"
-                                value={regForm.email}
-                                onChange={handleRegChange}
-                                placeholder="name@institute.com"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
+                                value={actForm.email}
+                                onChange={handleActChange}
+                                placeholder="student@institute.com"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2.5 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10"
                               />
                             </div>
                           </Field>
 
-                          {/* Password */}
-                          <Field label="Create Password" error={regErrors.password}>
+                          {/* Create Password */}
+                          <Field label="Create Password" error={actErrors.password}>
                             <div className="relative">
                               <Lock className="w-4 h-4 text-[var(--wl-faint)] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                               <input
                                 name="password"
                                 type={showPassword ? 'text' : 'password'}
                                 autoComplete="new-password"
-                                value={regForm.password}
-                                onChange={handleRegChange}
+                                value={actForm.password}
+                                onChange={handleActChange}
                                 placeholder="Min 6 characters"
-                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10 pr-10"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2.5 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10 pr-10"
                               />
                               <button
                                 type="button"
@@ -794,29 +908,66 @@ const AuthPage = () => {
                             </div>
                           </Field>
 
+                          {/* Confirm Password */}
+                          <Field
+                            label="Confirm Password"
+                            error={actErrors.confirmPassword}
+                            rightLabel={
+                              isPasswordMatch ? (
+                                <span className="text-[10px] font-mono text-lime-400 flex items-center gap-1">
+                                  <Check className="w-3 h-3" /> Match
+                                </span>
+                              ) : isPasswordMismatch ? (
+                                <span className="text-[10px] font-mono text-rose-400 flex items-center gap-1">
+                                  Mismatch
+                                </span>
+                              ) : null
+                            }
+                          >
+                            <div className="relative">
+                              <ShieldCheck className="w-4 h-4 text-[var(--wl-faint)] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                              <input
+                                name="confirmPassword"
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                autoComplete="new-password"
+                                value={actForm.confirmPassword}
+                                onChange={handleActChange}
+                                placeholder="Re-enter password"
+                                className="w-full bg-[var(--wl-surface-2)] border border-[var(--wl-line)] rounded-xl px-4 py-2.5 text-sm text-[var(--wl-fg)] placeholder:text-[var(--wl-faint)] focus:outline-none focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 transition-all pl-10 pr-10"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword((v) => !v)}
+                                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--wl-faint)] hover:text-[var(--wl-fg)] transition-colors"
+                              >
+                                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </button>
+                            </div>
+                          </Field>
+
                           {/* Submit Button */}
                           <button
                             type="submit"
-                            disabled={regLoading}
-                            className="w-full h-11 bg-lime-400 hover:bg-lime-300 active:scale-[0.99] text-zinc-950 font-bold shadow-[0_0_20px_rgba(190,242,100,0.35)] font-medium text-xs rounded-xl transition-all shadow-lg shadow-lime-400/25 flex items-center justify-center gap-2 group tracking-wider uppercase font-mono mt-3"
+                            disabled={actLoading}
+                            className="w-full h-11 bg-lime-400 hover:bg-lime-300 active:scale-[0.99] text-zinc-950 font-bold shadow-[0_0_20px_rgba(190,242,100,0.35)] text-xs rounded-xl transition-all shadow-lg shadow-lime-400/25 flex items-center justify-center gap-2 group tracking-wider uppercase font-mono mt-3"
                           >
-                            {regLoading ? (
+                            {actLoading ? (
                               <>
-                                <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin shrink-0" />
-                                <span>Creating Account…</span>
+                                <span className="w-4 h-4 rounded-full border-2 border-zinc-950/30 border-t-zinc-950 animate-spin shrink-0" />
+                                <span>Activating Account…</span>
                               </>
                             ) : (
                               <>
-                                <span>Initialize Sync</span>
+                                <span>Activate & Enter Workspace</span>
                                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                               </>
                             )}
                           </button>
                         </form>
 
-                        {/* Bottom Helper */}
+                        {/* Bottom Switch back to Login */}
                         <p className="mt-4 text-center text-xs text-[var(--wl-muted)]">
-                          Already have an account?{' '}
+                          Already activated your account?{' '}
                           <button
                             type="button"
                             onClick={() => switchMode('login')}
